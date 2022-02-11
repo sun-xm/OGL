@@ -3,7 +3,6 @@ project(Shapes)
 
 add_compile_definitions(WIN32 _WINDOWS _UNICODE UNICODE)
 add_link_options(/SUBSYSTEM:WINDOWS)
-add_link_options(/DYNAMICBASE "opengl32.lib" "glu32.lib" "glew32.lib" "gdiplus.lib" "kernel32.lib" "user32.lib" "gdi32.lib" "winspool.lib" "comdlg32.lib" "advapi32.lib" "shell32.lib" "ole32.lib" "oleaut32.lib" "uuid.lib" "odbc32.lib" "odbccp32.lib")
 
 add_executable(${PROJECT_NAME}
                ${GUI_CPP}
@@ -20,6 +19,7 @@ add_executable(${PROJECT_NAME}
                Sphere.cpp
                Donut.cpp
                Shapes.rc)
+target_link_libraries(${PROJECT_NAME} opengl32.lib glu32.lib glew32.lib gdiplus.lib)
 
 add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
                    COMMAND ${CMAKE_COMMAND} -E copy_if_different "${GLEW_DIR}/bin/${CMAKE_VS_PLATFORM_NAME}/glew32.dll" "${CMAKE_CURRENT_BINARY_DIR}/$<CONFIG>/"
