@@ -15,6 +15,5 @@ target_link_libraries(${PROJECT_NAME} opengl32.lib glu32.lib glew32.lib)
 
 add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
                    COMMAND ${CMAKE_COMMAND} -E copy_if_different "${GLEW_DIR}/bin/${CMAKE_VS_PLATFORM_NAME}/glew32.dll" "${CMAKE_CURRENT_BINARY_DIR}/$<CONFIG>/"
-                   COMMAND ${CMAKE_COMMAND} -E copy_if_different "${CMAKE_CURRENT_LIST_DIR}/VertexShader.txt" "${CMAKE_CURRENT_BINARY_DIR}/$<CONFIG>/"
-                   COMMAND ${CMAKE_COMMAND} -E copy_if_different "${CMAKE_CURRENT_LIST_DIR}/FragmentShader0.txt" "${CMAKE_CURRENT_BINARY_DIR}/$<CONFIG>/"
-                   COMMAND ${CMAKE_COMMAND} -E copy_if_different "${CMAKE_CURRENT_LIST_DIR}/FragmentShader1.txt" "${CMAKE_CURRENT_BINARY_DIR}/$<CONFIG>/")
+                   COMMAND ${CMAKE_COMMAND} -E copy_if_different "${CMAKE_CURRENT_LIST_DIR}/VertexShader.glsl" "${CMAKE_CURRENT_BINARY_DIR}/$<CONFIG>/"
+                   COMMAND ${CMAKE_COMMAND} -E copy_if_different "${CMAKE_CURRENT_LIST_DIR}/FragmentShader.glsl" "${CMAKE_CURRENT_BINARY_DIR}/$<CONFIG>/")

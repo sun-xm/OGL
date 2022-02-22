@@ -89,17 +89,17 @@ void GLCamera::Clip(const Vector<float, 2>& clip)
     this->clip = clip;
 }
 
-Vector<float, 3> GLCamera::Position() const
+const Vector<float, 3>& GLCamera::Position() const
 {
     return this->position;
 }
 
-Vector<float, 3> GLCamera::LookAt() const
+const Vector<float, 3>& GLCamera::LookAt() const
 {
     return this->lookAt;
 }
 
-Vector<float, 2> GLCamera::Clip() const
+const Vector<float, 2>& GLCamera::Clip() const
 {
     return this->clip;
 }

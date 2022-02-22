@@ -8,7 +8,7 @@ class ViewPort : public GLWindow
 {
 public:
     ViewPort();
-    
+
     void CreateShape(int shape);
 
 protected:

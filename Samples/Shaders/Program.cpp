@@ -4,7 +4,7 @@
 
 using namespace std;
 
-bool Program::Create(const wstring& vshader, const wstring& fshader)
+bool Program::Create(const wstring& vshader, const wstring& fshader, string& log)
 {
     if (!GLProgram::Create())
     {
@@ -12,7 +12,6 @@ bool Program::Create(const wstring& vshader, const wstring& fshader)
     }
     ONCLEANUP(release, [this]{ this->Release(); });
 
-    string log;
     if (!this->vshader.Create(GL_VERTEX_SHADER)   || !this->vshader.Load(vshader) || !this->vshader.Compile(log) ||
         !this->fshader.Create(GL_FRAGMENT_SHADER) || !this->fshader.Load(fshader) || !this->fshader.Compile(log))
     {

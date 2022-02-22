@@ -20,9 +20,9 @@ public:
     void Clip(float near, float far);
     void Clip(const Vector<float, 2>& clip);
 
-    Vector<float, 3> Position() const;
-    Vector<float, 3> LookAt() const;
-    Vector<float, 2> Clip() const;
+    const Vector<float, 3>& Position() const;
+    const Vector<float, 3>& LookAt() const;
+    const Vector<float, 2>& Clip() const;
 
     float Rotate() const;
 

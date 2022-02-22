@@ -113,7 +113,7 @@ void GLShape::Render()
         }
 
         this->material.Revoke();
-    
+
         this->RevokeTexture();
         this->RevokeTexCoords();
         this->RevokeNormals();

@@ -102,7 +102,7 @@ size_t GLCloud::ApplyVertices()
         glEnableClientState(GL_VERTEX_ARRAY);
         return this->vbo.Size() / sizeof(Vertex);
     }
-    
+
     return 0;
 }
 

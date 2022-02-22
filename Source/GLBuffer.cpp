@@ -36,7 +36,7 @@ bool GLBuffer::Data(const void* data, GLsizeiptr size, GLenum usage)
     this->Bind();
 
     glBufferData(this->target, size, data, usage);
-    
+
     return true;
 }
 
@@ -49,6 +49,6 @@ GLint GLBuffer::Size() const
         this->Bind();
         glGetBufferParameteriv(this->target, GL_BUFFER_SIZE, &size);
     }
-    
+
     return size;
 }

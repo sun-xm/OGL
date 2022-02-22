@@ -9,7 +9,7 @@ class Viewport : public GLWindow
 {
 public:
     Viewport();
-    
+
 protected:
     bool OnCreated() override;
     void OnDestroy() override;
@@ -18,9 +18,11 @@ protected:
     bool OnContextCreated() override;
 
 private:
-    GLScene scene;
-    Program program0;
-    Program program1;
-    Triangle triangle0;
-    Triangle triangle1;
+    GLScene  scene;
+    Program  program;
+    Triangle triangle;
+
+    Vertex lightPos;
+
+    POINT pos;
 };

@@ -68,7 +68,7 @@ bool ViewPort::OnCreated()
     {
         return false;
     }
-    
+
     this->scene.Camera().Clip(0.01f, 100.f);
     this->scene.Camera().LookAt(0.f, 0.f, 0.f);
     this->scene.Camera().Position(0.f, 0.f, -2.f);

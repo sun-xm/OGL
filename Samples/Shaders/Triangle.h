@@ -10,8 +10,9 @@ public:
 
     void Create();
     void Release() override;
-    
+
     bool Colors(const Vector<float, 3>* colors, int count);
+    void Render(const Vertex& lightPos, const Matrix<float, 4>& world);
 
 protected:
     size_t ApplyVertices() override;
@@ -20,4 +21,7 @@ protected:
 
     Program& program;
     GLBuffer cbo;
+
+    Vector<float, 3> lightPos;
+    Matrix<float, 4> worldView;
 };
