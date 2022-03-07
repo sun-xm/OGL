@@ -1,6 +1,7 @@
 #pragma once
 
 #include "GLCommon.h"
+#include "GLBuffer.h"
 #include "GLShader.h"
 
 class GLProgram
@@ -16,6 +17,9 @@ public:
     void Detach(const GLShader&);
     bool Link(std::string& log);
     bool Link();
+
+    bool BindAttrib(const std::string& name, const GLBuffer& buffer, GLint size, GLenum type, GLboolean normalized = GL_FALSE, GLsizei stride = 0, const void* pointer = 0);
+    void UnbindAttrib(const std::string& name);
 
     void  BindAttribLocation(GLuint index, const std::string& name);
     GLint GetAttribLocation(const std::string& name);

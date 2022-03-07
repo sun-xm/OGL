@@ -67,6 +67,37 @@ bool GLProgram::Link()
     return !!status;
 }
 
+bool GLProgram::BindAttrib(const string& name, const GLBuffer& buffer, GLint size, GLenum type, GLboolean normalized, GLsizei stride, const void* pointer)
+{
+    auto loc = this->GetAttribLocation(name);
+    if (loc < 0)
+    {
+        return false;
+    }
+
+    if (!buffer)
+    {
+        return false;
+    }
+    buffer.Bind();
+
+    glVertexAttribPointer(loc, size, type, normalized, stride, pointer);
+    glEnableVertexAttribArray(loc);
+
+    return true;
+}
+
+void GLProgram::UnbindAttrib(const string& name)
+{
+    auto loc = this->GetAttribLocation(name);
+    if (loc < 0)
+    {
+        return;
+    }
+
+    glDisableVertexAttribArray(loc);
+}
+
 void GLProgram::BindAttribLocation(GLuint index, const string& name)
 {
     glBindAttribLocation(this->program, index, name.c_str());

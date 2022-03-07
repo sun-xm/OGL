@@ -5,11 +5,11 @@ uniform mat4 WorldView;
 uniform mat4 ModelView;
 uniform mat4 Projection;
 
-layout (location = 0) in vec3 vtx;
-layout (location = 1) in vec3 clr;
-layout (location = 2) in vec3 nml;
+varying vec3 color;
 
-out vec4 color;
+attribute vec3 vtx;
+attribute vec3 clr;
+attribute vec3 nml;
 
 void main()
 {
@@ -20,11 +20,7 @@ void main()
     vec3 nvec = mat3(ModelView) * nml;
 
     float lumen = max(0, dot(nvec, normalize(lpos.xyz - vpos.xyz)));
+    lumen = dot(nvec, normalize(vpos.xyz)) > 0 ? 0 : lumen;
 
-    if (dot(nvec.xyz, normalize(vpos.xyz)) > 0)
-    {
-        lumen = 0;
-    }
-
-    color = vec4(clr * lumen, 1);
+    color = clr * lumen;
 }

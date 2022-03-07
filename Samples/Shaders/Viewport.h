@@ -2,7 +2,7 @@
 
 #include "GLWindow.h"
 #include "GLScene.h"
-#include "Program.h"
+#include "Sphere.h"
 #include "Triangle.h"
 
 class Viewport : public GLWindow
@@ -20,6 +20,7 @@ protected:
 private:
     GLScene  scene;
     Program  program;
+    Sphere   sphere;
     Triangle triangle;
 
     Vertex lightPos;

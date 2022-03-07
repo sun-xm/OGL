@@ -10,6 +10,7 @@ add_executable(${PROJECT_NAME}
                Application.cpp
                Viewport.cpp
                Program.cpp
+               Sphere.cpp
                Triangle.cpp)
 target_link_libraries(${PROJECT_NAME} opengl32.lib glu32.lib glew32.lib)
 

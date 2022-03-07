@@ -3,7 +3,7 @@
 
 using namespace std;
 
-Viewport::Viewport() : triangle(this->program)
+Viewport::Viewport() : sphere(this->program), triangle(this->program)
 {
 }
 
@@ -65,6 +65,7 @@ bool Viewport::OnCreated()
 
 void Viewport::OnDestroy()
 {
+    this->sphere.Release();
     this->triangle.Release();
     this->program.Release();
     GLWindow::OnDestroy();
@@ -79,6 +80,7 @@ void Viewport::OnPaint()
         Matrix<float, 4> worldView;
         glGetFloatv(GL_MODELVIEW_MATRIX, worldView);
 
+        this->sphere.Render(this->lightPos, worldView);
         this->triangle.Render(this->lightPos, worldView);
 
         this->scene.End();
@@ -102,7 +104,11 @@ bool Viewport::OnContextCreated()
         return false;
     }
 
+    this->sphere.Create();
+    this->sphere.Position = { 1, 0, 0 };
+
     this->triangle.Create();
+    this->triangle.Position = { -1, 0, 0 };
 
     return true;
 }

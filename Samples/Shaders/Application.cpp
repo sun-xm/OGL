@@ -15,6 +15,7 @@ bool Application::OnCreated()
     {
         return false;
     }
+    this->Caption(L"Shaders");
 
     if (!this->view.Create(this))
     {

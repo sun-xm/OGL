@@ -92,16 +92,9 @@ void GLShape::Render()
     glRotatef(this->Rotation[3], this->Rotation[0], this->Rotation[1], this->Rotation[2]);
     glScalef(this->Scaling[0], this->Scaling[1], this->Scaling[2]);
 
-    auto vc = this->ApplyVertices();
+    auto vc = this->Apply();
     if (vc)
     {
-        this->ApplyNormals();
-        this->ApplyTexCoords();
-        this->ApplyTexture();
-        this->ApplyProgram();
-
-        this->material.Apply();
-
         auto ec = this->ebo.Size() / sizeof(GLuint);
         if (ec)
         {
@@ -112,12 +105,7 @@ void GLShape::Render()
             glDrawArrays(this->mode, 0, (GLsizei)vc);
         }
 
-        this->material.Revoke();
-
-        this->RevokeTexture();
-        this->RevokeTexCoords();
-        this->RevokeNormals();
-        this->RevokeVertices();
+        this->Revoke();
     }
 
     for (auto child : this->children)
@@ -174,6 +162,19 @@ void GLShape::RemoveChild(const GLShape* child)
     this->children.erase(std::find(this->children.begin(), this->children.end(), child));
 }
 
+size_t GLShape::Apply()
+{
+    auto vc = this->ApplyVertices();
+    if (vc)
+    {
+        this->ApplyNormals();
+        this->ApplyTexCoords();
+        this->ApplyTexture();
+        this->material.Apply();
+    }
+    return vc;
+}
+
 size_t GLShape::ApplyVertices()
 {
     if (this->vbo)
@@ -225,8 +226,13 @@ void GLShape::ApplyTexture()
     }
 }
 
-void GLShape::ApplyProgram()
+void GLShape::Revoke()
 {
+    this->material.Revoke();
+    this->RevokeTexture();
+    this->RevokeTexCoords();
+    this->RevokeNormals();
+    this->RevokeVertices();
 }
 
 void GLShape::RevokeVertices()

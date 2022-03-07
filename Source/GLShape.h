@@ -31,12 +31,13 @@ public:
     void RemoveChild(const GLShape* child);
 
 protected:
+    virtual size_t Apply();
     virtual size_t ApplyVertices();
     virtual size_t ApplyNormals();
     virtual size_t ApplyTexCoords();
     virtual void   ApplyTexture();
-    virtual void   ApplyProgram();
 
+    virtual void Revoke();
     virtual void RevokeVertices();
     virtual void RevokeNormals();
     virtual void RevokeTexCoords();
