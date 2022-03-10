@@ -1,6 +1,6 @@
 #version 400 core
 
-varying vec3 color;
+in vec3 color;
 
 void main()
 {

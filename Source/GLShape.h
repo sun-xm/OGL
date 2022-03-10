@@ -45,7 +45,7 @@ protected:
     virtual void RevokeTexture();
 
     GLenum mode;
-    GLBuffer ebo, vbo, nbo, cbo;
+    GLBuffer ebo, vbo, nbo, tbo;
     GLTexture  texture;
     GLMaterial material;
 

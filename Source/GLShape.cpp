@@ -4,7 +4,7 @@
 
 using namespace std;
 
-GLShape::GLShape() : ebo(GL_ELEMENT_ARRAY_BUFFER), vbo(GL_ARRAY_BUFFER), nbo(GL_ARRAY_BUFFER), cbo(GL_ARRAY_BUFFER), mode(GL_TRIANGLES), parent(nullptr)
+GLShape::GLShape() : ebo(GL_ELEMENT_ARRAY_BUFFER), vbo(GL_ARRAY_BUFFER), nbo(GL_ARRAY_BUFFER), tbo(GL_ARRAY_BUFFER), mode(GL_TRIANGLES), parent(nullptr)
 {
     this->Position = { 0.f, 0.f, 0.f };
     this->Rotation = { 0.f, 0.f, 0.f, 0.f };
@@ -53,7 +53,7 @@ bool GLShape::TexCoords(const Coordinate* coords, size_t count)
         return false;
     }
 
-    return this->cbo.Data(coords, count * sizeof(*coords), GL_STATIC_DRAW);
+    return this->tbo.Data(coords, count * sizeof(*coords), GL_STATIC_DRAW);
 }
 
 GLenum GLShape::Mode()
@@ -125,7 +125,7 @@ void GLShape::Release()
     this->children.clear();
 
     this->nbo.Release();
-    this->cbo.Release();
+    this->tbo.Release();
     this->vbo.Release();
     this->ebo.Release();
 }
@@ -203,12 +203,12 @@ size_t GLShape::ApplyNormals()
 
 size_t GLShape::ApplyTexCoords()
 {
-    if (this->cbo)
+    if (this->tbo)
     {
-        this->cbo.Bind();
+        this->tbo.Bind();
         glTexCoordPointer(2, GL_FLOAT, 0, 0);
         glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-        return this->cbo.Size() / sizeof(Coordinate);
+        return this->tbo.Size() / sizeof(Coordinate);
     }
 
     return 0;
@@ -255,9 +255,9 @@ void GLShape::RevokeNormals()
 
 void GLShape::RevokeTexCoords()
 {
-    if (this->cbo)
+    if (this->tbo)
     {
-        this->cbo.Bind();
+        this->tbo.Bind();
         glDisableClientState(GL_TEXTURE_COORD_ARRAY);
     }
 }

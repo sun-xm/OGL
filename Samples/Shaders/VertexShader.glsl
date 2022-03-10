@@ -5,11 +5,11 @@ uniform mat4 WorldView;
 uniform mat4 ModelView;
 uniform mat4 Projection;
 
-varying vec3 color;
+in vec3 vtx;
+in vec3 clr;
+in vec3 nml;
 
-attribute vec3 vtx;
-attribute vec3 clr;
-attribute vec3 nml;
+out vec3 color;
 
 void main()
 {
