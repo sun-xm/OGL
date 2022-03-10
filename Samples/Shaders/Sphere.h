@@ -13,10 +13,10 @@ public:
     void Release() override;
 
     bool Colors(const Vector<float, 3>* colors, int count);
-    void Render(const Vertex& lightPos, const Matrix<float, 4>& world);
+    void Render(const GLScene& scene, const Vertex& lightPos);
 
 protected:
-    size_t Apply() override;
+    size_t Apply(const GLScene& scene) override;
     void   Revoke() override;
 
 private:
@@ -28,7 +28,6 @@ private:
     GLBuffer cbo;
 
     Vector<float, 3> lightPos;
-    Matrix<float, 4> worldView;
 
     static const Vertex RegularTetrahedron[4];
 };

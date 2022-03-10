@@ -64,11 +64,10 @@ bool Sphere::Colors(const Vector<float, 3>* colors, int count)
     return true;
 }
 
-void Sphere::Render(const Vertex& lightPos, const Matrix<float, 4>& worldView)
+void Sphere::Render(const GLScene& scene, const Vertex& lightPos)
 {
-    this->lightPos  = lightPos;
-    this->worldView = worldView;
-    GLShape::Render();
+    this->lightPos = lightPos;
+    GLShape::Render(scene);
 }
 
 void Sphere::Split(float radius, int recursion, const Vertex& v0, const Vertex& v1, const Vertex& v2, vector<Vertex>& vertices, vector<Normal>& normals)
@@ -95,7 +94,7 @@ void Sphere::Split(float radius, int recursion, const Vertex& v0, const Vertex& 
     this->Split(radius, recursion, mid[0], mid[1], mid[2], vertices, normals);
 }
 
-size_t Sphere::Apply()
+size_t Sphere::Apply(const GLScene& scene)
 {
     auto loc = this->program.GetAttribLocation("nml");
 
@@ -105,7 +104,7 @@ size_t Sphere::Apply()
         this->program.Use();
 
         this->program.UniformV3f("LightPos",  this->lightPos);
-        this->program.UniformM4f("WorldView", this->worldView);
+        this->program.UniformM4f("WorldView", scene.WorldView());
 
         Matrix<float, 4> modelView, projection;
         glGetFloatv(GL_MODELVIEW_MATRIX,  modelView);

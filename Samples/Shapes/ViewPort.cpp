@@ -207,7 +207,7 @@ void ViewPort::Render()
         this->scene.Begin(this->ClientWidth(), this->ClientHeight());
         if (this->shape)
         {
-            this->shape->Render();
+            this->shape->Render(this->scene);
         }
         this->scene.End();
         this->DetachContext();

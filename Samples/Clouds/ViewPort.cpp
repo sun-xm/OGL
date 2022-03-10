@@ -19,7 +19,7 @@ LRESULT ViewPort::WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
             if (GetCursorPos(&cursor))
             {
                 auto x = cursor.x - this->cursor.x;
-                auto y = cursor.y - this->cursor.y;
+                auto y = this->cursor.y - cursor.y;
                 this->cursor = cursor;
 
                 auto qx = Quaternion<float>::FromAxisAngle(Vertex::XAxis, ToRadian(y * .5f));
@@ -89,7 +89,7 @@ void ViewPort::OnPaint()
 {
     this->AttachContext();
     this->scene.Begin(this->ClientWidth(), this->ClientHeight());
-    this->cloud.Render();
+    this->cloud.Render(this->scene);
     this->scene.End();
     this->DetachContext();
 

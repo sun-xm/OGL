@@ -55,6 +55,11 @@ void GLScene::DisableLight(int index)
     this->lights[index] = nullptr;
 }
 
+const Matrix<float, 4>& GLScene::WorldView() const
+{
+    return this->matrix;
+}
+
 void GLScene::Begin(int width, int height)
 {
     glMatrixMode(GL_PROJECTION);
@@ -64,6 +69,7 @@ void GLScene::Begin(int width, int height)
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
     this->camera.SetLookAt();
+    glGetFloatv(GL_MODELVIEW_MATRIX, this->matrix);
 
     if (this->enableDepth)
     {

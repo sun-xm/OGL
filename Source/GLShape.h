@@ -1,6 +1,7 @@
 #pragma once
 #include "GLObject.h"
 #include "GLBuffer.h"
+#include "GLScene.h"
 #include "GLTexture.h"
 #include "GLMaterial.h"
 #include <vector>
@@ -22,7 +23,7 @@ public:
     GLTexture&  Texture();
     GLMaterial& Material();
 
-    virtual void Render();
+    virtual void Render(const GLScene& scene);
     virtual void Release();
 
     bool HasChild() const;
@@ -31,7 +32,7 @@ public:
     void RemoveChild(const GLShape* child);
 
 protected:
-    virtual size_t Apply();
+    virtual size_t Apply(const GLScene&);
     virtual size_t ApplyVertices();
     virtual size_t ApplyNormals();
     virtual size_t ApplyTexCoords();

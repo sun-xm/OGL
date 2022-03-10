@@ -37,14 +37,13 @@ bool Triangle::Colors(const Vector<float, 3>* colors, int count)
     return true;
 }
 
-void Triangle::Render(const Vertex& lightPos, const Matrix<float, 4>& worldView)
+void Triangle::Render(const GLScene& scene, const Vertex& lightPos)
 {
-    this->lightPos  = lightPos;
-    this->worldView = worldView;
-    GLShape::Render();
+    this->lightPos = lightPos;
+    GLShape::Render(scene);
 }
 
-size_t Triangle::Apply()
+size_t Triangle::Apply(const GLScene& scene)
 {
     auto count = this->vbo.Size() / sizeof(Vertex);
     if (count)
@@ -52,7 +51,7 @@ size_t Triangle::Apply()
         this->program.Use();
 
         this->program.UniformV3f("LightPos",  this->lightPos);
-        this->program.UniformM4f("WorldView", this->worldView);
+        this->program.UniformM4f("WorldView", scene.WorldView());
 
         Matrix<float, 4> modelView, projection;
         glGetFloatv(GL_MODELVIEW_MATRIX,  modelView);

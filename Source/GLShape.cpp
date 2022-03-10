@@ -84,7 +84,7 @@ GLMaterial& GLShape::Material()
     return this->material;
 }
 
-void GLShape::Render()
+void GLShape::Render(const GLScene& scene)
 {
     glPushMatrix();
 
@@ -92,7 +92,7 @@ void GLShape::Render()
     glRotatef(this->Rotation[3], this->Rotation[0], this->Rotation[1], this->Rotation[2]);
     glScalef(this->Scaling[0], this->Scaling[1], this->Scaling[2]);
 
-    auto vc = this->Apply();
+    auto vc = this->Apply(scene);
     if (vc)
     {
         auto ec = this->ebo.Size() / sizeof(GLuint);
@@ -110,7 +110,7 @@ void GLShape::Render()
 
     for (auto child : this->children)
     {
-        child->Render();
+        child->Render(scene);
     }
 
     glPopMatrix();
@@ -162,7 +162,7 @@ void GLShape::RemoveChild(const GLShape* child)
     this->children.erase(std::find(this->children.begin(), this->children.end(), child));
 }
 
-size_t GLShape::Apply()
+size_t GLShape::Apply(const GLScene& scene)
 {
     auto vc = this->ApplyVertices();
     if (vc)

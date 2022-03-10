@@ -77,11 +77,8 @@ void Viewport::OnPaint()
     {
         this->scene.Begin(this->ClientWidth(), this->ClientHeight());
 
-        Matrix<float, 4> worldView;
-        glGetFloatv(GL_MODELVIEW_MATRIX, worldView);
-
-        this->sphere.Render(this->lightPos, worldView);
-        this->triangle.Render(this->lightPos, worldView);
+        this->sphere.Render(this->scene, this->lightPos);
+        this->triangle.Render(this->scene, this->lightPos);
 
         this->scene.End();
         this->DetachContext();
