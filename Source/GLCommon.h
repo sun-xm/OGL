@@ -678,46 +678,46 @@ typedef Vector<float, 3> Vertex;
 typedef Vector<float, 3> Normal;
 typedef Vector<float, 2> Coordinate;
 
-template<typename Scalar, size_t Dimensions>
+template<typename Scalar, size_t MRows, size_t MCols = MRows>
 struct Matrix
 {
-    Vector<Scalar, Dimensions> v[Dimensions];
+    Vector<Scalar, MCols> v[MRows];
 
     Matrix() = default;
     Matrix(const Scalar* v)
     {
-        for (size_t i = 0; i < Dimensions; i++)
+        for (size_t i = 0; i < MRows; i++)
         {
-            this->v[i] = v + i * Dimensions;
+            this->v[i] = v + i * MCols;
         }
     }
     Matrix(const std::initializer_list<Scalar>& list)
     {
         auto l = list.begin();
-        for (size_t i = 0; i < Dimensions; i++)
+        for (size_t i = 0; i < MRows; i++)
         {
             auto& v = this->v[i];
-            for (size_t j = 0; j < Dimensions; j++)
+            for (size_t j = 0; j < MCols; j++)
             {
                 v[j] = (list.end() == l) ? (Scalar)0 : *l++;
             }
         }
     }
-    Matrix(const std::initializer_list<const Vector<Scalar, Dimensions>>& list)
+    Matrix(const std::initializer_list<const Vector<Scalar, MCols>>& list)
     {
         auto l = list.begin();
-        for (size_t i = 0; i < Dimensions; i++)
+        for (size_t i = 0; i < MRows; i++)
         {
-            this->v[i] = (list.end() == l) ? Vector<Scalar, Dimensions>((Scalar)0) : *l++;
+            this->v[i] = (list.end() == l) ? Vector<Scalar, MCols>((Scalar)0) : *l++;
         }
     }
 
-    Matrix<Scalar, Dimensions> Transpose() const
+    Matrix<Scalar, MCols, MRows> Transpose() const
     {
-        Matrix<Scalar, Dimensions> m;
-        for (size_t i = 0; i < Dimensions; i++)
+        Matrix<Scalar, MCols, MRows> m;
+        for (size_t i = 0; i < MRows; i++)
         {
-            for (size_t j = 0; j < Dimensions; j++)
+            for (size_t j = 0; j < MCols; j++)
             {
                 m[j][i] = this->v[i][j];
             }
@@ -726,11 +726,11 @@ struct Matrix
         return m;
     }
 
-    Vector<Scalar, Dimensions>& operator[](size_t index)
+    Vector<Scalar, MCols>& operator[](size_t index)
     {
         return this->v[index];
     }
-    const Vector<Scalar, Dimensions>& operator[](size_t index) const
+    const Vector<Scalar, MCols>& operator[](size_t index) const
     {
         return this->v[index];
     }
@@ -744,18 +744,18 @@ struct Matrix
     }
 };
 
-template<typename Scalar, size_t Dimensions>
-inline Matrix<Scalar, Dimensions> operator*(const Matrix<Scalar, Dimensions>& m0, const Matrix<Scalar, Dimensions>& m1)
+template<typename Scalar, size_t MRows, size_t MCols, size_t MCR>
+inline Matrix<Scalar, MRows, MCols> operator*(const Matrix<Scalar, MRows, MCR>& m0, const Matrix<Scalar, MCR, MCols>& m1)
 {
-    Matrix<Scalar, Dimensions> m;
-    for (size_t i = 0; i < Dimensions; i++)
+    Matrix<Scalar, MRows, MCols> m;
+    for (size_t i = 0; i < MRows; i++)
     {
-        for (size_t j = 0; j < Dimensions; j++)
+        for (size_t j = 0; j < MCols; j++)
         {
             auto& s = m[i][j];
             s = 0;
 
-            for (size_t k = 0; k < Dimensions; k++)
+            for (size_t k = 0; k < MCR; k++)
             {
                 s += m0[i][k] * m1[k][j];
             }
@@ -764,57 +764,57 @@ inline Matrix<Scalar, Dimensions> operator*(const Matrix<Scalar, Dimensions>& m0
     return m;
 }
 
-template<typename Scalar, size_t Dimensions>
-inline Vector<Scalar, Dimensions> operator*(const Matrix<Scalar, Dimensions>& m, const Vector<Scalar, Dimensions>& v)
+template<typename Scalar, size_t MRows, size_t MCols>
+inline Vector<Scalar, MCols> operator*(const Matrix<Scalar, MRows, MCols>& m, const Vector<Scalar, MCols>& v)
 {
-    Vector<Scalar, Dimensions> p;
-    for (size_t i = 0; i < Dimensions; i++)
+    Vector<Scalar, MCols> p;
+    for (size_t i = 0; i < MCols; i++)
     {
         p[i] = Dot(m[i], v);
     }
     return p;
 }
 
-template<typename Scalar, size_t Dimensions>
+template<typename Scalar, size_t MRows, size_t MCols = MRows>
 struct CMatrix
 {
-    Vector<Scalar, Dimensions> v[Dimensions];
+    Vector<Scalar, MRows> v[MCols];
 
     CMatrix() = default;
     CMatrix(const Scalar* v)
     {
-        for (size_t i = 0; i < Dimensions; i++)
+        for (size_t i = 0; i < MCols; i++)
         {
-            this->v[i] = v + i * Dimensions;
+            this->v[i] = v + i * MRows;
         }
     }
     CMatrix(const std::initializer_list<Scalar>& list)
     {
         auto l = list.begin();
-        for (size_t i = 0; i < Dimensions; i++)
+        for (size_t i = 0; i < MCols; i++)
         {
             auto& v = this->v[i];
-            for (size_t j = 0; j < Dimensions; j++)
+            for (size_t j = 0; j < MRows; j++)
             {
                 v[j] = (list.end() == l) ? (Scalar)0 : *l++;
             }
         }
     }
-    CMatrix(const std::initializer_list<const Vector<Scalar, Dimensions>>& list)
+    CMatrix(const std::initializer_list<const Vector<Scalar, MRows>>& list)
     {
         auto l = list.begin();
-        for (size_t i = 0; i < Dimensions; i++)
+        for (size_t i = 0; i < MCols; i++)
         {
-            this->v[i] = (list.end() == l) ? Vector<Scalar, Dimensions>((Scalar)0) : *l++;
+            this->v[i] = (list.end() == l) ? Vector<Scalar, MRows>((Scalar)0) : *l++;
         }
     }
 
-    ::Matrix<Scalar, Dimensions> ToMatrix() const
+    ::Matrix<Scalar, MRows, MCols> ToMatrix() const
     {
-        ::Matrix<Scalar, Dimensions> m;
-        for (size_t i = 0; i < Dimensions; i++)
+        ::Matrix<Scalar, MRows, MCols> m;
+        for (size_t i = 0; i < MCols; i++)
         {
-            for (size_t j = 0; j < Dimensions; j++)
+            for (size_t j = 0; j < MRows; j++)
             {
                 m[j][i] = this->v[i][j];
             }
@@ -822,9 +822,9 @@ struct CMatrix
         return m;
     }
 
-    const ::Matrix<Scalar, Dimensions>& RawMatrix() const
+    const ::Matrix<Scalar, MRows, MCols>& RawMatrix() const
     {
-        return (::Matrix<Scalar, Dimensions>&)*this;
+        return *(::Matrix<Scalar, MRows, MCols>*)this;
     }
 
     operator Scalar*()
