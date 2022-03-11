@@ -35,7 +35,7 @@ inline Scalar ToDegree(Scalar radian)
     return radian / (Scalar)3.14159265358979323846264338327950288419716939937510l * (Scalar)180.0;
 }
 
-template<typename Scalar, int Dimensions>
+template<typename Scalar, size_t Dimensions>
 struct Vector
 {
     Scalar v[Dimensions];
@@ -43,14 +43,14 @@ struct Vector
     Vector() = default;
     Vector(Scalar v)
     {
-        for (auto i = 0; i < Dimensions; i++)
+        for (size_t i = 0; i < Dimensions; i++)
         {
             this->v[i] = v;
         }
     }
     Vector(const Scalar* v)
     {
-        for (auto i = 0; i < Dimensions; i++)
+        for (size_t i = 0; i < Dimensions; i++)
         {
             this->v[i] = v[i];
         }
@@ -58,7 +58,7 @@ struct Vector
     Vector(const std::initializer_list<Scalar>& list)
     {
         auto l = list.begin();
-        for (int i = 0; i < Dimensions; i++)
+        for (size_t i = 0; i < Dimensions; i++)
         {
             this->v[i] = (list.end() == l) ? 0 : *l++;
         }
@@ -77,11 +77,11 @@ struct Vector
         return false;
     }
 
-    Scalar& operator[](int index)
+    Scalar& operator[](size_t index)
     {
         return this->v[index];
     }
-    const Scalar& operator[](int index) const
+    const Scalar& operator[](size_t index) const
     {
         return this->v[index];
     }
@@ -95,12 +95,12 @@ struct Vector
     }
 };
 
-template<typename Scalar, int Dimensions>
+template<typename Scalar, size_t Dimensions>
 inline Vector<Scalar, Dimensions> operator+(const Vector<Scalar, Dimensions>& first, const Vector<Scalar, Dimensions>& second)
 {
     Vector<Scalar, Dimensions> result;
 
-    for (auto i = 0; i < Dimensions; i++)
+    for (size_t i = 0; i < Dimensions; i++)
     {
         result.v[i] = first.v[i] + second.v[i];
     }
@@ -108,12 +108,12 @@ inline Vector<Scalar, Dimensions> operator+(const Vector<Scalar, Dimensions>& fi
     return result;
 }
 
-template<typename Scalar, int Dimensions>
+template<typename Scalar, size_t Dimensions>
 inline Vector<Scalar, Dimensions> operator-(const Vector<Scalar, Dimensions>& first, const Vector<Scalar, Dimensions>& second)
 {
     Vector<Scalar, Dimensions> result;
 
-    for (auto i = 0; i < Dimensions; i++)
+    for (size_t i = 0; i < Dimensions; i++)
     {
         result.v[i] = first.v[i] - second.v[i];
     }
@@ -121,12 +121,12 @@ inline Vector<Scalar, Dimensions> operator-(const Vector<Scalar, Dimensions>& fi
     return result;
 }
 
-template<typename Scalar, int Dimensions>
+template<typename Scalar, size_t Dimensions>
 inline Vector<Scalar, Dimensions> operator*(const Vector<Scalar, Dimensions>& vector, Scalar scale)
 {
     Vector<Scalar, Dimensions> result;
 
-    for (auto i = 0; i < Dimensions; i++)
+    for (size_t i = 0; i < Dimensions; i++)
     {
         result.v[i] = vector.v[i] * scale;
     }
@@ -134,18 +134,18 @@ inline Vector<Scalar, Dimensions> operator*(const Vector<Scalar, Dimensions>& ve
     return result;
 }
 
-template<typename Scalar, int Dimensions>
+template<typename Scalar, size_t Dimensions>
 inline Vector<Scalar, Dimensions> operator*(Scalar scale, const Vector<Scalar, Dimensions>& vector)
 {
     return vector * scale;
 }
 
-template<typename Scalar, int Dimensions>
+template<typename Scalar, size_t Dimensions>
 inline Vector<Scalar, Dimensions> operator/(const Vector<Scalar, Dimensions>& vector, Scalar scale)
 {
     Vector<Scalar, Dimensions> result;
 
-    for (auto i = 0; i < Dimensions; i++)
+    for (size_t i = 0; i < Dimensions; i++)
     {
         result.v[i] = vector.v[i] / scale;
     }
@@ -153,12 +153,12 @@ inline Vector<Scalar, Dimensions> operator/(const Vector<Scalar, Dimensions>& ve
     return result;
 }
 
-template<typename Scalar, int Dimensions>
+template<typename Scalar, size_t Dimensions>
 inline Vector<Scalar, Dimensions> operator-(const Vector<Scalar, Dimensions>& vector)
 {
     Vector<Scalar, Dimensions> result;
 
-    for (auto i = 0; i < Dimensions; i++)
+    for (size_t i = 0; i < Dimensions; i++)
     {
         result.v[i] = -vector.v[i];
     }
@@ -166,10 +166,10 @@ inline Vector<Scalar, Dimensions> operator-(const Vector<Scalar, Dimensions>& ve
     return result;
 }
 
-template<typename Scalar, int Dimensions>
+template<typename Scalar, size_t Dimensions>
 inline Vector<Scalar, Dimensions>& operator+=(Vector<Scalar, Dimensions>& first, const Vector<Scalar, Dimensions>& second)
 {
-    for (auto i = 0; i < Dimensions; i++)
+    for (size_t i = 0; i < Dimensions; i++)
     {
         first.v[i] += second.v[i];
     }
@@ -177,10 +177,10 @@ inline Vector<Scalar, Dimensions>& operator+=(Vector<Scalar, Dimensions>& first,
     return first;
 }
 
-template<typename Scalar, int Dimensions>
+template<typename Scalar, size_t Dimensions>
 inline Vector<Scalar, Dimensions>& operator-=(Vector<Scalar, Dimensions>& first, const Vector<Scalar, Dimensions>& second)
 {
-    for (auto i = 0; i < Dimensions; i++)
+    for (size_t i = 0; i < Dimensions; i++)
     {
         first.v[i] -= second.v[i];
     }
@@ -188,10 +188,10 @@ inline Vector<Scalar, Dimensions>& operator-=(Vector<Scalar, Dimensions>& first,
     return first;
 }
 
-template<typename Scalar, int Dimensions>
+template<typename Scalar, size_t Dimensions>
 inline Vector<Scalar, Dimensions>& operator+=(Vector<Scalar, Dimensions>& first, Scalar second)
 {
-    for (auto i = 0; i < Dimensions; i++)
+    for (size_t i = 0; i < Dimensions; i++)
     {
         first.v[i] += second;
     }
@@ -199,10 +199,10 @@ inline Vector<Scalar, Dimensions>& operator+=(Vector<Scalar, Dimensions>& first,
     return first;
 }
 
-template<typename Scalar, int Dimensions>
+template<typename Scalar, size_t Dimensions>
 inline Vector<Scalar, Dimensions>& operator-=(Vector<Scalar, Dimensions>& first, Scalar second)
 {
-    for (auto i = 0; i < Dimensions; i++)
+    for (size_t i = 0; i < Dimensions; i++)
     {
         first.v[i] -= second;
     }
@@ -210,10 +210,10 @@ inline Vector<Scalar, Dimensions>& operator-=(Vector<Scalar, Dimensions>& first,
     return first;
 }
 
-template<typename Scalar, int Dimensions>
+template<typename Scalar, size_t Dimensions>
 inline Vector<Scalar, Dimensions>& operator*=(Vector<Scalar, Dimensions>& vector, Scalar scale)
 {
-    for (auto i = 0; i < Dimensions; i++)
+    for (size_t i = 0; i < Dimensions; i++)
     {
         vector.v[i] *= scale;
     }
@@ -221,10 +221,10 @@ inline Vector<Scalar, Dimensions>& operator*=(Vector<Scalar, Dimensions>& vector
     return vector;
 }
 
-template<typename Scalar, int Dimensions>
+template<typename Scalar, size_t Dimensions>
 inline Vector<Scalar, Dimensions>& operator/=(Vector<Scalar, Dimensions>& vector, Scalar scale)
 {
-    for (auto i = 0; i < Dimensions; i++)
+    for (size_t i = 0; i < Dimensions; i++)
     {
         vector.v[i] /= scale;
     }
@@ -232,24 +232,24 @@ inline Vector<Scalar, Dimensions>& operator/=(Vector<Scalar, Dimensions>& vector
     return vector;
 }
 
-template<typename Scalar, int Dimensions>
+template<typename Scalar, size_t Dimensions>
 inline Scalar Dot(const Vector<Scalar, Dimensions>& v0, const Vector<Scalar, Dimensions>& v1)
 {
     Scalar product = 0;
-    for (int i = 0; i < Dimensions; i++)
+    for (size_t i = 0; i < Dimensions; i++)
     {
         product += v0.v[i] * v1.v[i];
     }
     return product;
 }
 
-template<typename Scalar, int Dimensions>
+template<typename Scalar, size_t Dimensions>
 inline Scalar Length(const Vector<Scalar, Dimensions>& v)
 {
     return sqrtx(Dot(v, v));
 }
 
-template<typename Scalar, int Dimensions>
+template<typename Scalar, size_t Dimensions>
 inline Vector<Scalar, Dimensions> Normalize(const Vector<Scalar, Dimensions>& v)
 {
     return v / Length(v);
@@ -316,7 +316,7 @@ struct Vector<Scalar, 2>
     Vector() = default;
     Vector(const Scalar* v)
     {
-        for (auto i = 0; i < 2; i++)
+        for (size_t i = 0; i < 2; i++)
         {
             this->v[i] = v[i];
         }
@@ -325,7 +325,7 @@ struct Vector<Scalar, 2>
     {
         auto l = list.begin();
 
-        for (int i = 0; i < 2; i++)
+        for (size_t i = 0; i < 2; i++)
         {
             this->v[i] = (list.end() == l) ? 0 : *l++;
         }
@@ -344,11 +344,11 @@ struct Vector<Scalar, 2>
         return false;
     }
 
-    Scalar& operator[](int index)
+    Scalar& operator[](size_t index)
     {
         return this->v[index];
     }
-    const Scalar& operator[](int index) const
+    const Scalar& operator[](size_t index) const
     {
         return this->v[index];
     }
@@ -406,7 +406,7 @@ struct Vector<Scalar, 3>
     Vector() = default;
     Vector(const Scalar* v)
     {
-        for (auto i = 0; i < 3; i++)
+        for (size_t i = 0; i < 3; i++)
         {
             this->v[i] = v[i];
         }
@@ -415,7 +415,7 @@ struct Vector<Scalar, 3>
     {
         auto l = list.begin();
 
-        for (int i = 0; i < 3; i++)
+        for (size_t i = 0; i < 3; i++)
         {
             this->v[i] = (list.end() == l) ? 0 : *l++;
         }
@@ -434,11 +434,11 @@ struct Vector<Scalar, 3>
         return false;
     }
 
-    Scalar& operator[](int index)
+    Scalar& operator[](size_t index)
     {
         return this->v[index];
     }
-    const Scalar& operator[](int index) const
+    const Scalar& operator[](size_t index) const
     {
         return this->v[index];
     }
@@ -503,7 +503,7 @@ struct Vector<Scalar, 4>
     Vector() = default;
     Vector(const Scalar* v)
     {
-        for (auto i = 0; i < 4; i++)
+        for (size_t i = 0; i < 4; i++)
         {
             this->v[i] = v[i];
         }
@@ -512,7 +512,7 @@ struct Vector<Scalar, 4>
     {
         auto l = list.begin();
 
-        for (int i = 0; i < 4; i++)
+        for (size_t i = 0; i < 4; i++)
         {
             this->v[i] = (list.end() == l) ? 0 : *l++;
         }
@@ -531,11 +531,11 @@ struct Vector<Scalar, 4>
         return false;
     }
 
-    Scalar& operator[](int index)
+    Scalar& operator[](size_t index)
     {
         return this->v[index];
     }
-    const Scalar& operator[](int index) const
+    const Scalar& operator[](size_t index) const
     {
         return this->v[index];
     }
@@ -678,7 +678,7 @@ typedef Vector<float, 3> Vertex;
 typedef Vector<float, 3> Normal;
 typedef Vector<float, 2> Coordinate;
 
-template<typename Scalar, int Dimensions>
+template<typename Scalar, size_t Dimensions>
 struct Matrix
 {
     Vector<Scalar, Dimensions> v[Dimensions];
@@ -686,28 +686,147 @@ struct Matrix
     Matrix() = default;
     Matrix(const Scalar* v)
     {
-        for (int i = 0; i < Dimensions; i++)
+        for (size_t i = 0; i < Dimensions; i++)
         {
             this->v[i] = v + i * Dimensions;
         }
     }
-    Matrix(const std::initializer_list<Vector<Scalar, Dimensions>>& list)
+    Matrix(const std::initializer_list<Scalar>& list)
     {
         auto l = list.begin();
-        for (int i = 0; i < Dimensions; i++)
+        for (size_t i = 0; i < Dimensions; i++)
         {
-            this->v[i] = (list.end() == l) ? Vector<float, Dimensions>((Scalar)0) : *l++;
+            auto& v = this->v[i];
+            for (size_t j = 0; j < Dimensions; j++)
+            {
+                v[j] = (list.end() == l) ? (Scalar)0 : *l++;
+            }
+        }
+    }
+    Matrix(const std::initializer_list<const Vector<Scalar, Dimensions>>& list)
+    {
+        auto l = list.begin();
+        for (size_t i = 0; i < Dimensions; i++)
+        {
+            this->v[i] = (list.end() == l) ? Vector<Scalar, Dimensions>((Scalar)0) : *l++;
         }
     }
 
-    Vector<Scalar, Dimensions>& operator[](int index)
+    Matrix<Scalar, Dimensions> Transpose() const
+    {
+        Matrix<Scalar, Dimensions> m;
+        for (size_t i = 0; i < Dimensions; i++)
+        {
+            for (size_t j = 0; j < Dimensions; j++)
+            {
+                m[j][i] = this->v[i][j];
+            }
+        }
+
+        return m;
+    }
+
+    Vector<Scalar, Dimensions>& operator[](size_t index)
     {
         return this->v[index];
     }
-    const Vector<Scalar, Dimensions>& operator[](int index) const
+    const Vector<Scalar, Dimensions>& operator[](size_t index) const
     {
         return this->v[index];
     }
+    operator Scalar*()
+    {
+        return this->v[0];
+    }
+    operator const Scalar*() const
+    {
+        return this->v[0];
+    }
+};
+
+template<typename Scalar, size_t Dimensions>
+inline Matrix<Scalar, Dimensions> operator*(const Matrix<Scalar, Dimensions>& m0, const Matrix<Scalar, Dimensions>& m1)
+{
+    Matrix<Scalar, Dimensions> m;
+    for (size_t i = 0; i < Dimensions; i++)
+    {
+        for (size_t j = 0; j < Dimensions; j++)
+        {
+            auto& s = m[i][j];
+            s = 0;
+
+            for (size_t k = 0; k < Dimensions; k++)
+            {
+                s += m0[i][k] * m1[k][j];
+            }
+        }
+    }
+    return m;
+}
+
+template<typename Scalar, size_t Dimensions>
+inline Vector<Scalar, Dimensions> operator*(const Matrix<Scalar, Dimensions>& m, const Vector<Scalar, Dimensions>& v)
+{
+    Vector<Scalar, Dimensions> p;
+    for (size_t i = 0; i < Dimensions; i++)
+    {
+        p[i] = Dot(m[i], v);
+    }
+    return p;
+}
+
+template<typename Scalar, size_t Dimensions>
+struct CMatrix
+{
+    Vector<Scalar, Dimensions> v[Dimensions];
+
+    CMatrix() = default;
+    CMatrix(const Scalar* v)
+    {
+        for (size_t i = 0; i < Dimensions; i++)
+        {
+            this->v[i] = v + i * Dimensions;
+        }
+    }
+    CMatrix(const std::initializer_list<Scalar>& list)
+    {
+        auto l = list.begin();
+        for (size_t i = 0; i < Dimensions; i++)
+        {
+            auto& v = this->v[i];
+            for (size_t j = 0; j < Dimensions; j++)
+            {
+                v[j] = (list.end() == l) ? (Scalar)0 : *l++;
+            }
+        }
+    }
+    CMatrix(const std::initializer_list<const Vector<Scalar, Dimensions>>& list)
+    {
+        auto l = list.begin();
+        for (size_t i = 0; i < Dimensions; i++)
+        {
+            this->v[i] = (list.end() == l) ? Vector<Scalar, Dimensions>((Scalar)0) : *l++;
+        }
+    }
+
+    ::Matrix<Scalar, Dimensions> ToMatrix() const
+    {
+        ::Matrix<Scalar, Dimensions> m;
+        for (size_t i = 0; i < Dimensions; i++)
+        {
+            for (size_t j = 0; j < Dimensions; j++)
+            {
+                m[j][i] = this->v[i][j];
+            }
+        }
+        return m;
+    }
+
+    const ::Matrix<Scalar, Dimensions>& RawMatrix() const
+    {
+        return (::Matrix<Scalar, Dimensions>&)*this;
+    }
+
     operator Scalar*()
     {
         return this->v[0];
