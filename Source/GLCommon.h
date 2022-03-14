@@ -404,6 +404,13 @@ struct Vector<Scalar, 3>
     };
 
     Vector() = default;
+    Vector(Scalar v)
+    {
+        for (size_t i = 0; i < 3; i++)
+        {
+            this->v[i] = v;
+        }
+    }
     Vector(const Scalar* v)
     {
         for (size_t i = 0; i < 3; i++)
@@ -501,6 +508,13 @@ struct Vector<Scalar, 4>
     };
 
     Vector() = default;
+    Vector(Scalar v)
+    {
+        for (size_t i = 0; i < 4; i++)
+        {
+            this->v[i] = v;
+        }
+    }
     Vector(const Scalar* v)
     {
         for (size_t i = 0; i < 4; i++)
@@ -684,6 +698,13 @@ struct Matrix
     Vector<Scalar, MCols> v[MRows];
 
     Matrix() = default;
+    Matrix(Scalar v)
+    {
+        for (size_t i = 0; i < MRows; i++)
+        {
+            this->v[i] = v;
+        }
+    }
     Matrix(const Scalar* v)
     {
         for (size_t i = 0; i < MRows; i++)
