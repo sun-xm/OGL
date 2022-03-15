@@ -378,16 +378,16 @@ struct Vector<Scalar, 2>
         return ::Normalize(*this);
     }
 
-    static Vector<Scalar, 2> NaN, Zero, XAxis, YAxis;
+    static const Vector<Scalar, 2> NaN, Zero, XAxis, YAxis;
 };
 template<typename Scalar>
-Vector<Scalar, 2> Vector<Scalar, 2>::NaN   = { std::numeric_limits<Scalar>::quiet_NaN(), std::numeric_limits<Scalar>::quiet_NaN() };
+const Vector<Scalar, 2> Vector<Scalar, 2>::NaN   = { std::numeric_limits<Scalar>::quiet_NaN(), std::numeric_limits<Scalar>::quiet_NaN() };
 template<typename Scalar>
-Vector<Scalar, 2> Vector<Scalar, 2>::Zero  = { 0, 0 };
+const Vector<Scalar, 2> Vector<Scalar, 2>::Zero  = { 0, 0 };
 template<typename Scalar>
-Vector<Scalar, 2> Vector<Scalar, 2>::XAxis = { 1, 0 };
+const Vector<Scalar, 2> Vector<Scalar, 2>::XAxis = { 1, 0 };
 template<typename Scalar>
-Vector<Scalar, 2> Vector<Scalar, 2>::YAxis = { 0, 1 };
+const Vector<Scalar, 2> Vector<Scalar, 2>::YAxis = { 0, 1 };
 
 template<typename Scalar>
 struct Vector<Scalar, 3>
@@ -479,18 +479,18 @@ struct Vector<Scalar, 3>
         return ::Normalize(*this);
     }
 
-    static Vector<Scalar, 3> NaN, Zero, XAxis, YAxis, ZAxis;
+    static const Vector<Scalar, 3> NaN, Zero, XAxis, YAxis, ZAxis;
 };
 template<typename Scalar>
-Vector<Scalar, 3> Vector<Scalar, 3>::NaN   = { std::numeric_limits<Scalar>::quiet_NaN(), std::numeric_limits<Scalar>::quiet_NaN(), std::numeric_limits<Scalar>::quiet_NaN() };
+const Vector<Scalar, 3> Vector<Scalar, 3>::NaN   = { std::numeric_limits<Scalar>::quiet_NaN(), std::numeric_limits<Scalar>::quiet_NaN(), std::numeric_limits<Scalar>::quiet_NaN() };
 template<typename Scalar>
-Vector<Scalar, 3> Vector<Scalar, 3>::Zero  = { 0, 0, 0 };
+const Vector<Scalar, 3> Vector<Scalar, 3>::Zero  = { 0, 0, 0 };
 template<typename Scalar>
-Vector<Scalar, 3> Vector<Scalar, 3>::XAxis = { 1, 0, 0 };
+const Vector<Scalar, 3> Vector<Scalar, 3>::XAxis = { 1, 0, 0 };
 template<typename Scalar>
-Vector<Scalar, 3> Vector<Scalar, 3>::YAxis = { 0, 1, 0 };
+const Vector<Scalar, 3> Vector<Scalar, 3>::YAxis = { 0, 1, 0 };
 template<typename Scalar>
-Vector<Scalar, 3> Vector<Scalar, 3>::ZAxis = { 0, 0, 1 };
+const Vector<Scalar, 3> Vector<Scalar, 3>::ZAxis = { 0, 0, 1 };
 
 template<typename Scalar>
 struct Vector<Scalar, 4>
@@ -562,12 +562,12 @@ struct Vector<Scalar, 4>
         return this->v;
     }
 
-    static Vector<Scalar, 4> NaN, Zero;
+    static const Vector<Scalar, 4> NaN, Zero;
 };
 template<typename Scalar>
-Vector<Scalar, 4> Vector<Scalar, 4>::NaN   = { std::numeric_limits<Scalar>::quiet_NaN(), std::numeric_limits<Scalar>::quiet_NaN(), std::numeric_limits<Scalar>::quiet_NaN(), std::numeric_limits<Scalar>::quiet_NaN() };
+const Vector<Scalar, 4> Vector<Scalar, 4>::NaN   = { std::numeric_limits<Scalar>::quiet_NaN(), std::numeric_limits<Scalar>::quiet_NaN(), std::numeric_limits<Scalar>::quiet_NaN(), std::numeric_limits<Scalar>::quiet_NaN() };
 template<typename Scalar>
-Vector<Scalar, 4> Vector<Scalar, 4>::Zero  = { 0, 0, 0, 0 };
+const Vector<Scalar, 4> Vector<Scalar, 4>::Zero  = { 0, 0, 0, 0 };
 
 template<typename Scalar>
 struct Quaternion : public Vector<Scalar, 4>
@@ -682,10 +682,10 @@ struct Quaternion : public Vector<Scalar, 4>
         return Quaternion<Scalar>{ s * n.v[0], s * n.v[1], s * n.v[2], c };
     }
 
-    static Quaternion<Scalar> Identity;
+    static const Quaternion<Scalar> Identity;
 };
 template<typename Scalar>
-Quaternion<Scalar> Quaternion<Scalar>::Identity = { 0, 0, 0, 1 };
+const Quaternion<Scalar> Quaternion<Scalar>::Identity = { 0, 0, 0, 1 };
 
 typedef Vector<uint32_t, 3> Element;
 typedef Vector<float, 3> Vertex;
