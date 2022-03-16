@@ -5,13 +5,6 @@ GLTexture::GLTexture()
 {
 }
 
-bool GLTexture::Create()
-{
-    this->Release();
-    glGenTextures(1, &this->tex);
-    return !!this->tex;
-}
-
 void GLTexture::Release()
 {
     if (this->tex)
@@ -99,4 +92,13 @@ void GLTexture::Revoke()
         glDisable(GL_TEXTURE_2D);
         glBindTexture(GL_TEXTURE_2D, 0);
     }
+}
+
+bool GLTexture::Create()
+{
+    if (!this->tex)
+    {
+        glGenTextures(1, &this->tex);
+    }
+    return !!this->tex;
 }

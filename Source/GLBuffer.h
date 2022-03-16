@@ -8,12 +8,11 @@ class GLBuffer
 public:
     GLBuffer(GLenum target);
 
-    bool Create();
-    void Release();
-
     void Bind() const;
     bool Data(const void* data, GLsizeiptr size, GLenum usage);
     GLint Size() const;
+
+    void Release();
 
     GLenum Target() const
     {
@@ -29,6 +28,9 @@ public:
     {
         return this->buffer;
     }
+
+private:
+    bool Create();
 
 private:
     GLuint buffer;

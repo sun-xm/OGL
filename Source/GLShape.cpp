@@ -18,41 +18,21 @@ GLShape::~GLShape()
 
 bool GLShape::Elements(const Element* elements, size_t count)
 {
-    if (!elements && count)
-    {
-        return false;
-    }
-
     return this->ebo.Data(elements, count * sizeof(*elements), GL_STATIC_DRAW);
 }
 
 bool GLShape::Vertices(const Vertex* vertices, size_t count)
 {
-    if (!vertices && count)
-    {
-        return false;
-    }
-
     return this->vbo.Data(vertices, count * sizeof(*vertices), GL_STATIC_DRAW);
 }
 
 bool GLShape::Normals(const Normal* normals, size_t count)
 {
-    if (!normals && count)
-    {
-        return false;
-    }
-
     return this->nbo.Data(normals, count * sizeof(*normals), GL_STATIC_DRAW);
 }
 
 bool GLShape::TexCoords(const Coordinate* coords, size_t count)
 {
-    if (!coords && count)
-    {
-        return false;
-    }
-
     return this->tbo.Data(coords, count * sizeof(*coords), GL_STATIC_DRAW);
 }
 
@@ -124,6 +104,7 @@ void GLShape::Release()
     }
     this->children.clear();
 
+    this->texture.Release();
     this->nbo.Release();
     this->tbo.Release();
     this->vbo.Release();
@@ -177,7 +158,7 @@ size_t GLShape::Apply(const GLScene& scene)
 
 size_t GLShape::ApplyVertices()
 {
-    if (this->vbo)
+    if (this->vbo && this->vbo.Size())
     {
         this->vbo.Bind();
         glVertexPointer(3, GL_FLOAT, 0, 0);
@@ -190,7 +171,7 @@ size_t GLShape::ApplyVertices()
 
 size_t GLShape::ApplyNormals()
 {
-    if (this->nbo)
+    if (this->nbo && this->nbo.Size())
     {
         this->nbo.Bind();
         glNormalPointer(GL_FLOAT, 0, 0);
@@ -203,7 +184,7 @@ size_t GLShape::ApplyNormals()
 
 size_t GLShape::ApplyTexCoords()
 {
-    if (this->tbo)
+    if (this->tbo && this->tbo.Size())
     {
         this->tbo.Bind();
         glTexCoordPointer(2, GL_FLOAT, 0, 0);

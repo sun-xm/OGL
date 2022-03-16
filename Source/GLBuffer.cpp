@@ -4,14 +4,6 @@ GLBuffer::GLBuffer(GLenum target) : buffer(0), target(target)
 {
 }
 
-bool GLBuffer::Create()
-{
-    this->Release();
-
-    glGenBuffers(1, &this->buffer);
-    return !!this->buffer;
-}
-
 void GLBuffer::Release()
 {
     if (this->buffer)
@@ -28,13 +20,18 @@ void GLBuffer::Bind() const
 
 bool GLBuffer::Data(const void* data, GLsizeiptr size, GLenum usage)
 {
-    if (!this->buffer && !this->Create())
+    if (!data || !size)
+    {
+        this->Release();
+        return true;
+    }
+
+    if (!this->Create())
     {
         return false;
     }
 
     this->Bind();
-
     glBufferData(this->target, size, data, usage);
 
     return true;
@@ -51,4 +48,13 @@ GLint GLBuffer::Size() const
     }
 
     return size;
+}
+
+bool GLBuffer::Create()
+{
+    if (!this->buffer)
+    {
+        glGenBuffers(1, &this->buffer);
+    }
+    return !!this->buffer;
 }

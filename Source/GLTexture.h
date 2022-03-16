@@ -8,8 +8,6 @@ class GLTexture
 public:
     GLTexture();
 
-    bool Create();
-
     void Mode(GLuint envMode);
     void Filter(GLuint minFilter, GLuint magFilter);
     void Wrap(GLuint wrapS, GLuint wrapT);
@@ -26,6 +24,9 @@ public:
     {
         return this->tex;
     }
+
+private:
+    bool Create();
 
 private:
     GLuint envMode;
