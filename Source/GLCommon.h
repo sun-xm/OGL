@@ -5,6 +5,8 @@
 #include <cmath>
 #include <cstdint>
 
+#define SCALAR_TYPE(v) decltype(ScalarHelper(v))
+
 template<typename Scalar>
 inline Scalar sqrtx(Scalar s)
 {
@@ -94,6 +96,18 @@ struct Vector
         return this->v;
     }
 };
+
+template<typename Scalar, size_t Dimensions>
+inline size_t Dims(const Vector<Scalar, Dimensions>&)
+{
+    return Dimensions;
+}
+
+template<typename Scalar, size_t Dimensions>
+inline Scalar ScalarHelper(const Vector<Scalar, Dimensions>&)
+{
+    return *(Scalar*)nullptr;
+}
 
 template<typename Scalar, size_t Dimensions>
 inline Vector<Scalar, Dimensions> operator+(const Vector<Scalar, Dimensions>& first, const Vector<Scalar, Dimensions>& second)
@@ -764,6 +778,24 @@ struct Matrix
         return this->v[0];
     }
 };
+
+template<typename Scalar, size_t MRows, size_t MCols>
+inline size_t Rows(const Matrix<Scalar, MRows, MCols>&)
+{
+    return MRows;
+}
+
+template<typename Scalar, size_t MRows, size_t MCols>
+inline size_t Cols(const Matrix<Scalar, MRows, MCols>&)
+{
+    return MCols;
+}
+
+template<typename Scalar, size_t MRows, size_t MCols>
+inline Scalar ScalarHelper(const Matrix<Scalar, MRows, MCols>&)
+{
+    return *(Scalar*)nullptr;
+}
 
 template<typename Scalar, size_t MRows, size_t MCols, size_t MCR>
 inline Matrix<Scalar, MRows, MCols> operator*(const Matrix<Scalar, MRows, MCR>& m0, const Matrix<Scalar, MCR, MCols>& m1)
