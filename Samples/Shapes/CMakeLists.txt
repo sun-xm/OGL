@@ -13,7 +13,8 @@ add_executable(${PROJECT_NAME}
                Texture.cpp
                Triangle.cpp
                Square.cpp
-               Circle.cpp
+               Plate.cpp
+               Cone.cpp
                Cube.cpp
                Cylinder.cpp
                Sphere.cpp

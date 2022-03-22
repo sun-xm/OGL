@@ -120,7 +120,7 @@ GLint GLProgram::GetFragDataLocation(const string& name)
 
 bool GLProgram::Uniform1i(const string& name, int value)
 {
-    auto loc = this->UniformLocInUse(name);
+    auto loc = this->UniformLocation(name);
     if (loc < 0)
     {
         return false;
@@ -132,7 +132,7 @@ bool GLProgram::Uniform1i(const string& name, int value)
 
 bool GLProgram::UniformV3f(const string& name, const Vector<float, 3>& value)
 {
-    auto loc = this->UniformLocInUse(name);
+    auto loc = this->UniformLocation(name);
     if (loc < 0)
     {
         return false;
@@ -144,7 +144,7 @@ bool GLProgram::UniformV3f(const string& name, const Vector<float, 3>& value)
 
 bool GLProgram::UniformV4f(const string& name, const Vector<float, 4>& value)
 {
-    auto loc = this->UniformLocInUse(name);
+    auto loc = this->UniformLocation(name);
     if (loc < 0)
     {
         return false;
@@ -156,7 +156,7 @@ bool GLProgram::UniformV4f(const string& name, const Vector<float, 4>& value)
 
 bool GLProgram::UniformM4f(const string& name, const Matrix<float, 4>& value)
 {
-    auto loc = this->UniformLocInUse(name);
+    auto loc = this->UniformLocation(name);
     if (loc < 0)
     {
         return false;
@@ -166,7 +166,7 @@ bool GLProgram::UniformM4f(const string& name, const Matrix<float, 4>& value)
     return true;
 }
 
-GLint GLProgram::UniformLocInUse(const string& name)
+GLint GLProgram::UniformLocation(const string& name)
 {
     if (!this->program)
     {

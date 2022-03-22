@@ -2,7 +2,8 @@
 #include "Texture.h"
 #include "Triangle.h"
 #include "Square.h"
-#include "Circle.h"
+#include "Plate.h"
+#include "Cone.h"
 #include "Cube.h"
 #include "Cylinder.h"
 #include "Sphere.h"
@@ -34,9 +35,9 @@ void ViewPort::CreateShape(int shape)
                 break;
             }
 
-            case IDC_CIRCLE:
+            case IDC_PLATE:
             {
-                s = new Circle();
+                s = new Plate();
                 break;
             }
 
@@ -61,6 +62,12 @@ void ViewPort::CreateShape(int shape)
             case IDC_DONUT:
             {
                 s = new Donut();
+                break;
+            }
+
+            case IDC_CONE:
+            {
+                s = new Cone();
                 break;
             }
 

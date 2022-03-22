@@ -41,7 +41,7 @@ public:
     }
 
 private:
-    GLint UniformLocInUse(const std::string& name);
+    GLint UniformLocation(const std::string& name);
 
 protected:
     GLuint program;

@@ -1,4 +1,4 @@
-#include "Circle.h"
+#include "Plate.h"
 #include <vector>
 
 using namespace std;
@@ -6,7 +6,7 @@ using namespace std;
 const int   Pieces = 36;
 const float Radius = 0.5f;
 
-Circle::Circle()
+Plate::Plate()
 {
     vector<Vertex> vertices;
     vertices.reserve(Pieces + 2);
@@ -39,9 +39,9 @@ Circle::Circle()
         normals.push_back(normal);
     }
 
-    this->Vertices(vertices.data(), (int)vertices.size());
-    this->Normals(normals.data(), (int)normals.size());
-    this->TexCoords(texCoords.data(), (int)texCoords.size());
+    this->Vertices(vertices.data(), vertices.size());
+    this->Normals(normals.data(), normals.size());
+    this->TexCoords(texCoords.data(), texCoords.size());
 
     this->Mode(GL_TRIANGLE_FAN);
 }
