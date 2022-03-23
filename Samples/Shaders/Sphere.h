@@ -20,14 +20,10 @@ protected:
     void   Revoke() override;
 
 private:
-    void Split(float radius, int recursion, const Vertex& v0, const Vertex& v1, const Vertex& v2, std::vector<Vertex>& vertices, std::vector<Normal>& normals);
-
-    int recursion;
+    static void Split(uint32_t level, const Vertex& v0, const Vertex& v1, const Vertex& v2, std::vector<Vertex>& vertices);
 
     Program& program;
     GLBuffer cbo;
 
     Vector<float, 3> lightPos;
-
-    static const Vertex RegularTetrahedron[4];
 };

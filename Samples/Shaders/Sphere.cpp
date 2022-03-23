@@ -3,12 +3,9 @@
 
 using namespace std;
 
-#define RATIO (4.f / sqrtf(6.f))
-
-const Vertex Sphere::RegularTetrahedron[] = {{  0.f, 1.f, 0.f },
-                                             {  0.f, -1.f / 3.f, 4.f / sqrtf(18.f) },
-                                             {  .5f * RATIO, -1.f / 3.f, -2.f / sqrtf(18.f)},
-                                             { -.5f * RATIO, -1.f / 3.f, -2.f / sqrtf(18.f)}};
+#define RATIO  (4.f / sqrtf(6.f))
+#define LEVELS (4)
+#define RADIUS (0.5f)
 
 Sphere::Sphere(Program& program) : program(program), cbo(GL_ARRAY_BUFFER)
 {
@@ -16,28 +13,31 @@ Sphere::Sphere(Program& program) : program(program), cbo(GL_ARRAY_BUFFER)
 
 void Sphere::Create()
 {
-    this->recursion = 5;
-
     vector<Vertex> vertices;
-    vector<Normal> normals;
 
-    int c = COUNTOF(RegularTetrahedron);
+    Vertex v0 = { RADIUS, 0, 0 };
+    Vertex v1 = { 0, 0, RADIUS };
+    Vertex v2 = { 0, RADIUS, 0 };
 
-    for (auto i = 0; i < this->recursion; i++)
+    // Split 8 faces of an octahedron
+    Split(1,  v0,  v1, v2, vertices);
+    Split(1,  v0, -v1, v2, vertices);
+    Split(1, -v0,  v1, v2, vertices);
+    Split(1, -v0, -v1, v2, vertices);
+
+    Split(1,  v0,  v1, -v2, vertices);
+    Split(1,  v0, -v1, -v2, vertices);
+    Split(1, -v0,  v1, -v2, vertices);
+    Split(1, -v0, -v1, -v2, vertices);
+
+    this->Vertices(vertices.data(), vertices.size());
+
+    auto ratio = 1.f / RADIUS;
+    for (auto& v : vertices)
     {
-        c *= COUNTOF(RegularTetrahedron);
+        v *= ratio;
     }
-
-    vertices.reserve(c);
-    normals.reserve(c);
-
-    this->Split(.5f, 1, RegularTetrahedron[0], RegularTetrahedron[1], RegularTetrahedron[2], vertices, normals);
-    this->Split(.5f, 1, RegularTetrahedron[0], RegularTetrahedron[3], RegularTetrahedron[1], vertices, normals);
-    this->Split(.5f, 1, RegularTetrahedron[1], RegularTetrahedron[3], RegularTetrahedron[2], vertices, normals);
-    this->Split(.5f, 1, RegularTetrahedron[0], RegularTetrahedron[2], RegularTetrahedron[3], vertices, normals);
-
-    this->Vertices(vertices.data(), (int)vertices.size());
-    this->Normals(normals.data(), (int)normals.size());
+    this->Normals(vertices.data(), vertices.size());
 
     vector<Vector<float, 3>> colors(vertices.size(), { 1, 1, 1 });
     this->Colors(colors.data(), (int)colors.size());
@@ -68,30 +68,6 @@ void Sphere::Render(const GLScene& scene, const Vertex& lightPos)
 {
     this->lightPos = lightPos;
     GLShape::Render(scene);
-}
-
-void Sphere::Split(float radius, int recursion, const Vertex& v0, const Vertex& v1, const Vertex& v2, vector<Vertex>& vertices, vector<Normal>& normals)
-{
-    if (recursion > this->recursion)
-    {
-        vertices.push_back(v0 * radius);
-        vertices.push_back(v1 * radius);
-        vertices.push_back(v2 * radius);
-
-        normals.push_back(v0);
-        normals.push_back(v1);
-        normals.push_back(v2);
-
-        return;
-    }
-
-    Vertex mid[] = { (v0 + v1).Normalize(), (v1 + v2).Normalize(), (v2 + v0).Normalize() };
-
-    recursion++;
-    this->Split(radius, recursion, mid[2], v0, mid[0], vertices, normals);
-    this->Split(radius, recursion, mid[0], v1, mid[1], vertices, normals);
-    this->Split(radius, recursion, mid[1], v2, mid[2], vertices, normals);
-    this->Split(radius, recursion, mid[0], mid[1], mid[2], vertices, normals);
 }
 
 size_t Sphere::Apply(const GLScene& scene)
@@ -126,4 +102,25 @@ void Sphere::Revoke()
     this->program.UnbindAttrib("clr");
     this->program.UnbindAttrib("nml");
     glUseProgram(0);
+}
+
+void Sphere::Split(uint32_t level, const Vertex& v0, const Vertex& v1, const Vertex& v2, vector<Vertex>& vertices)
+{
+    if (level > LEVELS)
+    {
+        vertices.push_back(v0);
+        vertices.push_back(v1);
+        vertices.push_back(v2);
+        return;
+    }
+
+    Vertex v[] = { (v0 + v1).Normalize() * RADIUS,
+                   (v1 + v2).Normalize() * RADIUS,
+                   (v2 + v0).Normalize() * RADIUS };
+
+    Split(level + 1, v0, v[0], v[2], vertices);
+    Split(level + 1, v1, v[1], v[0], vertices);
+    Split(level + 1, v2, v[2], v[1], vertices);
+
+    Split(level + 1, v[0], v[1], v[2], vertices);
 }

@@ -1,72 +1,66 @@
 #include "Sphere.h"
 #include <cmath>
 
+#define RATIO (4.f / sqrtf(6.f))
+#define LEVELS (4)
+#define RADIUS (0.5f)
+
 using namespace std;
 
-#define RATIO (4.f / sqrtf(6.f))
-
-const Vertex Sphere::RegularTetrahedron[] = {{  0.f, 1.f, 0.f },
-                                             {  0.f, -1.f / 3.f, 4.f / sqrtf(18.f) },
-                                             {  .5f * RATIO, -1.f / 3.f, -2.f / sqrtf(18.f)},
-                                             { -.5f * RATIO, -1.f / 3.f, -2.f / sqrtf(18.f)}};
-
-Sphere::Sphere(float radius, int recursion)
+Sphere::Sphere()
 {
-    if (recursion < 0)
-    {
-        return;
-    }
-
-    this->recursion = recursion;
-
     vector<Vertex> vertices;
-    vector<Normal> normals;
     vector<Coordinate> coords;
 
-    int c = COUNTOF(RegularTetrahedron);
+    Vertex v0 = { RADIUS, 0, 0 };
+    Vertex v1 = { 0, 0, RADIUS };
+    Vertex v2 = { 0, RADIUS, 0 };
 
-    for (auto i = 0; i < recursion; i++)
+    // Split 8 faces of an octahedron
+    Split(1,  v0,  v1, v2, vertices, coords);
+    Split(1,  v0, -v1, v2, vertices, coords);
+    Split(1, -v0,  v1, v2, vertices, coords);
+    Split(1, -v0, -v1, v2, vertices, coords);
+
+    Split(1,  v0,  v1, -v2, vertices, coords);
+    Split(1,  v0, -v1, -v2, vertices, coords);
+    Split(1, -v0,  v1, -v2, vertices, coords);
+    Split(1, -v0, -v1, -v2, vertices, coords);
+
+    this->Vertices(vertices.data(), vertices.size());
+
+    auto ratio = 1.f / RADIUS;
+    for (auto& v : vertices)
     {
-        c *= COUNTOF(RegularTetrahedron);
+        v *= ratio;
     }
+    this->Normals(vertices.data(), vertices.size());
 
-    vertices.reserve(c);
-    normals.reserve(c);
-
-    this->Split(radius, 1, RegularTetrahedron[0], RegularTetrahedron[1], RegularTetrahedron[2], vertices, normals, coords);
-    this->Split(radius, 1, RegularTetrahedron[0], RegularTetrahedron[3], RegularTetrahedron[1], vertices, normals, coords);
-    this->Split(radius, 1, RegularTetrahedron[1], RegularTetrahedron[3], RegularTetrahedron[2], vertices, normals, coords);
-    this->Split(radius, 1, RegularTetrahedron[0], RegularTetrahedron[2], RegularTetrahedron[3], vertices, normals, coords);
-
-    this->Vertices(vertices.data(), (int)vertices.size());
-    this->Normals(normals.data(), (int)normals.size());
     this->TexCoords(coords.data(), (int)coords.size());
 }
 
-void Sphere::Split(float radius, int recursion, const Vertex& v0, const Vertex& v1, const Vertex& v2, vector<Vertex>& vertices, vector<Normal>& normals, vector<Coordinate>& coords)
+void Sphere::Split(uint32_t level, const Vertex& v0, const Vertex& v1, const Vertex& v2, vector<Vertex>& vertices, vector<Coordinate>& coords)
 {
-    if (recursion > this->recursion)
+    if (level > LEVELS)
     {
-        vertices.push_back(v0 * radius);
-        vertices.push_back(v1 * radius);
-        vertices.push_back(v2 * radius);
+        vertices.push_back(v0);
+        vertices.push_back(v1);
+        vertices.push_back(v2);
 
-        normals.push_back(v0);
-        normals.push_back(v1);
-        normals.push_back(v2);
-
-        coords.push_back({ (v0[0] + 1.f) / 2.f, (1.f - v0[1]) / 2.f });
-        coords.push_back({ (v1[0] + 1.f) / 2.f, (1.f - v1[1]) / 2.f });
-        coords.push_back({ (v2[0] + 1.f) / 2.f, (1.f - v2[1]) / 2.f });
+        coords.push_back({ v0[0] + .5f, .5f - v0[1] });
+        coords.push_back({ v1[0] + .5f, .5f - v1[1] });
+        coords.push_back({ v2[0] + .5f, .5f - v2[1] });
 
         return;
     }
 
-    Vertex mid[] = { (v0 + v1).Normalize(), (v1 + v2).Normalize(), (v2 + v0).Normalize() };
+    Vertex v[] = { (v0 + v1).Normalize() * RADIUS,
+                   (v1 + v2).Normalize() * RADIUS,
+                   (v2 + v0).Normalize() * RADIUS };
 
-    recursion++;
-    this->Split(radius, recursion, mid[2], v0, mid[0], vertices, normals, coords);
-    this->Split(radius, recursion, mid[0], v1, mid[1], vertices, normals, coords);
-    this->Split(radius, recursion, mid[1], v2, mid[2], vertices, normals, coords);
-    this->Split(radius, recursion, mid[0], mid[1], mid[2], vertices, normals, coords);
+    Split(level + 1, v0, v[0], v[2], vertices, coords);
+    Split(level + 1, v1, v[1], v[0], vertices, coords);
+    Split(level + 1, v2, v[2], v[1], vertices, coords);
+
+    Split(level + 1, v[0], v[1], v[2], vertices, coords);
 }
