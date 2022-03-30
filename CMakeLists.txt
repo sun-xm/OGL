@@ -11,6 +11,8 @@ file(GLOB GUI_CPP ${GUI_DIR}/*.cpp)
 include_directories(${SRC_DIR} ${GUI_DIR} ${GLEW_DIR}/include)
 link_directories(${GLEW_DIR}/lib/${CMAKE_VS_PLATFORM_NAME})
 
+add_compile_definitions(WIN32 _WINDOWS _UNICODE UNICODE)
+
 add_subdirectory(Samples/Clouds  Clouds)
 add_subdirectory(Samples/Shapes  Shapes)
 add_subdirectory(Samples/Shaders Shaders)

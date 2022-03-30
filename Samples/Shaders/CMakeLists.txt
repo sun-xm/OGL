@@ -1,10 +1,7 @@
 cmake_minimum_required(VERSION 3.10)
 project(Shaders)
 
-add_compile_definitions(WIN32 _WINDOWS _UNICODE UNICODE)
-add_link_options(/SUBSYSTEM:WINDOWS)
-
-add_executable(${PROJECT_NAME}
+add_executable(${PROJECT_NAME} WIN32
                ${GUI_CPP}
                ${SRC_CPP}
                Application.cpp
@@ -12,7 +9,7 @@ add_executable(${PROJECT_NAME}
                Program.cpp
                Sphere.cpp
                Triangle.cpp)
-target_link_libraries(${PROJECT_NAME} opengl32.lib glu32.lib glew32.lib)
+target_link_libraries(${PROJECT_NAME} opengl32 glu32 glew32)
 
 add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
                    COMMAND ${CMAKE_COMMAND} -E copy_if_different "${GLEW_DIR}/bin/${CMAKE_VS_PLATFORM_NAME}/glew32.dll" "${CMAKE_CURRENT_BINARY_DIR}/$<CONFIG>/"
