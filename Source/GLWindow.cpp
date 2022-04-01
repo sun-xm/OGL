@@ -68,6 +68,12 @@ bool GLWindow::OnCreated()
 
 void GLWindow::OnDestroy()
 {
+    if (this->AttachContext())
+    {
+        this->OnContextDestroy();
+        this->DetachContext();
+    }
+
     if (this->hdc)
     {
         if (this->hrc)
@@ -86,4 +92,8 @@ void GLWindow::OnDestroy()
 bool GLWindow::OnContextCreated()
 {
     return true;
+}
+
+void GLWindow::OnContextDestroy()
+{
 }

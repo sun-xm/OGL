@@ -72,8 +72,6 @@ void Sphere::Render(const GLScene& scene, const Vertex& lightPos)
 
 size_t Sphere::Apply(const GLScene& scene)
 {
-    auto loc = this->program.GetAttribLocation("nml");
-
     auto count = this->vbo.Size() / sizeof(Vertex);
     if (count)
     {

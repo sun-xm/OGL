@@ -63,14 +63,6 @@ bool Viewport::OnCreated()
     return true;
 }
 
-void Viewport::OnDestroy()
-{
-    this->sphere.Release();
-    this->triangle.Release();
-    this->program.Release();
-    GLWindow::OnDestroy();
-}
-
 void Viewport::OnPaint()
 {
     if (this->AttachContext())
@@ -108,4 +100,12 @@ bool Viewport::OnContextCreated()
     this->triangle.Position = { -1, 0, 0 };
 
     return true;
+}
+
+void Viewport::OnContextDestroy()
+{
+    this->sphere.Release();
+    this->triangle.Release();
+    this->program.Release();
+    GLWindow::OnContextDestroy();
 }

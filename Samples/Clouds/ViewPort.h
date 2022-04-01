@@ -9,8 +9,8 @@ public:
 
 protected:
     LRESULT WindowProc(HWND, UINT, WPARAM, LPARAM) override;
-    bool OnCreated() override;
-    void OnDestroy() override;
+    bool OnContextCreated() override;
+    void OnContextDestroy() override;
     void OnPaint() override;
 
 private:

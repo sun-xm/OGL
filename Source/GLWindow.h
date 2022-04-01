@@ -17,6 +17,7 @@ protected:
     void OnDestroy() override;
 
     virtual bool OnContextCreated();
+    virtual void OnContextDestroy();
 
 protected:
     HDC   hdc;

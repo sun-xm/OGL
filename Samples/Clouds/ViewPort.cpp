@@ -62,9 +62,9 @@ LRESULT ViewPort::WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
     return GLWindow::WindowProc(hWnd, uMsg, wParam, lParam);
 }
 
-bool ViewPort::OnCreated()
+bool ViewPort::OnContextCreated()
 {
-    if (!GLWindow::OnCreated())
+    if (!GLWindow::OnContextCreated())
     {
         return false;
     }
@@ -77,12 +77,10 @@ bool ViewPort::OnCreated()
     return true;
 }
 
-void ViewPort::OnDestroy()
+void ViewPort::OnContextDestroy()
 {
-    this->AttachContext();
     this->cloud.Release();
-    this->DetachContext();
-    GLWindow::OnDestroy();
+    GLWindow::OnContextDestroy();
 }
 
 void ViewPort::OnPaint()
@@ -142,9 +140,7 @@ void ViewPort::LoadCloud()
                 v[i] = v[i] - center;
             }
 
-            this->AttachContext();
             this->cloud.Vertices(v.data(), (int)v.size());
-            this->DetachContext();
         }
     }
 }

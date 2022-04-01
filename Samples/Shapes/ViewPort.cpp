@@ -96,75 +96,9 @@ void ViewPort::CreateShape(int shape)
     }
 }
 
-LRESULT ViewPort::WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+bool ViewPort::OnContextCreated()
 {
-    switch (uMsg)
-    {
-        case WM_MOUSEMOVE:
-        {
-            if (MK_LBUTTON & wParam)
-            {
-                POINT pos;
-                if (GetCursorPos(&pos))
-                {
-                    auto x = pos.x - this->cursor.x;
-                    auto y = pos.y - this->cursor.y;
-                    this->cursor = pos;
-
-                    if (this->shape)
-                    {
-                        auto qx = Quaternion<float>::FromAxisAngle(Vertex::XAxis, ToRadian(y * .5f));
-                        auto qy = Quaternion<float>::FromAxisAngle(Vertex::YAxis, ToRadian(x * .5f));
-                        auto qr = Quaternion<float>::FromRotation(this->shape->Rotation);
-
-                        this->shape->Rotation = (qx * qy * qr).ToRotation();
-                        this->Render();
-                    }
-                }
-            }
-            break;
-        }
-
-        case WM_LBUTTONDOWN:
-        {
-            SetCapture(this->Handle());
-            GetCursorPos(&this->cursor);
-            break;
-        }
-
-        case WM_LBUTTONUP:
-        {
-            ReleaseCapture();
-            break;
-        }
-
-        case WM_LBUTTONDBLCLK:
-        {
-            if (this->shape)
-            {
-                this->shape->Rotation = { 0.f, 0.f, 0.f, 0.f };
-            }
-        }
-
-        case WM_MOUSEWHEEL:
-        {
-            auto delta = 1.f + (float)((short)HIWORD(wParam) / WHEEL_DELTA) * 0.05f;
-
-            auto position = this->scene.Camera().Position();
-            auto lookAt   = this->scene.Camera().LookAt();
-            this->scene.Camera().Position((position - lookAt) * delta + lookAt);
-            this->Render();
-
-            break;
-        }
-    }
-
-    return GLWindow::WindowProc(hWnd, uMsg, wParam, lParam);
-}
-
-bool ViewPort::OnCreated()
-{
-    if (!GLWindow::OnCreated())
+    if (!GLWindow::OnContextCreated())
     {
         return false;
     }
@@ -183,22 +117,71 @@ bool ViewPort::OnCreated()
     this->scene.Camera().Clip(0.01f, 100.f);
     this->scene.Camera().Focal(616.f);
 
-    return true;
-}
+    this->RegisterMessage(WM_MOUSEMOVE, [this]
+    {
+        if (MK_LBUTTON & this->wparam)
+        {
+            POINT pos;
+            if (GetCursorPos(&pos))
+            {
+                auto x = pos.x - this->cursor.x;
+                auto y = pos.y - this->cursor.y;
+                this->cursor = pos;
 
-void ViewPort::OnDestroy()
-{
-    if (this->AttachContext())
+                if (this->shape)
+                {
+                    auto qx = Quaternion<float>::FromAxisAngle(Vertex::XAxis, ToRadian(y * .5f));
+                    auto qy = Quaternion<float>::FromAxisAngle(Vertex::YAxis, ToRadian(x * .5f));
+                    auto qr = Quaternion<float>::FromRotation(this->shape->Rotation);
+
+                    this->shape->Rotation = (qx * qy * qr).ToRotation();
+                    this->Render();
+                }
+            }
+        }
+        return 0;
+    });
+    this->RegisterMessage(WM_LBUTTONDOWN, [this]
+    {
+        SetCapture(this->Handle());
+        GetCursorPos(&this->cursor);
+        return 0;
+    });
+    this->RegisterMessage(WM_LBUTTONUP, []
+    {
+        ReleaseCapture();
+        return 0;
+    });
+    this->RegisterMessage(WM_LBUTTONDBLCLK, [this]
     {
         if (this->shape)
         {
-            this->shape->Release();
-            delete this->shape;
+            this->shape->Rotation = { 0.f, 0.f, 0.f, 0.f };
         }
-        this->DetachContext();
-    }
+        return 0;
+    });
+    this->RegisterMessage(WM_MOUSEWHEEL, [this]
+    {
+        auto delta = 1.f + (float)((short)HIWORD(this->wparam) / WHEEL_DELTA) * 0.05f;
 
-    GLWindow::OnDestroy();
+        auto position = this->scene.Camera().Position();
+        auto lookAt   = this->scene.Camera().LookAt();
+        this->scene.Camera().Position((position - lookAt) * delta + lookAt);
+        this->Render();
+        return 0;
+    });
+
+    return true;
+}
+
+void ViewPort::OnContextDestroy()
+{
+    if (this->shape)
+    {
+        this->shape->Release();
+        delete this->shape;
+    }
+    GLWindow::OnContextDestroy();
 }
 
 void ViewPort::OnPaint()

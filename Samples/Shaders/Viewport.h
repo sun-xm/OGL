@@ -12,10 +12,10 @@ public:
 
 protected:
     bool OnCreated() override;
-    void OnDestroy() override;
     void OnPaint() override;
 
     bool OnContextCreated() override;
+    void OnContextDestroy() override;
 
 private:
     GLScene  scene;
