@@ -74,13 +74,10 @@ void Viewport::OnPaint()
 
 void Viewport::Render(float x, float y, float w, float h)
 {
-    auto cw = this->ClientWidth();
-    auto ch = this->ClientHeight();
-
-    auto l = x / cw * 2 - 1;
-    auto t = y / ch * 2 - 1;
-    auto r = (x + w) / cw * 2 - 1;
-    auto b = (y + h) / ch * 2 - 1;
+    auto l = x / this->scene.Width()  * 2 - 1;
+    auto t = y / this->scene.Height() * 2 - 1;
+    auto r = (x + w) / this->scene.Width()  * 2 - 1;
+    auto b = (y + h) / this->scene.Height() * 2 - 1;
 
     vector<Vertex> vertices = {{ l, t, 0 }, { r, t, 0 }, { l, b, 0 },
                                { l, b, 0 }, { r, b, 0 }, { r, t, 0 }};

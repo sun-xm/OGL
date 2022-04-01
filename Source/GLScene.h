@@ -23,6 +23,15 @@ public:
     virtual void Begin(int width, int height);
     virtual void End();
 
+    int Width() const
+    {
+        return this->width;
+    }
+    int Height() const
+    {
+        return this->height;
+    }
+
 protected:
     bool enableDepth;
 
@@ -30,4 +39,6 @@ protected:
     GLLight* lights[GL_LIGHT7 - GL_LIGHT0];
 
     CMatrix<float, 4> matrix;
+
+    int width, height;
 };

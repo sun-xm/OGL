@@ -62,6 +62,9 @@ const CMatrix<float, 4>& GLScene::WorldView() const
 
 void GLScene::Begin(int width, int height)
 {
+    this->width  = width;
+    this->height = height;
+
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
     this->camera.SetProject(width, height);
