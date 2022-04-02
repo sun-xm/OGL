@@ -13,7 +13,6 @@ GLShape::GLShape() : ebo(GL_ELEMENT_ARRAY_BUFFER), vbo(GL_ARRAY_BUFFER), nbo(GL_
 
 GLShape::~GLShape()
 {
-    this->Release();
 }
 
 bool GLShape::Elements(const Element* elements, size_t count)

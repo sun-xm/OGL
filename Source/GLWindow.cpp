@@ -10,13 +10,7 @@ GLWindow::~GLWindow()
 
 bool GLWindow::AttachContext()
 {
-    if (this->hrc)
-    {
-        wglMakeCurrent(this->hdc, this->hrc);
-        return true;
-    }
-
-    return false;
+    return this->hrc && wglMakeCurrent(this->hdc, this->hrc);
 }
 
 void GLWindow::DetachContext()
