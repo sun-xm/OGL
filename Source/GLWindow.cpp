@@ -48,15 +48,23 @@ bool GLWindow::OnCreated()
     DescribePixelFormat(this->hdc, pf, sizeof(pfd), &pfd);
 
     this->hrc = wglCreateContext(this->hdc);
+    if (!this->AttachContext())
+    {
+        return false;
+    }
 
-    this->AttachContext();
-    if (GLEW_OK != glewInit() || !this->OnContextCreated())
+    if (GLEW_OK != glewInit())
+    {
+        return false;
+    }
+
+    if (!this->OnContextCreated())
     {
         this->DetachContext();
         return false;
     }
-    this->DetachContext();
 
+    this->DetachContext();
     return true;
 }
 
