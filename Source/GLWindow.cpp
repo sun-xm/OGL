@@ -18,6 +18,11 @@ void GLWindow::DetachContext()
     wglMakeCurrent(nullptr, nullptr);
 }
 
+void GLWindow::SwapBuffers()
+{
+    ::SwapBuffers(this->hdc);
+}
+
 bool GLWindow::OnCreated()
 {
     this->hdc = GetDC(this->Handle());
@@ -30,7 +35,7 @@ bool GLWindow::OnCreated()
     memset(&pfd, 0, sizeof(pfd));
     pfd.nSize = sizeof(pfd);
     pfd.nVersion = 1;
-    pfd.dwFlags = PFD_DRAW_TO_WINDOW | PFD_SUPPORT_OPENGL;
+    pfd.dwFlags = PFD_DRAW_TO_WINDOW | PFD_DOUBLEBUFFER | PFD_SUPPORT_OPENGL;
     pfd.iPixelType = PFD_TYPE_RGBA;
     pfd.cColorBits = 32;
 

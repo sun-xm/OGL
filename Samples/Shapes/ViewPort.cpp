@@ -200,6 +200,8 @@ void ViewPort::Render()
             this->shape->Render(this->scene);
         }
         this->scene.End();
+
+        this->SwapBuffers();
         this->DetachContext();
     }
 }

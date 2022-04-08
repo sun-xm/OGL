@@ -12,6 +12,7 @@ public:
 protected:
     bool AttachContext();
     void DetachContext();
+    void SwapBuffers();
 
     bool OnCreated() override;
     void OnDestroy() override;

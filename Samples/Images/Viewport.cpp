@@ -66,6 +66,8 @@ void Viewport::OnPaint()
         this->scene.Begin(w, h);
         this->Render((w - 400) / 2.f, (h - 400) / 2.f, 400, 400);
         this->scene.End();
+
+        this->SwapBuffers();
         this->DetachContext();
     }
 

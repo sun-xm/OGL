@@ -85,11 +85,15 @@ void ViewPort::OnContextDestroy()
 
 void ViewPort::OnPaint()
 {
-    this->AttachContext();
-    this->scene.Begin(this->ClientWidth(), this->ClientHeight());
-    this->cloud.Render(this->scene);
-    this->scene.End();
-    this->DetachContext();
+    if (this->AttachContext())
+    {
+        this->scene.Begin(this->ClientWidth(), this->ClientHeight());
+        this->cloud.Render(this->scene);
+        this->scene.End();
+
+        this->SwapBuffers();
+        this->DetachContext();
+    }
 
     GLWindow::OnPaint();
 }

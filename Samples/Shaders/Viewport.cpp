@@ -73,6 +73,8 @@ void Viewport::OnPaint()
         this->triangle.Render(this->scene, this->lightPos);
 
         this->scene.End();
+
+        this->SwapBuffers();
         this->DetachContext();
     }
 
