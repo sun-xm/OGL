@@ -15,6 +15,7 @@ public:
 protected:
     bool OnContextCreated() override;
     void OnContextDestroy() override;
+    void OnTimer() override;
     void OnPaint() override;
 
 private:
@@ -30,4 +31,6 @@ private:
     GLBuffer  vbo;
     GLBuffer  tbo;
     GLTexture tex;
+
+    float rotate;
 };

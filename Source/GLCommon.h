@@ -583,124 +583,6 @@ const Vector<Scalar, 4> Vector<Scalar, 4>::NaN   = { std::numeric_limits<Scalar>
 template<typename Scalar>
 const Vector<Scalar, 4> Vector<Scalar, 4>::Zero  = { 0, 0, 0, 0 };
 
-template<typename Scalar>
-struct Quaternion : public Vector<Scalar, 4>
-{
-    Quaternion() = default;
-    Quaternion(const Scalar* v) : Vector<Scalar, 4>(v)
-    {
-    }
-    Quaternion(const std::initializer_list<Scalar>& v) : Vector<Scalar, 4>(v)
-    {
-    }
-
-    Vector<Scalar, 3> Rotate(const Vector<Scalar, 3>& v) const
-    {
-        auto uv = ((Vector<Scalar, 3>*)this)->Cross(v);
-        uv += uv;
-        return uv * this->v[3] + ((Vector<Scalar, 3>*)this)->Cross(uv) + v;
-    }
-
-    Quaternion<Scalar> Inverse() const
-    {
-        return Quaternion<Scalar>{ this->v[0], this->v[1], this->v[2], -this->v[3] };
-    }
-
-    Quaternion<Scalar> operator*(const Quaternion& other) const
-    {
-        auto& t = (Vector<Scalar, 3>&)*this;
-        auto& o = (Vector<Scalar, 3>&)other;
-
-        auto w = t[3] * o[3] - t.Dot(o);
-        auto p = t.Cross(o) + o * t[3] + t * o[3];
-
-        return Quaternion<Scalar>{ p.v[0], p.v[1], p.v[2], w };
-    }
-
-    Vector<Scalar, 3> ToEuler() const
-    {
-        auto x = std::atan2(2 * (this->v[0] * this->v[3] + this->v[1] * this->v[2]), 1 - 2 * (this->v[0] * this->v[0] + this->v[1] * this->v[1]));
-        auto s = 2 * (this->v[1] * this->v[3] - this->v[0] * this->v[2]);
-        auto y = std::abs(s) < 1 ? std::asin(s) : std::copysign((Scalar)3.14159265358979323846264338327950288419716939937510l / 2, s);
-        auto z = std::atan2(2 * (this->v[2] * this->v[3] + this->v[0] * this->v[1]), 1 - 2 * (this->v[1] * this->v[1] + this->v[2] * this->v[2]));
-
-        return Vector<Scalar, 3>{ x, y, z };
-    }
-
-    Vector<Scalar, 4> ToRotation() const
-    {
-        auto a = acos(this->v[3]);
-        auto s = sin(a);
-
-        if (abs(s) < FLT_EPSILON)
-        {
-            return Vector<Scalar, 4>{ 0, 0, 0, 0 };
-        }
-
-        return Vector<Scalar, 4>{ this->v[0] / s, this->v[1] / s, this->v[2] / s, ToDegree(a * 2) };
-    }
-
-    static Quaternion<Scalar> FromEuler(const Vector<Scalar, 3>& e)
-    {
-        auto cx = std::cos(e[0] / 2);
-        auto sx = std::sin(e[0] / 2);
-        auto cy = std::cos(e[1] / 2);
-        auto sy = std::sin(e[1] / 2);
-        auto cz = std::cos(e[2] / 2);
-        auto sz = std::sin(e[2] / 2);
-
-        return Quaternion<Scalar>{ cz * cy * sx - sz * sy * cx,
-                                   sz * cy * sx + cz * sy * cx,
-                                   sz * cy * cx - cz * sy * sx,
-                                   cz * cy * cx + sz * sy * sx };
-    }
-
-    static Quaternion<Scalar> FromRotation(const Vector<Scalar, 4>& rotation)
-    {
-        auto& axis = (Vector<Scalar, 3>&)rotation;
-        auto angle = rotation.v[3];
-
-        if (axis.Dot() < FLT_EPSILON)
-        {
-            return Identity;
-        }
-
-        return FromAxisAngle(axis, ToRadian(angle));
-    }
-
-    static Quaternion<Scalar> From2Vectors(const Vector<Scalar, 3>& v0, const Vector<Scalar, 3>& v1)
-    {
-        auto n0 = v0.Normalize();
-        auto n1 = v1.Normalize();
-
-        if (std::fabs(n0[0] - n1[0]) < 0.00001 &&
-            std::fabs(n0[1] - n1[1]) < 0.00001 &&
-            std::fabs(n0[2] - n1[2]) < 0.00001)
-        {
-            return Identity;
-        }
-
-        auto h = (n0 + n1).Normalize();
-        auto q = n0.Cross(h);
-
-        return Quaternion<Scalar>{ q[0], q[1], q[2], n0.Dot(h) };
-    }
-
-    static Quaternion<Scalar> FromAxisAngle(const Vector<Scalar, 3>& axis, float radian)
-    {
-        auto a = radian / 2;
-        auto c = cos(a);
-        auto s = sin(a);
-        auto n = axis.Normalize();
-
-        return Quaternion<Scalar>{ s * n.v[0], s * n.v[1], s * n.v[2], c };
-    }
-
-    static const Quaternion<Scalar> Identity;
-};
-template<typename Scalar>
-const Quaternion<Scalar> Quaternion<Scalar>::Identity = { 0, 0, 0, 1 };
-
 typedef Vector<uint32_t, 3> Element;
 typedef Vector<float, 3> Vertex;
 typedef Vector<float, 3> Normal;
@@ -889,6 +771,143 @@ struct CMatrix
         return this->v[0];
     }
 };
+
+template<typename Scalar>
+struct Quaternion : public Vector<Scalar, 4>
+{
+    Quaternion() = default;
+    Quaternion(const Scalar* v) : Vector<Scalar, 4>(v)
+    {
+    }
+    Quaternion(const std::initializer_list<Scalar>& v) : Vector<Scalar, 4>(v)
+    {
+    }
+
+    Vector<Scalar, 3> Rotate(const Vector<Scalar, 3>& v) const
+    {
+        auto uv = ((Vector<Scalar, 3>*)this)->Cross(v);
+        uv += uv;
+        return uv * this->v[3] + ((Vector<Scalar, 3>*)this)->Cross(uv) + v;
+    }
+
+    Quaternion<Scalar> Inverse() const
+    {
+        return Quaternion<Scalar>{ this->v[0], this->v[1], this->v[2], -this->v[3] };
+    }
+
+    Quaternion<Scalar> operator*(const Quaternion& other) const
+    {
+        auto& t = (Vector<Scalar, 3>&)*this;
+        auto& o = (Vector<Scalar, 3>&)other;
+
+        auto w = t[3] * o[3] - t.Dot(o);
+        auto p = t.Cross(o) + o * t[3] + t * o[3];
+
+        return Quaternion<Scalar>{ p.v[0], p.v[1], p.v[2], w };
+    }
+
+    Vector<Scalar, 3> ToEuler() const
+    {
+        auto x = std::atan2(2 * (this->v[0] * this->v[3] + this->v[1] * this->v[2]), 1 - 2 * (this->v[0] * this->v[0] + this->v[1] * this->v[1]));
+        auto s = 2 * (this->v[1] * this->v[3] - this->v[0] * this->v[2]);
+        auto y = std::abs(s) < 1 ? std::asin(s) : std::copysign((Scalar)3.14159265358979323846264338327950288419716939937510l / 2, s);
+        auto z = std::atan2(2 * (this->v[2] * this->v[3] + this->v[0] * this->v[1]), 1 - 2 * (this->v[1] * this->v[1] + this->v[2] * this->v[2]));
+
+        return Vector<Scalar, 3>{ x, y, z };
+    }
+
+    Vector<Scalar, 4> ToRotation() const
+    {
+        auto a = acos(this->v[3]);
+        auto s = sin(a);
+
+        if (abs(s) < FLT_EPSILON)
+        {
+            return Vector<Scalar, 4>{ 0, 0, 0, 0 };
+        }
+
+        return Vector<Scalar, 4>{ this->v[0] / s, this->v[1] / s, this->v[2] / s, ToDegree(a * 2) };
+    }
+
+    Matrix<Scalar, 4> ToMatrix() const
+    {
+        auto xx2 = this->X * this->X * 2;
+        auto yy2 = this->Y * this->Y * 2;
+        auto zz2 = this->Z * this->Z * 2;
+        auto xy2 = this->X * this->Y * 2;
+        auto xz2 = this->X * this->Z * 2;
+        auto yz2 = this->Y * this->Z * 2;
+        auto xw2 = this->X * this->W * 2;
+        auto yw2 = this->Y * this->W * 2;
+        auto zw2 = this->Z * this->W * 2;
+
+        return Matrix<Scalar, 4>{{ 1 - yy2 - zz2,     xy2 - zw2,     xz2 + yw2, 0 },
+                                 {     xy2 + zw2, 1 - xx2 - zz2,     yz2 - xw2, 0 },
+                                 {     xz2 - yw2,     yz2 + xw2, 1 - xx2 - yy2, 0 },
+                                 {             0,             0,             0, 1 }}; 
+    }
+
+    static Quaternion<Scalar> FromEuler(const Vector<Scalar, 3>& e)
+    {
+        auto cx = std::cos(e[0] / 2);
+        auto sx = std::sin(e[0] / 2);
+        auto cy = std::cos(e[1] / 2);
+        auto sy = std::sin(e[1] / 2);
+        auto cz = std::cos(e[2] / 2);
+        auto sz = std::sin(e[2] / 2);
+
+        return Quaternion<Scalar>{ cz * cy * sx - sz * sy * cx,
+                                   sz * cy * sx + cz * sy * cx,
+                                   sz * cy * cx - cz * sy * sx,
+                                   cz * cy * cx + sz * sy * sx };
+    }
+
+    static Quaternion<Scalar> FromRotation(const Vector<Scalar, 4>& rotation)
+    {
+        auto& axis = (Vector<Scalar, 3>&)rotation;
+        auto angle = rotation.v[3];
+
+        if (axis.Dot() < FLT_EPSILON)
+        {
+            return Identity;
+        }
+
+        return FromAxisAngle(axis, ToRadian(angle));
+    }
+
+    static Quaternion<Scalar> From2Vectors(const Vector<Scalar, 3>& v0, const Vector<Scalar, 3>& v1)
+    {
+        auto n0 = v0.Normalize();
+        auto n1 = v1.Normalize();
+
+        if (std::fabs(n0[0] - n1[0]) < 0.00001 &&
+            std::fabs(n0[1] - n1[1]) < 0.00001 &&
+            std::fabs(n0[2] - n1[2]) < 0.00001)
+        {
+            return Identity;
+        }
+
+        auto h = (n0 + n1).Normalize();
+        auto q = n0.Cross(h);
+
+        return Quaternion<Scalar>{ q[0], q[1], q[2], n0.Dot(h) };
+    }
+
+    static Quaternion<Scalar> FromAxisAngle(const Vector<Scalar, 3>& axis, float radian)
+    {
+        auto a = radian / 2;
+        auto c = cos(a);
+        auto s = sin(a);
+        auto n = axis.Normalize();
+
+        return Quaternion<Scalar>{ s * n.v[0], s * n.v[1], s * n.v[2], c };
+    }
+
+    static const Quaternion<Scalar> Identity;
+};
+
+template<typename Scalar>
+const Quaternion<Scalar> Quaternion<Scalar>::Identity = { 0, 0, 0, 1 };
 
 template<typename T, size_t N>
 char(&_ArraySizeHelper(T(&array)[N]))[N];

@@ -130,6 +130,18 @@ bool GLProgram::Uniform1i(const string& name, int value)
     return true;
 }
 
+bool GLProgram::UniformV2f(const string& name, const Vector<float, 2>& value)
+{
+    auto loc = this->UniformLocation(name);
+    if (loc < 0)
+    {
+        return false;
+    }
+
+    glUniform2f(loc, value[0], value[1]);
+    return true;
+}
+
 bool GLProgram::UniformV3f(const string& name, const Vector<float, 3>& value)
 {
     auto loc = this->UniformLocation(name);

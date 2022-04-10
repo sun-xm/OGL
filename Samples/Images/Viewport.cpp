@@ -3,7 +3,7 @@
 
 using namespace std;
 
-Viewport::Viewport() : vbo(GL_ARRAY_BUFFER), tbo(GL_ARRAY_BUFFER)
+Viewport::Viewport() : vbo(GL_ARRAY_BUFFER), tbo(GL_ARRAY_BUFFER), rotate(0)
 {
 }
 
@@ -39,6 +39,8 @@ bool Viewport::OnContextCreated()
     Texture tex(L"Portrait.png");
     this->tex.Data(tex.Pixels(), tex.Width(), tex.Height(), tex.Width() * tex.Height() * 4, GL_BGRA);
 
+    this->SetTimer(0, 17);
+
     return true;
 }
 
@@ -53,6 +55,17 @@ void Viewport::OnContextDestroy()
     this->tex.Release();
 
     GLWindow::OnContextDestroy();
+}
+
+void Viewport::OnTimer()
+{
+    this->rotate += .5f;
+    if (this->rotate > 360.f)
+    {
+        this->rotate -= 360.f;
+    }
+
+    this->Invalidate();
 }
 
 void Viewport::OnPaint()
@@ -76,10 +89,12 @@ void Viewport::OnPaint()
 
 void Viewport::Render(float x, float y, float w, float h)
 {
-    auto l = x / this->scene.Width()  * 2 - 1;
-    auto t = y / this->scene.Height() * 2 - 1;
-    auto r = (x + w) / this->scene.Width()  * 2 - 1;
-    auto b = (y + h) / this->scene.Height() * 2 - 1;
+    auto cx = this->scene.Width()  * .5f;
+    auto cy = this->scene.Height() * .5f;
+    auto l = x - cx;
+    auto t = y - cy;
+    auto r = l + w;
+    auto b = t + h;
 
     vector<Vertex> vertices = {{ l, t, 0 }, { r, t, 0 }, { l, b, 0 },
                                { l, b, 0 }, { r, b, 0 }, { r, t, 0 }};
@@ -92,6 +107,8 @@ void Viewport::Render(float x, float y, float w, float h)
     this->program.Use();
     this->program.BindAttrib("vtx", this->vbo, 3, GL_FLOAT);
     this->program.BindAttrib("crd", this->tbo, 2, GL_FLOAT);
+    this->program.UniformV2f("HalfWH", Vector<float, 2>{ cx, cy });
+    this->program.UniformM4f("Rotate", Quaternion<float>::FromAxisAngle(Vertex::ZAxis, ToRadian(this->rotate)).ToMatrix().Transpose());
 
     this->tex.Apply();
 
