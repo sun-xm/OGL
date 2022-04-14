@@ -106,7 +106,8 @@ void Viewport::Render(float x, float y, float w, float h)
     this->program.BindAttrib("crd", this->tbo, 2, GL_FLOAT);
     this->program.UniformV2f("Unify", Vector<float, 2>{ cw * .5f, ch * .5f });
 
-    auto m = Transform2D<float>::Shift(x, -y);
+    auto m = Transform2D<float>::Rotate(w * .5f, h * .5f, ToRadian(this->rotate));
+    m = Transform2D<float>::Shift(x, -y) * m;
     m = Transform2D<float>::Shift(-cw * .5f, ch * .5f) * m;
     this->program.UniformM3f("Matrix", m);
 
