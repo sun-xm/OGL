@@ -29,9 +29,9 @@ public:
     bool Uniform1i(const std::string& name, int value);
     bool UniformV2f(const std::string& name, const Vector<float, 2>& value);
     bool UniformV3f(const std::string& name, const Vector<float, 3>& value);
-    bool UniformM3f(const std::string& name, const Matrix<float, 3>& value);
+    bool UniformM3f(const std::string& name, const Matrix<float, 3>& value, bool transpose = true);
     bool UniformV4f(const std::string& name, const Vector<float, 4>& value);
-    bool UniformM4f(const std::string& name, const Matrix<float, 4>& value);
+    bool UniformM4f(const std::string& name, const Matrix<float, 4>& value, bool transpose = true);
 
     operator bool() const
     {

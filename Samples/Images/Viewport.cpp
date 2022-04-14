@@ -108,7 +108,7 @@ void Viewport::Render(float x, float y, float w, float h)
 
     auto m = Transform2D<float>::Shift(x, -y);
     m = Transform2D<float>::Shift(-cw * .5f, ch * .5f) * m;
-    this->program.UniformM3f("Matrix", m.Transpose());
+    this->program.UniformM3f("Matrix", m);
 
     this->tex.Apply();
 

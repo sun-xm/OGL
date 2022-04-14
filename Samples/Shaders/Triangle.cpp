@@ -51,13 +51,13 @@ size_t Triangle::Apply(const GLScene& scene)
         this->program.Use();
 
         this->program.UniformV3f("LightPos",  this->lightPos);
-        this->program.UniformM4f("WorldView", scene.WorldView().RawMatrix());
+        this->program.UniformM4f("WorldView", scene.WorldView());
 
         Matrix<float, 4> modelView, projection;
         glGetFloatv(GL_MODELVIEW_MATRIX,  modelView);
         glGetFloatv(GL_PROJECTION_MATRIX, projection);
-        this->program.UniformM4f("ModelView",  modelView);
-        this->program.UniformM4f("Projection", projection);
+        this->program.UniformM4f("ModelView",  modelView,  false);
+        this->program.UniformM4f("Projection", projection, false);
 
         this->program.BindAttrib("vtx", this->vbo, 3, GL_FLOAT);
         this->program.BindAttrib("clr", this->cbo, 3, GL_FLOAT);

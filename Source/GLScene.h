@@ -18,7 +18,7 @@ public:
     GLLight& EnableLight(int index);
     void DisableLight(int index);
 
-    const CMatrix<float, 4>& WorldView() const;
+    const Matrix<float, 4>& WorldView() const;
 
     virtual void Begin(int width, int height);
     virtual void End();
@@ -38,7 +38,7 @@ protected:
     GLCamera camera;
     GLLight* lights[GL_LIGHT7 - GL_LIGHT0];
 
-    CMatrix<float, 4> matrix;
+    Matrix<float, 4> matrix;
 
     int width, height;
 };

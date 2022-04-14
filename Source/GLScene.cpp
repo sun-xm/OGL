@@ -55,7 +55,7 @@ void GLScene::DisableLight(int index)
     this->lights[index] = nullptr;
 }
 
-const CMatrix<float, 4>& GLScene::WorldView() const
+const Matrix<float, 4>& GLScene::WorldView() const
 {
     return this->matrix;
 }
@@ -73,6 +73,7 @@ void GLScene::Begin(int width, int height)
     glLoadIdentity();
     this->camera.SetLookAt();
     glGetFloatv(GL_MODELVIEW_MATRIX, this->matrix);
+    this->matrix = this->matrix.Transpose();
 
     if (this->enableDepth)
     {

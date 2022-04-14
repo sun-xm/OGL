@@ -710,68 +710,6 @@ inline Vector<Scalar, MCols> operator*(const Matrix<Scalar, MRows, MCols>& m, co
     return p;
 }
 
-template<typename Scalar, size_t MRows, size_t MCols = MRows>
-struct CMatrix
-{
-    Vector<Scalar, MRows> v[MCols];
-
-    CMatrix() = default;
-    CMatrix(const Scalar* v)
-    {
-        for (size_t i = 0; i < MCols; i++)
-        {
-            this->v[i] = v + i * MRows;
-        }
-    }
-    CMatrix(const std::initializer_list<Scalar>& list)
-    {
-        auto l = list.begin();
-        for (size_t i = 0; i < MCols; i++)
-        {
-            auto& v = this->v[i];
-            for (size_t j = 0; j < MRows; j++)
-            {
-                v[j] = (list.end() == l) ? (Scalar)0 : *l++;
-            }
-        }
-    }
-    CMatrix(const std::initializer_list<const Vector<Scalar, MRows>>& list)
-    {
-        auto l = list.begin();
-        for (size_t i = 0; i < MCols; i++)
-        {
-            this->v[i] = (list.end() == l) ? Vector<Scalar, MRows>((Scalar)0) : *l++;
-        }
-    }
-
-    ::Matrix<Scalar, MRows, MCols> ToMatrix() const
-    {
-        ::Matrix<Scalar, MRows, MCols> m;
-        for (size_t i = 0; i < MCols; i++)
-        {
-            for (size_t j = 0; j < MRows; j++)
-            {
-                m[j][i] = this->v[i][j];
-            }
-        }
-        return m;
-    }
-
-    const ::Matrix<Scalar, MRows, MCols>& RawMatrix() const
-    {
-        return *(::Matrix<Scalar, MRows, MCols>*)this;
-    }
-
-    operator Scalar*()
-    {
-        return this->v[0];
-    }
-    operator const Scalar*() const
-    {
-        return this->v[0];
-    }
-};
-
 template<typename Scalar>
 class Transform2D
 {
