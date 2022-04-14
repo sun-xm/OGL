@@ -773,6 +773,42 @@ struct CMatrix
 };
 
 template<typename Scalar>
+class Transform2D
+{
+public:
+    static Matrix<Scalar, 3> Identity()
+    {
+        return Matrix<Scalar, 3>{{ 1, 0, 0 },
+                                 { 0, 1, 0 },
+                                 { 0, 0, 1 }};
+    }
+
+    static Matrix<Scalar, 3> Shift(Scalar x, Scalar y)
+    {
+        return Matrix<Scalar, 3>{{ 1, 0, x },
+                                 { 0, 1, y },
+                                 { 0, 0, 1 }};
+    }
+
+    static Matrix<Scalar, 3> Scale(Scalar x, Scalar y)
+    {
+        return Matrix<Scalar, 3>{{ x, 0, 0 },
+                                 { 0, y, 0 },
+                                 { 0, 0, 1 }};
+    }
+
+    static Matrix<Scalar, 3> Rotate(Scalar x, Scalar y, Scalar radian)
+    {
+        auto s = std::sin(radian);
+        auto c = std::cos(radian);
+        auto m = Matrix<Scalar, 3>{{ c, -s, 0 },
+                                   { s,  c, 0 },
+                                   { 0,  0, 1 }};
+        return Shift(x, y) * m * Shift(-x, -y);
+    }
+};
+
+template<typename Scalar>
 struct Quaternion : public Vector<Scalar, 4>
 {
     Quaternion() = default;

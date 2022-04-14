@@ -154,6 +154,18 @@ bool GLProgram::UniformV3f(const string& name, const Vector<float, 3>& value)
     return true;
 }
 
+bool GLProgram::UniformM3f(const string& name, const Matrix<float, 3>& value)
+{
+    auto loc = this->UniformLocation(name);
+    if (loc < 0)
+    {
+        return false;
+    }
+
+    glUniformMatrix3fv(loc, 1, GL_FALSE, value);
+    return true;
+}
+
 bool GLProgram::UniformV4f(const string& name, const Vector<float, 4>& value)
 {
     auto loc = this->UniformLocation(name);

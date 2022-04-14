@@ -89,26 +89,26 @@ void Viewport::OnPaint()
 
 void Viewport::Render(float x, float y, float w, float h)
 {
-    auto cx = this->scene.Width()  * .5f;
-    auto cy = this->scene.Height() * .5f;
-    auto l = x - cx;
-    auto t = y - cy;
-    auto r = l + w;
-    auto b = t + h;
+    auto cw = this->scene.Width();
+    auto ch = this->scene.Height();
 
-    vector<Vertex> vertices = {{ l, t, 0 }, { r, t, 0 }, { l, b, 0 },
-                               { l, b, 0 }, { r, b, 0 }, { r, t, 0 }};
+    h = -h;
+    vector<Vertex> vertices = {{ 0, 0, 1 }, { w, 0, 1 }, { 0, h, 1 },
+                               { 0, h, 1 }, { w, h, 1 }, { w, 0, 1 }};
     this->vbo.Data(vertices.data(), vertices.size() * sizeof(vertices[0]), GL_DYNAMIC_DRAW);
 
-    vector<Coordinate> coords = {{ 0, 1 }, { 1, 1 }, { 0, 0 },
-                                 { 0, 0 }, { 1, 0 }, { 1, 1 }};
+    vector<Coordinate> coords = {{ 0, 0 }, { 1, 0 }, { 0, 1 },
+                                 { 0, 1 }, { 1, 1 }, { 1, 0 }};
     this->tbo.Data(coords.data(), coords.size() * sizeof(coords[0]), GL_DYNAMIC_DRAW);
 
     this->program.Use();
     this->program.BindAttrib("vtx", this->vbo, 3, GL_FLOAT);
     this->program.BindAttrib("crd", this->tbo, 2, GL_FLOAT);
-    this->program.UniformV2f("HalfWH", Vector<float, 2>{ cx, cy });
-    this->program.UniformM4f("Rotate", Quaternion<float>::FromAxisAngle(Vertex::ZAxis, ToRadian(this->rotate)).ToMatrix().Transpose());
+    this->program.UniformV2f("Unify", Vector<float, 2>{ cw * .5f, ch * .5f });
+
+    auto m = Transform2D<float>::Shift(x, -y);
+    m = Transform2D<float>::Shift(-cw * .5f, ch * .5f) * m;
+    this->program.UniformM3f("Matrix", m.Transpose());
 
     this->tex.Apply();
 
