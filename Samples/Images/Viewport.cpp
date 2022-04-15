@@ -104,11 +104,11 @@ void Viewport::Render(float x, float y, float w, float h)
     this->program.Use();
     this->program.BindAttrib("vtx", this->vbo, 3, GL_FLOAT);
     this->program.BindAttrib("crd", this->tbo, 2, GL_FLOAT);
-    this->program.UniformV2f("Unify", Vector<float, 2>{ cw * .5f, ch * .5f });
 
-    auto m = Transform2D<float>::Rotate(w * .5f, h * .5f, ToRadian(this->rotate));
-    m = Transform2D<float>::Shift(x, -y) * m;
-    m = Transform2D<float>::Shift(-cw * .5f, ch * .5f) * m;
+    auto m = Transform2D<float>::Rotate(w * .5f, h * .5f, ToRadian(this->rotate));  // Rotate image
+    m = Transform2D<float>::Shift(x, -y) * m;                                       // Shift image to position
+    m = Transform2D<float>::Shift(-cw * .5f, ch * .5f) * m;                         // Shift origin of coordinates to upper-left corner
+    m = Transform2D<float>::Scale(2.f / cw, 2.f / ch) * m;                          // Unify projected coordinates to -1 ~ +1
     this->program.UniformM3f("Matrix", m);
 
     this->tex.Apply();
