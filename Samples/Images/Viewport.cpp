@@ -3,7 +3,7 @@
 
 using namespace std;
 
-Viewport::Viewport() : vbo(GL_ARRAY_BUFFER), tbo(GL_ARRAY_BUFFER), rotate(0)
+Viewport::Viewport() : rotate(0)
 {
 }
 
@@ -14,30 +14,15 @@ bool Viewport::OnContextCreated()
         return false;
     }
 
-    if (!this->program.Create())
-    {
-        return false;
-    }
-
     string log;
-    if (!this->vshader.Create(GL_VERTEX_SHADER)   || !this->vshader.Load(L"VertexShader.glsl")   || !this->vshader.Compile(log) ||
-        !this->fshader.Create(GL_FRAGMENT_SHADER) || !this->fshader.Load(L"FragmentShader.glsl") || !this->fshader.Compile(log))
+    if (!this->renderer.Create(log))
     {
-        OutputDebugStringA(("Failed to create shaders:\n" + log + '\n').c_str());
-        return false;
-    }
-
-    this->program.Attach(this->vshader);
-    this->program.Attach(this->fshader);
-
-    if (!this->program.Link(log))
-    {
-        OutputDebugStringA(("Failed to link program:\n" + log + '\n').c_str());
+        OutputDebugStringA(("Failed to create renderer:\n" + log + '\n').c_str());
         return false;
     }
 
     Texture tex(L"Portrait.png");
-    this->tex.Data(tex.Pixels(), tex.Width(), tex.Height(), tex.Width() * tex.Height() * 4, GL_BGRA);
+    this->texture.Data(tex.Pixels(), tex.Width(), tex.Height(), tex.Width() * tex.Height() * 4, GL_BGRA);
 
     this->SetTimer(0, 17);
 
@@ -46,13 +31,8 @@ bool Viewport::OnContextCreated()
 
 void Viewport::OnContextDestroy()
 {
-    this->vshader.Release();
-    this->fshader.Release();
-    this->program.Release();
-
-    this->vbo.Release();
-    this->tbo.Release();
-    this->tex.Release();
+    this->renderer.Release();
+    this->texture.Release();
 
     GLWindow::OnContextDestroy();
 }
@@ -75,49 +55,20 @@ void Viewport::OnPaint()
 
     if (this->AttachContext())
     {
-        glClearColor(1, 1, 1, 1);
-        this->scene.Begin(w, h);
-        this->Render((w - 400) / 2.f, (h - 400) / 2.f, 400, 400);
-        this->scene.End();
+        this->renderer.Begin(w, h);
+        this->renderer.Clear(1, 1, 1, 1);
+        this->renderer.Identity();
+        this->renderer.Rotate(200, 200, ToRadian(this->rotate));
+        this->renderer.Shift((w - 400) * .5f, (h - 400) * .5f);
+        this->renderer.Image(this->texture, 400, 400);
 
+        glColor3f(1, 0, 0);
+        glLineWidth(2);
+        this->renderer.Line(0, 0, 400, 400);
+        this->renderer.End();
         this->SwapBuffers();
         this->DetachContext();
     }
 
     GLWindow::OnPaint();
-}
-
-void Viewport::Render(float x, float y, float w, float h)
-{
-    auto cw = this->scene.Width();
-    auto ch = this->scene.Height();
-
-    h = -h;
-    vector<Vertex> vertices = {{ 0, 0, 1 }, { w, 0, 1 }, { 0, h, 1 },
-                               { 0, h, 1 }, { w, h, 1 }, { w, 0, 1 }};
-    this->vbo.Data(vertices.data(), vertices.size() * sizeof(vertices[0]), GL_DYNAMIC_DRAW);
-
-    vector<Coordinate> coords = {{ 0, 0 }, { 1, 0 }, { 0, 1 },
-                                 { 0, 1 }, { 1, 1 }, { 1, 0 }};
-    this->tbo.Data(coords.data(), coords.size() * sizeof(coords[0]), GL_DYNAMIC_DRAW);
-
-    this->program.Use();
-    this->program.BindAttrib("vtx", this->vbo, 3, GL_FLOAT);
-    this->program.BindAttrib("crd", this->tbo, 2, GL_FLOAT);
-
-    auto m = Transform2D<float>::Rotate(w * .5f, h * .5f, ToRadian(this->rotate));  // Rotate image
-    m = Transform2D<float>::Shift(x, -y) * m;                                       // Shift image to position
-    m = Transform2D<float>::Shift(-cw * .5f, ch * .5f) * m;                         // Shift origin of coordinates to upper-left corner
-    m = Transform2D<float>::Scale(2.f / cw, 2.f / ch) * m;                          // Unify projected coordinates to -1 ~ +1
-    this->program.UniformM3f("Matrix", m);
-
-    this->tex.Apply();
-
-    glDrawArrays(GL_TRIANGLES, 0, (GLsizei)vertices.size());
-
-    this->tex.Revoke();
-
-    this->program.UnbindAttrib("vtx");
-    this->program.UnbindAttrib("crd");
-    glUseProgram(0);
 }

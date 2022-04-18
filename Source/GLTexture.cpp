@@ -71,7 +71,7 @@ bool GLTexture::Data(const unsigned char* pixels, int width, int height, int siz
     return true;
 }
 
-void GLTexture::Apply()
+void GLTexture::Apply() const
 {
     if (this->tex)
     {
@@ -85,7 +85,7 @@ void GLTexture::Apply()
     }
 }
 
-void GLTexture::Revoke()
+void GLTexture::Revoke() const
 {
     if (this->tex)
     {

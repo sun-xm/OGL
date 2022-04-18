@@ -12,8 +12,8 @@ public:
     void Filter(GLuint minFilter, GLuint magFilter);
     void Wrap(GLuint wrapS, GLuint wrapT);
     bool Data(const unsigned char* pixels, int width, int height, int size, GLenum format);
-    void Apply();
-    void Revoke();
+    void Apply() const;
+    void Revoke() const;
     void Release();
 
     operator bool() const

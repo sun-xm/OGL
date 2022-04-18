@@ -5,14 +5,17 @@ add_executable(${PROJECT_NAME} WIN32
                ${GUI_CPP}
                ${SRC_CPP}
                Application.cpp
+               GLRenderer.cpp
                Viewport.cpp
                Texture.cpp)
 target_link_libraries(${PROJECT_NAME} opengl32 glu32 gdiplus ${GLEW_LIB})
 
 add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
-                   COMMAND ${CMAKE_COMMAND} -E copy_if_different "${CMAKE_CURRENT_LIST_DIR}/Portrait.png" "${CMAKE_CURRENT_BINARY_DIR}/$<CONFIG>/"
-                   COMMAND ${CMAKE_COMMAND} -E copy_if_different "${CMAKE_CURRENT_LIST_DIR}/VertexShader.glsl" "${CMAKE_CURRENT_BINARY_DIR}/$<CONFIG>/"
-                   COMMAND ${CMAKE_COMMAND} -E copy_if_different "${CMAKE_CURRENT_LIST_DIR}/FragmentShader.glsl" "${CMAKE_CURRENT_BINARY_DIR}/$<CONFIG>/")
+                   COMMAND ${CMAKE_COMMAND} -E copy_if_different "${CMAKE_CURRENT_LIST_DIR}/Portrait.png"     "${CMAKE_CURRENT_BINARY_DIR}/$<CONFIG>/"
+                   COMMAND ${CMAKE_COMMAND} -E copy_if_different "${CMAKE_CURRENT_LIST_DIR}/GLSL/TexVtx.glsl" "${CMAKE_CURRENT_BINARY_DIR}/$<CONFIG>/"
+                   COMMAND ${CMAKE_COMMAND} -E copy_if_different "${CMAKE_CURRENT_LIST_DIR}/GLSL/TexFrg.glsl" "${CMAKE_CURRENT_BINARY_DIR}/$<CONFIG>/"
+                   COMMAND ${CMAKE_COMMAND} -E copy_if_different "${CMAKE_CURRENT_LIST_DIR}/GLSL/ClrVtx.glsl" "${CMAKE_CURRENT_BINARY_DIR}/$<CONFIG>/"
+                   COMMAND ${CMAKE_COMMAND} -E copy_if_different "${CMAKE_CURRENT_LIST_DIR}/GLSL/ClrFrg.glsl" "${CMAKE_CURRENT_BINARY_DIR}/$<CONFIG>/")
 
 if(GLEW_SHARED)
     add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
