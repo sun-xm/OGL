@@ -143,10 +143,9 @@ void GLRenderer::Triangles(const Coordinate* coordinates, const Coordinate* texC
     this->texPrg.BindAttrib("vtx", vbo, 3, GL_FLOAT);
     this->texPrg.BindAttrib("crd", tbo, 2, GL_FLOAT);
     this->texPrg.UniformM3f("Matrix", this->unify * this->origin * this->transform);
+    this->texPrg.UniformTex("tex", texture, 0);
 
-    texture.Apply();
     glDrawArrays(GL_TRIANGLES, 0, (GLsizei)vertices.size());
-    texture.Revoke();
 
     this->texPrg.UnbindAttrib("vtx");
     this->texPrg.UnbindAttrib("crd");

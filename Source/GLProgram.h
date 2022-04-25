@@ -3,6 +3,7 @@
 #include "GLCommon.h"
 #include "GLBuffer.h"
 #include "GLShader.h"
+#include "GLTexture.h"
 
 class GLProgram
 {
@@ -32,6 +33,7 @@ public:
     bool UniformM3f(const std::string& name, const Matrix<float, 3>& value, bool transpose = true);
     bool UniformV4f(const std::string& name, const Vector<float, 4>& value);
     bool UniformM4f(const std::string& name, const Matrix<float, 4>& value, bool transpose = true);
+    bool UniformTex(const std::string& name, const GLTexture& texture, uint32_t index);
 
     operator bool() const
     {

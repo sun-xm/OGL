@@ -1,7 +1,7 @@
 #include "GLTexture.h"
 
-GLTexture::GLTexture()
-  : tex(0), envMode(GL_MODULATE), minFilter(GL_LINEAR), magFilter(GL_LINEAR), wrapS(GL_REPEAT), wrapT(GL_REPEAT)
+GLTexture::GLTexture(GLenum target)
+  : w(0), h(0), tex(0), target(target), envMode(GL_MODULATE), minFilter(GL_LINEAR), magFilter(GL_LINEAR), wrapS(GL_REPEAT), wrapT(GL_REPEAT)
 {
 }
 
@@ -31,9 +31,9 @@ void GLTexture::Wrap(GLuint wrapS, GLuint wrapT)
     this->wrapT = wrapT;
 }
 
-bool GLTexture::Data(const unsigned char* pixels, int width, int height, int size, GLenum format)
+bool GLTexture::Data(GLenum format, const unsigned char* pixels, size_t size, uint32_t width, uint32_t height)
 {
-    if (!pixels || width <= 0 || height <= 0 || size <= 0)
+    if (!pixels || !size || !width)
     {
         return false;
     }
@@ -64,24 +64,57 @@ bool GLTexture::Data(const unsigned char* pixels, int width, int height, int siz
             return false;
     }
 
-    glBindTexture(GL_TEXTURE_2D, this->tex);
+    glBindTexture(this->target, this->tex);
     glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-    glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, width, height, 0, format, GL_UNSIGNED_BYTE, pixels);
+
+    switch (this->target)
+    {
+        case GL_TEXTURE_1D:
+        {
+            glTexImage1D(this->target, 0, internalFormat, width, 0, format, GL_UNSIGNED_BYTE, pixels);
+            break;
+        }
+
+        case GL_TEXTURE_2D:
+        {
+            if (!height)
+            {
+                return false;
+            }
+
+            glTexImage2D(this->target, 0, internalFormat, width, height, 0, format, GL_UNSIGNED_BYTE, pixels);
+            break;
+        }
+
+        default:
+            return false;
+    }
+
+    this->w = width;
+    this->h = height;
 
     return true;
+}
+
+void GLTexture::Set() const
+{
+    if (this->tex)
+    {
+        glBindTexture(this->target, this->tex);
+        glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, this->envMode);
+        glTexParameteri(this->target, GL_TEXTURE_WRAP_S, this->wrapS);
+        glTexParameteri(this->target, GL_TEXTURE_WRAP_T, this->wrapT);
+        glTexParameteri(this->target, GL_TEXTURE_MIN_FILTER, this->minFilter);
+        glTexParameteri(this->target, GL_TEXTURE_MAG_FILTER, this->magFilter);
+    }
 }
 
 void GLTexture::Apply() const
 {
     if (this->tex)
     {
-        glBindTexture(GL_TEXTURE_2D, this->tex);
-        glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, this->envMode);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, this->wrapS);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, this->wrapT);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, this->minFilter);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, this->magFilter);
-        glEnable(GL_TEXTURE_2D);
+        this->Set();
+        glEnable(this->target);
     }
 }
 
@@ -89,8 +122,8 @@ void GLTexture::Revoke() const
 {
     if (this->tex)
     {
-        glDisable(GL_TEXTURE_2D);
-        glBindTexture(GL_TEXTURE_2D, 0);
+        glDisable(this->target);
+        glBindTexture(this->target, 0);
     }
 }
 

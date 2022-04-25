@@ -22,7 +22,7 @@ bool Viewport::OnContextCreated()
     }
 
     Texture tex(L"Portrait.png");
-    this->texture.Data(tex.Pixels(), tex.Width(), tex.Height(), tex.Width() * tex.Height() * 4, GL_BGRA);
+    this->texture.Data(GL_BGRA, tex.Pixels(), tex.Width() * tex.Height() * 4, tex.Width(), tex.Height());
 
     this->SetTimer(0, 17);
 

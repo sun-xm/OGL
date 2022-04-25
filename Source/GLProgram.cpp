@@ -190,6 +190,22 @@ bool GLProgram::UniformM4f(const string& name, const Matrix<float, 4>& value, bo
     return true;
 }
 
+bool GLProgram::UniformTex(const string& name, const GLTexture& texture, uint32_t index)
+{
+    auto loc = this->UniformLocation(name);
+    if (loc < 0)
+    {
+        return false;
+    }
+
+    glActiveTexture(GL_TEXTURE0 + index);
+    glBindTexture(texture.Target(), texture);
+    glUniform1i(loc, index);
+    texture.Set();
+
+    return true;
+}
+
 GLint GLProgram::UniformLocation(const string& name)
 {
     if (!this->program)
