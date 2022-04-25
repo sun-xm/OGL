@@ -7,12 +7,14 @@ using namespace std;
 #define LEVELS (4)
 #define RADIUS (0.5f)
 
-Sphere::Sphere(Program& program) : program(program), cbo(GL_ARRAY_BUFFER)
+Sphere::Sphere() : cbo(GL_ARRAY_BUFFER)
 {
 }
 
-void Sphere::Create()
+void Sphere::Create(const GLProgram& program)
 {
+    this->program = program;
+
     vector<Vertex> vertices;
 
     Vertex v0 = { RADIUS, 0, 0 };
@@ -47,6 +49,7 @@ void Sphere::Release()
 {
     GLShape::Release();
     this->cbo.Release();
+    this->program.Release();
 }
 
 bool Sphere::Colors(const Vector<float, 3>* colors, int count)

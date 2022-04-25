@@ -1,15 +1,15 @@
 #pragma once
 
 #include "GLShape.h"
-#include "Program.h"
+#include "GLProgram.h"
 #include <vector>
 
 class Sphere : public GLShape
 {
 public:
-    Sphere(Program& program);
+    Sphere();
 
-    void Create();
+    void Create(const GLProgram& program);
     void Release() override;
 
     bool Colors(const Vector<float, 3>* colors, int count);
@@ -22,8 +22,8 @@ protected:
 private:
     static void Split(uint32_t level, const Vertex& v0, const Vertex& v1, const Vertex& v2, std::vector<Vertex>& vertices);
 
-    Program& program;
-    GLBuffer cbo;
+    GLProgram program;
+    GLBuffer  cbo;
 
     Vector<float, 3> lightPos;
 };

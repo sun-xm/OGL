@@ -6,14 +6,13 @@ add_executable(${PROJECT_NAME} WIN32
                ${SRC_CPP}
                Application.cpp
                Viewport.cpp
-               Program.cpp
                Sphere.cpp
                Triangle.cpp)
 target_link_libraries(${PROJECT_NAME} opengl32 glu32 ${GLEW_LIB})
 
 add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
-                   COMMAND ${CMAKE_COMMAND} -E copy_if_different "${CMAKE_CURRENT_LIST_DIR}/VertexShader.glsl" "${CMAKE_CURRENT_BINARY_DIR}/$<CONFIG>/"
-                   COMMAND ${CMAKE_COMMAND} -E copy_if_different "${CMAKE_CURRENT_LIST_DIR}/FragmentShader.glsl" "${CMAKE_CURRENT_BINARY_DIR}/$<CONFIG>/")
+                   COMMAND ${CMAKE_COMMAND} -E copy_if_different "${CMAKE_CURRENT_LIST_DIR}/vshader.glsl" "${CMAKE_CURRENT_BINARY_DIR}/$<CONFIG>/"
+                   COMMAND ${CMAKE_COMMAND} -E copy_if_different "${CMAKE_CURRENT_LIST_DIR}/fshader.glsl" "${CMAKE_CURRENT_BINARY_DIR}/$<CONFIG>/")
 
 if(GLEW_SHARED)
     add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD

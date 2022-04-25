@@ -1,11 +1,13 @@
 #include "Triangle.h"
 
-Triangle::Triangle(Program& program) : program(program), cbo(GL_ARRAY_BUFFER)
+Triangle::Triangle() : cbo(GL_ARRAY_BUFFER)
 {
 }
 
-void Triangle::Create()
+void Triangle::Create(const GLProgram& program)
 {
+    this->program = program;
+
     Vertex vertices[] = {{ -.5f, -.5f, 0.f }, { .5f, -.5f, 0.f }, { 0.f, .5f, 0.f }};
     this->Vertices(vertices, 3);
 
@@ -20,6 +22,7 @@ void Triangle::Release()
 {
     GLShape::Release();
     this->cbo.Release();
+    this->program.Release();
 }
 
 bool Triangle::Colors(const Vector<float, 3>* colors, int count)

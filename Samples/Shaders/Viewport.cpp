@@ -3,7 +3,7 @@
 
 using namespace std;
 
-Viewport::Viewport() : sphere(this->program), triangle(this->program)
+Viewport::Viewport()
 {
 }
 
@@ -89,16 +89,26 @@ bool Viewport::OnContextCreated()
     }
 
     string log;
-    if (!this->program.Create(L"VertexShader.glsl", L"FragmentShader.glsl", log) || !this->program.Link(log))
+    if (!this->vshader.Create(GL_VERTEX_SHADER)   || !this->vshader.Load(L"vshader.glsl") || !this->vshader.Compile(log) ||
+        !this->fshader.Create(GL_FRAGMENT_SHADER) || !this->fshader.Load(L"fshader.glsl") || !this->fshader.Compile(log))
     {
-        OutputDebugStringA(("Failed to create shader program\n" + log + '\n').c_str());
+        OutputDebugStringA(("Failed to create load shaders\n" + log + '\n').c_str());
         return false;
     }
 
-    this->sphere.Create();
+    this->program.Create();
+    this->program.Attach(this->vshader);
+    this->program.Attach(this->fshader);
+    if (!this->program.Link(log))
+    {
+        OutputDebugStringA(("Failed to create link program\n" + log + '\n').c_str());
+        return false;
+    }
+
+    this->sphere.Create(this->program);
     this->sphere.Position = { 1, 0, 0 };
 
-    this->triangle.Create();
+    this->triangle.Create(this->program);
     this->triangle.Position = { -1, 0, 0 };
 
     return true;
@@ -108,6 +118,8 @@ void Viewport::OnContextDestroy()
 {
     this->sphere.Release();
     this->triangle.Release();
+    this->vshader.Release();
+    this->fshader.Release();
     this->program.Release();
     GLWindow::OnContextDestroy();
 }

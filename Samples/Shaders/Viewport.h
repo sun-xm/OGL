@@ -2,6 +2,7 @@
 
 #include "GLWindow.h"
 #include "GLScene.h"
+#include "GLProgram.h"
 #include "Sphere.h"
 #include "Triangle.h"
 
@@ -18,10 +19,12 @@ protected:
     void OnContextDestroy() override;
 
 private:
-    GLScene  scene;
-    Program  program;
-    Sphere   sphere;
-    Triangle triangle;
+    GLScene   scene;
+    GLShader  vshader;
+    GLShader  fshader;
+    GLProgram program;
+    Sphere    sphere;
+    Triangle  triangle;
 
     Vertex lightPos;
 
