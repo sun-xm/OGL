@@ -7,7 +7,7 @@ using namespace std;
 #define LEVELS (4)
 #define RADIUS (0.5f)
 
-Sphere::Sphere() : cbo(GL_ARRAY_BUFFER)
+Sphere::Sphere()
 {
 }
 

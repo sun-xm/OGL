@@ -101,7 +101,7 @@ void GLRenderer::Triangles(const Coordinate* coordinates, size_t count, const Ve
         vertices[i] = Vertex{ c.X, -c.Y, 1 };
     }
 
-    GLBuffer vbo(GL_ARRAY_BUFFER);
+    GLBuffer vbo;
     ONCLEANUP(vbo, [&]{ vbo.Release(); });
 
     if (!vbo.Data(vertices.data(), vertices.size() * sizeof(vertices[0]), GL_DYNAMIC_DRAW))
@@ -129,8 +129,7 @@ void GLRenderer::Triangles(const Coordinate* coordinates, const Coordinate* texC
         vertices[i] = Vertex{ c.X, -c.Y, 1 };
     }
 
-    GLBuffer vbo(GL_ARRAY_BUFFER);
-    GLBuffer tbo(GL_ARRAY_BUFFER);
+    GLBuffer vbo, tbo;
     ONCLEANUP(buffers, [&]{ vbo.Release(); tbo.Release(); });
 
     if (!vbo.Data(vertices.data(), vertices.size() * sizeof(vertices[0]), GL_DYNAMIC_DRAW) ||

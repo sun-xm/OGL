@@ -6,7 +6,7 @@
 class GLBuffer
 {
 public:
-    GLBuffer(GLenum target);
+    GLBuffer(GLenum target = GL_ARRAY_BUFFER);
 
     void Bind() const;
     bool Data(const void* data, GLsizeiptr size, GLenum usage);
@@ -35,4 +35,10 @@ private:
 private:
     GLuint buffer;
     GLenum target;
+};
+
+class GLElmBuf : public GLBuffer
+{
+public:
+    GLElmBuf() : GLBuffer(GL_ELEMENT_ARRAY_BUFFER) {}
 };

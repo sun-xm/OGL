@@ -1,6 +1,6 @@
 #include "Triangle.h"
 
-Triangle::Triangle() : cbo(GL_ARRAY_BUFFER)
+Triangle::Triangle()
 {
 }
 

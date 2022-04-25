@@ -4,7 +4,7 @@
 
 using namespace std;
 
-GLShape::GLShape() : ebo(GL_ELEMENT_ARRAY_BUFFER), vbo(GL_ARRAY_BUFFER), nbo(GL_ARRAY_BUFFER), tbo(GL_ARRAY_BUFFER), mode(GL_TRIANGLES), parent(nullptr)
+GLShape::GLShape() : mode(GL_TRIANGLES), parent(nullptr)
 {
     this->Position = { 0.f, 0.f, 0.f };
     this->Rotation = { 0.f, 0.f, 0.f, 0.f };
