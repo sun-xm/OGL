@@ -8,9 +8,9 @@
 class GLShader
 {
 public:
-    GLShader();
+    GLShader(GLenum type);
 
-    virtual bool Create(GLenum type);
+    virtual bool Create();
     virtual void Release();
     virtual bool Load(const std::wstring& path);
 
@@ -30,4 +30,17 @@ public:
 
 protected:
     GLuint shader;
+    GLenum type;
+};
+
+class GLVShader : public GLShader
+{
+public:
+    GLVShader() : GLShader(GL_VERTEX_SHADER) {}
+};
+
+class GLFShader : public GLShader
+{
+public:
+    GLFShader() : GLShader(GL_FRAGMENT_SHADER) {}
 };

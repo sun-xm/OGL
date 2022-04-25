@@ -89,8 +89,8 @@ bool Viewport::OnContextCreated()
     }
 
     string log;
-    if (!this->vshader.Create(GL_VERTEX_SHADER)   || !this->vshader.Load(L"vshader.glsl") || !this->vshader.Compile(log) ||
-        !this->fshader.Create(GL_FRAGMENT_SHADER) || !this->fshader.Load(L"fshader.glsl") || !this->fshader.Compile(log))
+    if (!this->vshader.Create() || !this->vshader.Load(L"vshader.glsl") || !this->vshader.Compile(log) ||
+        !this->fshader.Create() || !this->fshader.Load(L"fshader.glsl") || !this->fshader.Compile(log))
     {
         OutputDebugStringA(("Failed to create load shaders\n" + log + '\n').c_str());
         return false;

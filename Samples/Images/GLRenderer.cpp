@@ -15,10 +15,10 @@ bool GLRenderer::Create(string& log)
         return false;
     }
 
-    if (!this->texVtx.Create(GL_VERTEX_SHADER)   || !this->texVtx.Load(L"TexVtx.glsl") || !this->texVtx.Compile(log) ||
-        !this->texFrg.Create(GL_FRAGMENT_SHADER) || !this->texFrg.Load(L"TexFrg.glsl") || !this->texFrg.Compile(log) ||
-        !this->clrVtx.Create(GL_VERTEX_SHADER)   || !this->clrVtx.Load(L"ClrVtx.glsl") || !this->clrVtx.Compile(log) ||
-        !this->clrFrg.Create(GL_FRAGMENT_SHADER) || !this->clrFrg.Load(L"ClrFrg.glsl") || !this->clrFrg.Compile(log))
+    if (!this->texVtx.Create() || !this->texVtx.Load(L"TexVtx.glsl") || !this->texVtx.Compile(log) ||
+        !this->texFrg.Create() || !this->texFrg.Load(L"TexFrg.glsl") || !this->texFrg.Compile(log) ||
+        !this->clrVtx.Create() || !this->clrVtx.Load(L"ClrVtx.glsl") || !this->clrVtx.Compile(log) ||
+        !this->clrFrg.Create() || !this->clrFrg.Load(L"ClrFrg.glsl") || !this->clrFrg.Compile(log))
     {
         return false;
     }

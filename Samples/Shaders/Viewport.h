@@ -20,8 +20,8 @@ protected:
 
 private:
     GLScene   scene;
-    GLShader  vshader;
-    GLShader  fshader;
+    GLVShader vshader;
+    GLFShader fshader;
     GLProgram program;
     Sphere    sphere;
     Triangle  triangle;

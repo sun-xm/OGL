@@ -3,14 +3,14 @@
 
 using namespace std;
 
-GLShader::GLShader() : shader(0)
+GLShader::GLShader(GLenum type) : shader(0), type(type)
 {
 }
 
-bool GLShader::Create(GLenum type)
+bool GLShader::Create()
 {
     this->Release();
-    this->shader = glCreateShader(type);
+    this->shader = glCreateShader(this->type);
     return !!this->shader;
 }
 

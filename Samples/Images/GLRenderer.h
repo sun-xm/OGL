@@ -39,12 +39,12 @@ public:
 
 private:
     GLProgram texPrg;
-    GLShader  texVtx;
-    GLShader  texFrg;
+    GLVShader texVtx;
+    GLFShader texFrg;
 
     GLProgram clrPrg;
-    GLShader  clrVtx;
-    GLShader  clrFrg;
+    GLVShader clrVtx;
+    GLFShader clrFrg;
 
     Matrix<float, 3> transform;
     Matrix<float, 3> origin;
