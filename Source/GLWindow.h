@@ -16,6 +16,7 @@ protected:
 
     bool OnCreated() override;
     void OnDestroy() override;
+    void OnClose() override;
 
     virtual bool OnContextCreated();
     virtual void OnContextDestroy();
