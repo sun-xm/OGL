@@ -12,14 +12,14 @@ GLProgram::GLProgram() : program(obj)
         return !!this->program;
     };
 
-    this->release = [this]
-    {
-        this->program = 0;
-    };
-
     this->destroy = [this]
     {
         glDeleteProgram(this->program);
+    };
+
+    this->reset = [this]
+    {
+        this->program = 0;
     };
 }
 

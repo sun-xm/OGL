@@ -3,24 +3,30 @@
 
 using namespace std;
 
-GLShader::GLShader(GLenum type) : shader(0), type(type)
+GLShader::GLShader(GLenum type) : shader(obj), type(type)
 {
-}
+    this->shader = 0;
 
-bool GLShader::Create()
-{
-    this->Release();
-    this->shader = glCreateShader(this->type);
-    return !!this->shader;
-}
+    this->create = [this]
+    {
+        this->shader = glCreateShader(this->type);
+        return !!this->shader;
+    };
 
-void GLShader::Release()
-{
-    if (this->shader)
+    this->destroy = [this]
     {
         glDeleteShader(this->shader);
+    };
+
+    this->reset = [this]
+    {
         this->shader = 0;
-    }
+    };
+}
+
+GLShader::GLShader(const GLShader& other) : GLShader(other.type)
+{
+    *this = other;
 }
 
 bool GLShader::Load(const wstring& path)

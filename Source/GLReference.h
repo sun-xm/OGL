@@ -12,7 +12,7 @@ public:
     {
         this->Release();
 
-        if (this->create && this->create())
+        if (this->create())
         {
             this->ref = new int;
             (*this->ref) = 1;
@@ -24,11 +24,6 @@ public:
 
     virtual void Release()
     {
-        if (this->release)
-        {
-            this->release();
-        }
-
         if (this->ref)
         {
             (*this->ref)--;
@@ -40,6 +35,8 @@ public:
                 this->ref = nullptr;
             }
         }
+
+        this->reset();
     }
 
     GLReference& operator=(const GLReference& other)
@@ -58,8 +55,8 @@ public:
 
 protected:
     std::function<bool()> create;
-    std::function<void()> release;
     std::function<void()> destroy;
+    std::function<void()> reset;
 
     int* ref;
     T    obj;
