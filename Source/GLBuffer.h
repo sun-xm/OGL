@@ -7,10 +7,13 @@ class GLBuffer
 {
 public:
     GLBuffer(GLenum target = GL_ARRAY_BUFFER);
+    GLBuffer(const GLBuffer& other);
 
     void Bind() const;
     bool Data(const void* data, GLsizeiptr size, GLenum usage);
+    bool Copy(const GLBuffer& other, GLenum usage);
     GLint Size() const;
+    GLenum Usage() const;
 
     void Release();
 
@@ -28,6 +31,8 @@ public:
     {
         return this->buffer;
     }
+
+    GLBuffer& operator=(const GLBuffer&) = delete;
 
 private:
     bool Create();

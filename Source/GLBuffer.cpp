@@ -4,6 +4,14 @@ GLBuffer::GLBuffer(GLenum target) : buffer(0), target(target)
 {
 }
 
+GLBuffer::GLBuffer(const GLBuffer& other) : GLBuffer(other.target)
+{
+    if (other.buffer)
+    {
+        this->Copy(other, other.Usage());
+    }
+}
+
 void GLBuffer::Release()
 {
     if (this->buffer)
@@ -20,12 +28,6 @@ void GLBuffer::Bind() const
 
 bool GLBuffer::Data(const void* data, GLsizeiptr size, GLenum usage)
 {
-    if (!data || !size)
-    {
-        this->Release();
-        return true;
-    }
-
     if (!this->Create())
     {
         return false;
@@ -33,6 +35,33 @@ bool GLBuffer::Data(const void* data, GLsizeiptr size, GLenum usage)
 
     this->Bind();
     glBufferData(this->target, size, data, usage);
+
+    return true;
+}
+
+bool GLBuffer::Copy(const GLBuffer& other, GLenum usage)
+{
+    if (this->target != other.target)
+    {
+        return false;
+    }
+
+    if (!other)
+    {
+        return false;
+    }
+
+    if (!this->Create())
+    {
+        return false;
+    }
+
+    auto size = other.Size();
+    this->Data(nullptr, size, usage);
+
+    glBindBuffer(GL_COPY_READ_BUFFER,  other.buffer);
+    glBindBuffer(GL_COPY_WRITE_BUFFER, this->buffer);
+    glCopyBufferSubData(GL_COPY_READ_BUFFER, GL_COPY_WRITE_BUFFER, 0, 0, size);
 
     return true;
 }
@@ -48,6 +77,19 @@ GLint GLBuffer::Size() const
     }
 
     return size;
+}
+
+GLenum GLBuffer::Usage() const
+{
+    GLenum usage = GL_STATIC_DRAW;
+
+    if (this->buffer)
+    {
+        this->Bind();
+        glGetBufferParameteriv(this->target, GL_BUFFER_USAGE, (GLint*)&usage);
+    }
+
+    return usage;
 }
 
 bool GLBuffer::Create()
