@@ -38,13 +38,8 @@ public:
     void Line(float x0, float y0, float x1, float y1);
 
 private:
-    GLProgram texPrg;
-    GLVShader texVtx;
-    GLFShader texFrg;
-
-    GLProgram clrPrg;
-    GLVShader clrVtx;
-    GLFShader clrFrg;
+    GLProgram texProg;
+    GLProgram clrProg;
 
     Matrix<float, 3> transform;
     Matrix<float, 3> origin;

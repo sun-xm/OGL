@@ -89,21 +89,29 @@ bool Viewport::OnContextCreated()
     }
 
     string log;
-    if (!this->vshader.Create() || !this->vshader.Load(L"vshader.glsl") || !this->vshader.Compile(log) ||
-        !this->fshader.Create() || !this->fshader.Load(L"fshader.glsl") || !this->fshader.Compile(log))
+    GLVShader vshader;
+    GLFShader fshader;
+
+    if (!vshader.Create() || !vshader.Load(L"vshader.glsl") || !vshader.Compile(log) ||
+        !fshader.Create() || !fshader.Load(L"fshader.glsl") || !fshader.Compile(log))
     {
         OutputDebugStringA(("Failed to create load shaders\n" + log + '\n').c_str());
         return false;
     }
 
     this->program.Create();
-    this->program.Attach(this->vshader);
-    this->program.Attach(this->fshader);
+    this->program.Attach(vshader);
+    this->program.Attach(fshader);
     if (!this->program.Link(log))
     {
         OutputDebugStringA(("Failed to create link program\n" + log + '\n').c_str());
         return false;
     }
+
+    this->program.Detach(vshader);
+    this->program.Detach(fshader);
+    vshader.Release();
+    fshader.Release();
 
     this->sphere.Create(this->program);
     this->sphere.Position = { 1, 0, 0 };
@@ -118,8 +126,6 @@ void Viewport::OnContextDestroy()
 {
     this->sphere.Release();
     this->triangle.Release();
-    this->vshader.Release();
-    this->fshader.Release();
     this->program.Release();
     GLWindow::OnContextDestroy();
 }

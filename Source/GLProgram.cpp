@@ -43,6 +43,18 @@ void GLProgram::Detach(const GLShader& shader)
     glDetachShader(this->program, shader);
 }
 
+bool GLProgram::Link(const GLVShader& vshader, const GLFShader& fshader, string& log)
+{
+    this->Attach(vshader);
+    this->Attach(fshader);
+
+    auto res = this->Link(log);
+    this->Detach(vshader);
+    this->Detach(fshader);
+
+    return res;
+}
+
 bool GLProgram::Link(string& log)
 {
     if (!this->Link())

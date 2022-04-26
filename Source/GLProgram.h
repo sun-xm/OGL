@@ -16,6 +16,7 @@ public:
 
     void Attach(const GLShader&);
     void Detach(const GLShader&);
+    bool Link(const GLVShader&, const GLFShader&, std::string& log);
     bool Link(std::string& log);
     bool Link();
 

@@ -10,25 +10,37 @@ GLRenderer::GLRenderer() : transform(Transform2D<float>::Identity())
 
 bool GLRenderer::Create(string& log)
 {
-    if (!this->texPrg.Create() || !this->clrPrg.Create())
+    if (!this->texProg.Create() || !this->clrProg.Create())
     {
         return false;
     }
 
-    if (!this->texVtx.Create() || !this->texVtx.Load(L"TexVtx.glsl") || !this->texVtx.Compile(log) ||
-        !this->texFrg.Create() || !this->texFrg.Load(L"TexFrg.glsl") || !this->texFrg.Compile(log) ||
-        !this->clrVtx.Create() || !this->clrVtx.Load(L"ClrVtx.glsl") || !this->clrVtx.Compile(log) ||
-        !this->clrFrg.Create() || !this->clrFrg.Load(L"ClrFrg.glsl") || !this->clrFrg.Compile(log))
+    GLVShader vshader;
+    GLFShader fshader;
+    ONCLEANUP(vshader, [&]{ vshader.Release(); });
+    ONCLEANUP(fshader, [&]{ fshader.Release(); });
+
+    if (!vshader.Create() || !vshader.Load(L"TexVtx.glsl") || !vshader.Compile(log) ||
+        !fshader.Create() || !fshader.Load(L"TexFrg.glsl") || !fshader.Compile(log))
     {
         return false;
     }
 
-    this->texPrg.Attach(this->texVtx);
-    this->texPrg.Attach(this->texFrg);
-    this->clrPrg.Attach(this->clrVtx);
-    this->clrPrg.Attach(this->clrFrg);
+    if (!this->texProg.Link(vshader, fshader, log))
+    {
+        return false;
+    }
 
-    if (!this->texPrg.Link(log) || !this->clrPrg.Link(log))
+    vshader.Release();
+    fshader.Release();
+
+    if (!vshader.Create() || !vshader.Load(L"ClrVtx.glsl") || !vshader.Compile(log) ||
+        !fshader.Create() || !fshader.Load(L"ClrFrg.glsl") || !fshader.Compile(log))
+    {
+        return false;
+    }
+
+    if (!this->clrProg.Link(vshader, fshader, log))
     {
         return false;
     }
@@ -38,12 +50,8 @@ bool GLRenderer::Create(string& log)
 
 void GLRenderer::Release()
 {
-    this->texVtx.Release();
-    this->texFrg.Release();
-    this->texPrg.Release();
-    this->clrVtx.Release();
-    this->clrFrg.Release();
-    this->clrPrg.Release();
+    this->texProg.Release();
+    this->clrProg.Release();
 }
 
 void GLRenderer::Begin(int w, int h)
@@ -109,14 +117,14 @@ void GLRenderer::Triangles(const Coordinate* coordinates, size_t count, const Ve
         return;
     }
 
-    this->clrPrg.Use();
-    this->clrPrg.BindAttrib("vtx", vbo, 3, GL_FLOAT);
-    this->clrPrg.UniformV4f("Color", color);
-    this->clrPrg.UniformM3f("Matrix", this->unify * this->origin * this->transform);
+    this->clrProg.Use();
+    this->clrProg.BindAttrib("vtx", vbo, 3, GL_FLOAT);
+    this->clrProg.UniformV4f("Color", color);
+    this->clrProg.UniformM3f("Matrix", this->unify * this->origin * this->transform);
 
     glDrawArrays(GL_TRIANGLES, 0, (GLsizei)vertices.size());
 
-    this->clrPrg.UnbindAttrib("vtx");
+    this->clrProg.UnbindAttrib("vtx");
     glUseProgram(0);
 }
 
@@ -138,16 +146,16 @@ void GLRenderer::Triangles(const Coordinate* coordinates, const Coordinate* texC
         return;
     }
 
-    this->texPrg.Use();
-    this->texPrg.BindAttrib("vtx", vbo, 3, GL_FLOAT);
-    this->texPrg.BindAttrib("crd", tbo, 2, GL_FLOAT);
-    this->texPrg.UniformM3f("Matrix", this->unify * this->origin * this->transform);
-    this->texPrg.UniformTex("tex", texture, 0);
+    this->texProg.Use();
+    this->texProg.BindAttrib("vtx", vbo, 3, GL_FLOAT);
+    this->texProg.BindAttrib("crd", tbo, 2, GL_FLOAT);
+    this->texProg.UniformM3f("Matrix", this->unify * this->origin * this->transform);
+    this->texProg.UniformTex("tex", texture, 0);
 
     glDrawArrays(GL_TRIANGLES, 0, (GLsizei)vertices.size());
 
-    this->texPrg.UnbindAttrib("vtx");
-    this->texPrg.UnbindAttrib("crd");
+    this->texProg.UnbindAttrib("vtx");
+    this->texProg.UnbindAttrib("crd");
     glUseProgram(0);
 }
 
