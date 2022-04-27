@@ -1,24 +1,29 @@
 #include "GLBuffer.h"
 
-GLBuffer::GLBuffer(GLenum target) : buffer(0), target(target)
+GLBuffer::GLBuffer(GLenum target) : buffer(obj), target(target)
 {
+    this->buffer = 0;
+
+    this->create = [this]
+    {
+        glGenBuffers(1, &this->buffer);
+        return !!this->buffer;
+    };
+
+    this->destroy = [this]
+    {
+        glDeleteBuffers(1, &this->buffer);
+    };
+
+    this->reset = [this]
+    {
+        this->buffer = 0;
+    };
 }
 
 GLBuffer::GLBuffer(const GLBuffer& other) : GLBuffer(other.target)
 {
-    if (other.buffer)
-    {
-        this->Copy(other, other.Usage());
-    }
-}
-
-void GLBuffer::Release()
-{
-    if (this->buffer)
-    {
-        glDeleteBuffers(1, &this->buffer);
-        this->buffer = 0;
-    }
+    *this = other;
 }
 
 void GLBuffer::Bind() const
@@ -28,7 +33,7 @@ void GLBuffer::Bind() const
 
 bool GLBuffer::Data(const void* data, GLsizeiptr size, GLenum usage)
 {
-    if (!this->Create())
+    if (!this->buffer && !this->Create())
     {
         return false;
     }
@@ -51,12 +56,18 @@ bool GLBuffer::Copy(const GLBuffer& other, GLenum usage)
         return false;
     }
 
-    if (!this->Create())
+    if (!this->buffer && !this->Create())
     {
         return false;
     }
 
     auto size = other.Size();
+
+    if (!usage)
+    {
+        usage = other.Usage();
+    }
+
     this->Data(nullptr, size, usage);
 
     glBindBuffer(GL_COPY_READ_BUFFER,  other.buffer);
@@ -90,13 +101,4 @@ GLenum GLBuffer::Usage() const
     }
 
     return usage;
-}
-
-bool GLBuffer::Create()
-{
-    if (!this->buffer)
-    {
-        glGenBuffers(1, &this->buffer);
-    }
-    return !!this->buffer;
 }

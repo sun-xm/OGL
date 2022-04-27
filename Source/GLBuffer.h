@@ -1,9 +1,10 @@
 #pragma once
 
+#include "GLReference.h"
 #include "GLCommon.h"
 #include <gl/glew.h>
 
-class GLBuffer
+class GLBuffer : public GLReference<GLuint>
 {
 public:
     GLBuffer(GLenum target = GL_ARRAY_BUFFER);
@@ -11,11 +12,9 @@ public:
 
     void Bind() const;
     bool Data(const void* data, GLsizeiptr size, GLenum usage);
-    bool Copy(const GLBuffer& other, GLenum usage);
+    bool Copy(const GLBuffer& other, GLenum usage = 0);
     GLint Size() const;
     GLenum Usage() const;
-
-    void Release();
 
     GLenum Target() const
     {
@@ -32,14 +31,15 @@ public:
         return this->buffer;
     }
 
-    GLBuffer& operator=(const GLBuffer&) = delete;
+    GLBuffer& operator=(const GLBuffer& other)
+    {
+        this->target = other.target;
+        return (GLBuffer&)GLReference<GLuint>::operator=(other);
+    }
 
 private:
-    bool Create();
-
-private:
-    GLuint buffer;
-    GLenum target;
+    GLuint& buffer;
+    GLenum  target;
 };
 
 class GLElmBuf : public GLBuffer
