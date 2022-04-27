@@ -3,6 +3,7 @@
 #include "GLReference.h"
 #include "GLCommon.h"
 #include <gl/glew.h>
+#include <iostream>
 #include <string>
 #include <vector>
 
@@ -12,10 +13,9 @@ public:
     GLShader(GLenum type);
     GLShader(const GLShader&);
 
-    virtual bool Load(const std::wstring& path);
-
-    void Source(const std::string& source);
-    void Source(const std::vector<std::string>& sources);
+    bool Source(std::istream& source);
+    bool Source(const std::string& source);
+    bool Source(const std::vector<std::string>& sources);
     bool Compile(std::string& log);
     bool Compile();
 

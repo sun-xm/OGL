@@ -29,27 +29,31 @@ GLShader::GLShader(const GLShader& other) : GLShader(other.type)
     *this = other;
 }
 
-bool GLShader::Load(const wstring& path)
+bool GLShader::Source(istream& source)
 {
-    ifstream in(path);
-    if (!in.is_open())
+    return this->Source(string(istreambuf_iterator<char>(source), istreambuf_iterator<char>()));
+}
+
+bool GLShader::Source(const string& source)
+{
+    if (!this->shader && !this->Create())
+    {
+        return false;
+    }
+    const GLchar* srcs[] = { source.c_str() };
+    const GLint   lens[] = { (GLint)source.length() };
+    glShaderSource(this->shader, 1, srcs, lens);
+
+    return true;
+}
+
+bool GLShader::Source(const vector<string>& sources)
+{
+    if (!this->shader && !this->Create())
     {
         return false;
     }
 
-    this->Source(string(istreambuf_iterator<char>(in), istreambuf_iterator<char>()));
-    return true;
-}
-
-void GLShader::Source(const string& source)
-{
-    const GLchar* srcs[] = { source.c_str() };
-    const GLint   lens[] = { (GLint)source.length() };
-    glShaderSource(this->shader, 1, srcs, lens);
-}
-
-void GLShader::Source(const vector<string>& sources)
-{
     vector<const GLchar*> srcs(sources.size());
     vector<GLint> lens(sources.size());
 
@@ -60,6 +64,8 @@ void GLShader::Source(const vector<string>& sources)
     }
 
     glShaderSource(this->shader, (GLsizei)sources.size(), srcs.data(), lens.data());
+
+    return true;
 }
 
 bool GLShader::Compile(string& log)

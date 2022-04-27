@@ -1,6 +1,7 @@
 #include "GLRenderer.h"
 #include "Cleanup.h"
 #include <gl/glew.h>
+#include <fstream>
 
 using namespace std;
 
@@ -20,8 +21,16 @@ bool GLRenderer::Create(string& log)
     ONCLEANUP(vshader, [&]{ vshader.Release(); });
     ONCLEANUP(fshader, [&]{ fshader.Release(); });
 
-    if (!vshader.Create() || !vshader.Load(L"TexVtx.glsl") || !vshader.Compile(log) ||
-        !fshader.Create() || !fshader.Load(L"TexFrg.glsl") || !fshader.Compile(log))
+    ifstream texVtx(L"TexVtx.glsl");
+    ifstream texFrg(L"TexFrg.glsl");
+    if (!texVtx.is_open() ||
+        !texVtx.is_open())
+    {
+        return false;
+    }
+
+    if (!vshader.Source(texVtx) || !vshader.Compile(log) ||
+        !fshader.Source(texFrg) || !fshader.Compile(log))
     {
         return false;
     }
@@ -34,8 +43,16 @@ bool GLRenderer::Create(string& log)
     vshader.Release();
     fshader.Release();
 
-    if (!vshader.Create() || !vshader.Load(L"ClrVtx.glsl") || !vshader.Compile(log) ||
-        !fshader.Create() || !fshader.Load(L"ClrFrg.glsl") || !fshader.Compile(log))
+    ifstream clrVtx(L"ClrVtx.glsl");
+    ifstream clrFrg(L"ClrFrg.glsl");
+    if (!clrVtx.is_open() ||
+        !clrFrg.is_open())
+    {
+        return false;
+    }
+
+    if (!vshader.Source(clrVtx) || !vshader.Compile(log) ||
+        !vshader.Source(clrFrg) || !fshader.Compile(log))
     {
         return false;
     }

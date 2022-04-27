@@ -1,4 +1,6 @@
 #include "Viewport.h"
+#include "Cleanup.h"
+#include <fstream>
 #include <string>
 
 using namespace std;
@@ -88,30 +90,33 @@ bool Viewport::OnContextCreated()
         return false;
     }
 
-    string log;
     GLVShader vshader;
     GLFShader fshader;
+    ONCLEANUP(vshader, [&]{ vshader.Release(); });
+    ONCLEANUP(fshader, [&]{ fshader.Release(); });
 
-    if (!vshader.Create() || !vshader.Load(L"vshader.glsl") || !vshader.Compile(log) ||
-        !fshader.Create() || !fshader.Load(L"fshader.glsl") || !fshader.Compile(log))
+    ifstream vsrc(L"vshader.glsl");
+    ifstream fsrc(L"fshader.glsl");
+    if (!vsrc.is_open() ||
+        !fsrc.is_open())
+    {
+        return false;
+    }
+
+    string log;
+    if (!vshader.Source(vsrc) || !vshader.Compile(log) ||
+        !fshader.Source(fsrc) || !fshader.Compile(log))
     {
         OutputDebugStringA(("Failed to create load shaders\n" + log + '\n').c_str());
         return false;
     }
 
     this->program.Create();
-    this->program.Attach(vshader);
-    this->program.Attach(fshader);
-    if (!this->program.Link(log))
+    if (!this->program.Link(vshader, fshader, log))
     {
         OutputDebugStringA(("Failed to create link program\n" + log + '\n').c_str());
         return false;
     }
-
-    this->program.Detach(vshader);
-    this->program.Detach(fshader);
-    vshader.Release();
-    fshader.Release();
 
     this->sphere.Create(this->program);
     this->sphere.Position = { 1, 0, 0 };
