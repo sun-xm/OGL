@@ -1,34 +1,59 @@
 #include "GLTexture.h"
 
 GLTexture::GLTexture(GLenum target)
-  : w(0), h(0), tex(0), target(target), envMode(GL_MODULATE), minFilter(GL_LINEAR), magFilter(GL_LINEAR), wrapS(GL_REPEAT), wrapT(GL_REPEAT)
+  : w(0), h(0), tex(obj), target(target)
 {
-}
+    this->tex = 0;
 
-void GLTexture::Release()
-{
-    if (this->tex)
+    this->create = [this]
+    {
+        glGenTextures(1, &this->tex);
+        return !! this->tex;
+    };
+
+    this->destroy = [this]
     {
         glDeleteTextures(1, &this->tex);
+    };
+
+    this->reset = [this]
+    {
         this->tex = 0;
-    }
+    };
+}
+
+GLTexture::GLTexture(const GLTexture& other) : GLTexture(other.Target())
+{
+    *this = other;
 }
 
 void GLTexture::Mode(GLuint envMode)
 {
-    this->envMode = envMode;
-}
-
-void GLTexture::Filter(GLuint minFilter, GLuint magFilter)
-{
-    this->minFilter = minFilter;
-    this->magFilter = magFilter;
+    if (this->tex)
+    {
+        glBindTexture(this->target, this->tex);
+        glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, envMode);
+    }
 }
 
 void GLTexture::Wrap(GLuint wrapS, GLuint wrapT)
 {
-    this->wrapS = wrapS;
-    this->wrapT = wrapT;
+    if (this->tex)
+    {
+        glBindTexture(this->target, this->tex);
+        glTexParameteri(this->target, GL_TEXTURE_WRAP_S, wrapS);
+        glTexParameteri(this->target, GL_TEXTURE_WRAP_T, wrapT);
+    }
+}
+
+void GLTexture::Filter(GLuint minFilter, GLuint magFilter)
+{
+    if (this->tex)
+    {
+        glBindTexture(this->target, this->tex);
+        glTexParameteri(this->target, GL_TEXTURE_MIN_FILTER, minFilter);
+        glTexParameteri(this->target, GL_TEXTURE_MAG_FILTER, magFilter);
+    }
 }
 
 bool GLTexture::Data(GLenum format, const unsigned char* pixels, size_t size, uint32_t width, uint32_t height)
@@ -96,24 +121,11 @@ bool GLTexture::Data(GLenum format, const unsigned char* pixels, size_t size, ui
     return true;
 }
 
-void GLTexture::Set() const
-{
-    if (this->tex)
-    {
-        glBindTexture(this->target, this->tex);
-        glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, this->envMode);
-        glTexParameteri(this->target, GL_TEXTURE_WRAP_S, this->wrapS);
-        glTexParameteri(this->target, GL_TEXTURE_WRAP_T, this->wrapT);
-        glTexParameteri(this->target, GL_TEXTURE_MIN_FILTER, this->minFilter);
-        glTexParameteri(this->target, GL_TEXTURE_MAG_FILTER, this->magFilter);
-    }
-}
-
 void GLTexture::Apply() const
 {
     if (this->tex)
     {
-        this->Set();
+        glBindTexture(this->target, this->tex);
         glEnable(this->target);
     }
 }
@@ -122,16 +134,72 @@ void GLTexture::Revoke() const
 {
     if (this->tex)
     {
+        glBindTexture(this->target, this->tex);
         glDisable(this->target);
-        glBindTexture(this->target, 0);
     }
 }
 
-bool GLTexture::Create()
+GLuint GLTexture::Mode() const
 {
-    if (!this->tex)
+    GLuint mode = 0;
+
+    if (this->tex)
     {
-        glGenTextures(1, &this->tex);
+        glBindTexture(this->target, this->tex);
+        glGetTexEnviv(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, (GLint*)&mode);
     }
-    return !!this->tex;
+
+    return mode;
+}
+
+GLuint GLTexture::WrapS() const
+{
+    GLuint wrapS = 0;
+
+    if (this->tex)
+    {
+        glBindTexture(this->target, this->tex);
+        glGetTexParameteriv(this->target, GL_TEXTURE_WRAP_S, (GLint*)&wrapS);
+    }
+
+    return wrapS;
+}
+
+GLuint GLTexture::WrapT() const
+{
+    GLuint wrapT = 0;
+
+    if (this->tex)
+    {
+        glBindTexture(this->target, this->tex);
+        glGetTexParameteriv(this->target, GL_TEXTURE_WRAP_T, (GLint*)&wrapT);
+    }
+
+    return wrapT;
+}
+
+GLuint GLTexture::MinFilter() const
+{
+    GLuint minFilter = 0;
+
+    if (this->tex)
+    {
+        glBindTexture(this->target, this->tex);
+        glGetTexParameteriv(this->target, GL_TEXTURE_MIN_FILTER, (GLint*)&minFilter);
+    }
+
+    return minFilter;
+}
+
+GLuint GLTexture::MagFilter() const
+{
+    GLuint magFilter = 0;
+
+    if (this->tex)
+    {
+        glBindTexture(this->target, this->tex);
+        glGetTexParameteriv(this->target, GL_TEXTURE_MAG_FILTER, (GLint*)&magFilter);
+    }
+
+    return magFilter;
 }

@@ -92,7 +92,7 @@ GLint GLBuffer::Size() const
 
 GLenum GLBuffer::Usage() const
 {
-    GLenum usage = GL_STATIC_DRAW;
+    GLenum usage = 0;
 
     if (this->buffer)
     {

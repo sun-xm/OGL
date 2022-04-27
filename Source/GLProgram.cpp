@@ -219,7 +219,6 @@ bool GLProgram::UniformTex(const string& name, const GLTexture& texture, uint32_
     glActiveTexture(GL_TEXTURE0 + index);
     glBindTexture(texture.Target(), texture);
     glUniform1i(loc, index);
-    texture.Set();
 
     return true;
 }
