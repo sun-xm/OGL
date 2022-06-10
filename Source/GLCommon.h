@@ -818,7 +818,7 @@ struct Quaternion : public Vector<Scalar, 4>
         return Matrix<Scalar, 4>{{ 1 - yy2 - zz2,     xy2 - zw2,     xz2 + yw2, 0 },
                                  {     xy2 + zw2, 1 - xx2 - zz2,     yz2 - xw2, 0 },
                                  {     xz2 - yw2,     yz2 + xw2, 1 - xx2 - yy2, 0 },
-                                 {             0,             0,             0, 1 }}; 
+                                 {             0,             0,             0, 1 }};
     }
 
     static Quaternion<Scalar> FromEuler(const Vector<Scalar, 3>& e)
