@@ -5,7 +5,7 @@
 
 using namespace std;
 
-GLRenderer::GLRenderer() : transform(Transform2D<float>::Identity())
+GLRenderer::GLRenderer() : transform(Transform2D<>::Identity())
 {
 }
 
@@ -73,8 +73,8 @@ void GLRenderer::Release()
 
 void GLRenderer::Begin(int w, int h)
 {
-    this->origin = Transform2D<float>::Shift(-w * .5f, h * .5f);    // Shift origin of coordinates to upper-left corner
-    this->unify  = Transform2D<float>::Scale(2.f / w,  2.f / h);    // Unify projected coordinates to -1 ~ +1
+    this->origin = Transform2D<>::Shift(-w * .5f, h * .5f);    // Shift origin of coordinates to upper-left corner
+    this->unify  = Transform2D<>::Scale(2.f / w,  2.f / h);    // Unify projected coordinates to -1 ~ +1
 
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
@@ -93,22 +93,22 @@ void GLRenderer::End()
 
 void GLRenderer::Identity()
 {
-    this->transform = Transform2D<float>::Identity();
+    this->transform = Transform2D<>::Identity();
 }
 
 void GLRenderer::Rotate(float x, float y, float radian)
 {
-    this->transform = Transform2D<float>::Rotate(x, -y, radian) * this->transform;
+    this->transform = Transform2D<>::Rotate(x, -y, radian) * this->transform;
 }
 
 void GLRenderer::Scale(float x, float y)
 {
-    this->transform = Transform2D<float>::Scale(x, y) * this->transform;
+    this->transform = Transform2D<>::Scale(x, y) * this->transform;
 }
 
 void GLRenderer::Shift(float x, float y)
 {
-    this->transform = Transform2D<float>::Shift(x, -y) * this->transform;
+    this->transform = Transform2D<>::Shift(x, -y) * this->transform;
 }
 
 void GLRenderer::Clear(float r, float g, float b, float a)
@@ -117,7 +117,7 @@ void GLRenderer::Clear(float r, float g, float b, float a)
     glClear(GL_COLOR_BUFFER_BIT);
 }
 
-void GLRenderer::Triangles(const Coordinate* coordinates, size_t count, const Vector<float, 4>& color)
+void GLRenderer::Triangles(const Coordinate* coordinates, size_t count, const Vector<4>& color)
 {
     vector<Vertex> vertices(count);
     for (size_t i = 0; i < count; i++)

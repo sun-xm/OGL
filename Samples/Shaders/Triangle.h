@@ -11,7 +11,7 @@ public:
     void Create(const GLProgram& program);
     void Release() override;
 
-    bool Colors(const Vector<float, 3>* colors, int count);
+    bool Colors(const Vector<3>* colors, int count);
     void Render(const GLScene& scene, const Vertex& lightPos);
 
 protected:
@@ -21,5 +21,5 @@ protected:
     GLProgram program;
     GLBuffer  cbo;
 
-    Vector<float, 3> lightPos;
+    Vector<3> lightPos;
 };

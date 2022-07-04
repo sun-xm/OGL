@@ -41,7 +41,7 @@ void Sphere::Create(const GLProgram& program)
     }
     this->Normals(vertices.data(), vertices.size());
 
-    vector<Vector<float, 3>> colors(vertices.size(), { 1, 1, 1 });
+    vector<Vector<3>> colors(vertices.size(), { 1, 1, 1 });
     this->Colors(colors.data(), (int)colors.size());
 }
 
@@ -52,7 +52,7 @@ void Sphere::Release()
     this->program.Release();
 }
 
-bool Sphere::Colors(const Vector<float, 3>* colors, int count)
+bool Sphere::Colors(const Vector<3>* colors, int count)
 {
     if (!colors || count <= 0)
     {
@@ -83,7 +83,7 @@ size_t Sphere::Apply(const GLScene& scene)
         this->program.UniformV3f("LightPos",  this->lightPos);
         this->program.UniformM4f("WorldView", scene.WorldView());
 
-        Matrix<float, 4> modelView, projection;
+        Matrix<4> modelView, projection;
         glGetFloatv(GL_MODELVIEW_MATRIX,  modelView);
         glGetFloatv(GL_PROJECTION_MATRIX, projection);
         this->program.UniformM4f("ModelView",  modelView,  false);

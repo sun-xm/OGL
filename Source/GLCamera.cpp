@@ -59,7 +59,7 @@ void GLCamera::Position(float x, float y, float z)
     this->position = { x, y, z };
 }
 
-void GLCamera::Position(const Vector<float, 3>& position)
+void GLCamera::Position(const Vector<3>& position)
 {
     this->position = position;
 }
@@ -69,7 +69,7 @@ void GLCamera::LookAt(float x, float y, float z)
     this->lookAt = { x, y, z };
 }
 
-void GLCamera::LookAt(const Vector<float, 3>& lookAt)
+void GLCamera::LookAt(const Vector<3>& lookAt)
 {
     this->lookAt = lookAt;
 }
@@ -84,22 +84,22 @@ void GLCamera::Clip(float near, float far)
     this->clip = { near, far };
 }
 
-void GLCamera::Clip(const Vector<float, 2>& clip)
+void GLCamera::Clip(const Vector<2>& clip)
 {
     this->clip = clip;
 }
 
-const Vector<float, 3>& GLCamera::Position() const
+const Vector<3>& GLCamera::Position() const
 {
     return this->position;
 }
 
-const Vector<float, 3>& GLCamera::LookAt() const
+const Vector<3>& GLCamera::LookAt() const
 {
     return this->lookAt;
 }
 
-const Vector<float, 2>& GLCamera::Clip() const
+const Vector<2>& GLCamera::Clip() const
 {
     return this->clip;
 }
@@ -138,27 +138,27 @@ void GLCamera::SetProject(int width, int height)
 
 void GLCamera::SetLookAt()
 {
-    Vector<float, 3> v;
+    Vector<3> v;
     v = this->position - this->lookAt;
 
     if (this->perspective)
     {
-        Quaternion<float> q;
+        Quaternion<> q;
 
         if (0.f != v[0] || 0.f != v[2])
         {
-            q = Quaternion<float>::From2Vectors(Vector<float, 3>::ZAxis, { v[0], 0.f, v[2] });
-            q = Quaternion<float>::From2Vectors({ v[0], 0.f, v[2] }, v) * q;
+            q = Quaternion<>::From2Vectors(Vector<3>::ZAxis, { v[0], 0.f, v[2] });
+            q = Quaternion<>::From2Vectors({ v[0], 0.f, v[2] }, v) * q;
         }
         else
         {
-            q = Quaternion<float>::From2Vectors(Vector<float, 3>::ZAxis, v);
+            q = Quaternion<>::From2Vectors(Vector<3>::ZAxis, v);
         }
 
-        q = Quaternion<float>::FromAxisAngle(v, this->rotate);
+        q = Quaternion<>::FromAxisAngle(v, this->rotate);
 
-        Vector<float, 3> yAxis;
-        yAxis = q.Rotate(Vector<float, 3>::YAxis);
+        Vector<3> yAxis;
+        yAxis = q.Rotate(Vector<3>::YAxis);
 
         gluLookAt(this->position[0], this->position[1], this->position[2], this->lookAt[0], this->lookAt[1], this->lookAt[2], yAxis[0], yAxis[1], yAxis[2]);
     }
@@ -169,7 +169,7 @@ void GLCamera::SetLookAt()
             float a = ToDegree(acosf(CosOfVectors<float>(v, { v[0], 0.f, v[2] }))) * (v[1] > 0.f ? 1.f : -1.f);
             glRotatef(a, 1.f, 0.f, 0.f);
 
-            a = ToDegree(acosf(CosOfVectors<float>({ v[0], 0.f, v[2] }, Vector<float, 3>::ZAxis))) * (v[0] > 0.f ? -1.f : 1.f);
+            a = ToDegree(acosf(CosOfVectors<float>({ v[0], 0.f, v[2] }, Vector<3>::ZAxis))) * (v[0] > 0.f ? -1.f : 1.f);
             glRotatef(a, 0.f, 1.f, 0.f);
         }
         else

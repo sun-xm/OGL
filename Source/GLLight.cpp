@@ -21,7 +21,7 @@ void GLLight::Ambient(float r, float g, float b, float a)
     this->ambient = { r, g, b, a };
 }
 
-void GLLight::Ambient(const Vector<float, 4>& rgba)
+void GLLight::Ambient(const Vector<4>& rgba)
 {
     this->ambient = rgba;
 }
@@ -31,7 +31,7 @@ void GLLight::Diffuse(float r, float g, float b, float a)
     this->diffuse = { r, g, b, a };
 }
 
-void GLLight::Diffuse(const Vector<float, 4>& rgba)
+void GLLight::Diffuse(const Vector<4>& rgba)
 {
     this->diffuse = rgba;
 }
@@ -41,7 +41,7 @@ void GLLight::Specular(float r, float g, float b, float a)
     this->specular = { r, g, b, a };
 }
 
-void GLLight::Specular(const Vector<float, 4>& rgba)
+void GLLight::Specular(const Vector<4>& rgba)
 {
     this->specular = rgba;
 }
@@ -51,12 +51,12 @@ void GLLight::Position(float x, float y, float z, float w)
     this->position = { x, y, z, w };
 }
 
-void GLLight::Position(const Vector<float, 4>& position)
+void GLLight::Position(const Vector<4>& position)
 {
     this->position = position;
 }
 
-void GLLight::Position(const Vector<float, 3>& position)
+void GLLight::Position(const Vector<3>& position)
 {
     this->Position(position[0], position[1], position[2], 1.f);
 }

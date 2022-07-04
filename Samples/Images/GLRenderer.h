@@ -19,11 +19,11 @@ public:
     void Scale(float x, float y);
     void Shift(float x, float y);
 
-    Matrix<float, 3> Transform() const
+    Matrix<3> Transform() const
     {
         return this->transform;
     }
-    void Transform(const Matrix<float, 3>& transform)
+    void Transform(const Matrix<3>& transform)
     {
         this->transform = transform;
     }
@@ -32,7 +32,7 @@ public:
     void End();
 
     void Clear(float r, float g, float b, float a = 1.f);
-    void Triangles(const Coordinate* screenCoords, size_t count, const Vector<float, 4>& color);
+    void Triangles(const Coordinate* screenCoords, size_t count, const Vector<4>& color);
     void Triangles(const Coordinate* screenCoords, const Coordinate* texCoords, size_t count, const GLTexture& texture);
     void Image(const GLTexture& texture, float w, float h);
     void Line(float x0, float y0, float x1, float y1);
@@ -41,7 +41,7 @@ private:
     GLProgram texProg;
     GLProgram clrProg;
 
-    Matrix<float, 3> transform;
-    Matrix<float, 3> origin;
-    Matrix<float, 3> unify;
+    Matrix<3> transform;
+    Matrix<3> origin;
+    Matrix<3> unify;
 };

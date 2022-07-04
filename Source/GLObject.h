@@ -4,7 +4,7 @@
 
 struct GLObject
 {
-    Vector<float, 3> Position;
-    Vector<float, 4> Rotation;
-    Vector<float, 3> Scaling;
+    Vector<3> Position;
+    Vector<4> Rotation;
+    Vector<3> Scaling;
 };

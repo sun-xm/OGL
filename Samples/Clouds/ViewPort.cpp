@@ -22,9 +22,9 @@ LRESULT ViewPort::WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
                 auto y = this->cursor.y - cursor.y;
                 this->cursor = cursor;
 
-                auto qx = Quaternion<float>::FromAxisAngle(Vertex::XAxis, ToRadian(y * .5f));
-                auto qy = Quaternion<float>::FromAxisAngle(Vertex::YAxis, ToRadian(x * .5f));
-                auto qr = Quaternion<float>::FromRotation(this->cloud.Rotation);
+                auto qx = Quaternion<>::FromAxisAngle(Vertex::XAxis, ToRadian(y * .5f));
+                auto qy = Quaternion<>::FromAxisAngle(Vertex::YAxis, ToRadian(x * .5f));
+                auto qr = Quaternion<>::FromRotation(this->cloud.Rotation);
 
                 this->cloud.Rotation = (qx * qy * qr).ToRotation();
                 this->Invalidate();

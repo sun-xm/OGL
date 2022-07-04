@@ -38,7 +38,7 @@ Donut::Donut()
     for (int i = 0; i < Pieces + 1; i++)
     {
         c.Y = (float)i / Pieces;
-        auto q = Quaternion<float>::FromAxisAngle(Vertex::YAxis, ToRadian(i * step));
+        auto q = Quaternion<>::FromAxisAngle(Vertex::YAxis, ToRadian(i * step));
 
         for (int j = 0; j < COUNTOF(baseVertices); j++)
         {

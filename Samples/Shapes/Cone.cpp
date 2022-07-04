@@ -28,7 +28,7 @@ Cone::Cone()
     c.X = v.X + .5f;
     c.Y = .5f - v.Y;
 
-    auto q = Quaternion<float>::From2Vectors(tip, tip - v);
+    auto q = Quaternion<>::From2Vectors(tip, tip - v);
     Normal n = q.Rotate(v).Normalize();
 
     float delta = 3.14159265358979323846f / Pieces;
@@ -42,7 +42,7 @@ Cone::Cone()
         v.X = Radius * cosf(i * delta);
         v.Y = Radius * sinf(i * delta);
 
-        q = Quaternion<float>::From2Vectors(tip, tip - v);
+        q = Quaternion<>::From2Vectors(tip, tip - v);
         n = q.Rotate(v).Normalize();
 
         vertices.push_back(tip);
@@ -56,7 +56,7 @@ Cone::Cone()
         c.X = v.X + .5f;
         c.Y = .5f - v.Y;
 
-        q = Quaternion<float>::From2Vectors(tip, tip - v);
+        q = Quaternion<>::From2Vectors(tip, tip - v);
         n = q.Rotate(v).Normalize();
 
         vertices.push_back(v);

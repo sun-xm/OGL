@@ -55,7 +55,7 @@ void GLScene::DisableLight(int index)
     this->lights[index] = nullptr;
 }
 
-const Matrix<float, 4>& GLScene::WorldView() const
+const Matrix<4>& GLScene::WorldView() const
 {
     return this->matrix;
 }

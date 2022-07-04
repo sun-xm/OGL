@@ -132,9 +132,9 @@ bool ViewPort::OnContextCreated()
 
                 if (this->shape)
                 {
-                    auto qx = Quaternion<float>::FromAxisAngle(Vertex::XAxis, ToRadian(y * .5f));
-                    auto qy = Quaternion<float>::FromAxisAngle(Vertex::YAxis, ToRadian(x * .5f));
-                    auto qr = Quaternion<float>::FromRotation(this->shape->Rotation);
+                    auto qx = Quaternion<>::FromAxisAngle(Vertex::XAxis, ToRadian(y * .5f));
+                    auto qy = Quaternion<>::FromAxisAngle(Vertex::YAxis, ToRadian(x * .5f));
+                    auto qr = Quaternion<>::FromRotation(this->shape->Rotation);
 
                     this->shape->Rotation = (qx * qy * qr).ToRotation();
                     this->Render();

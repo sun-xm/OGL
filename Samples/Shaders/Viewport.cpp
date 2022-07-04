@@ -52,9 +52,9 @@ bool Viewport::OnCreated()
             auto y = pos.y - this->pos.y;
             this->pos = pos;
 
-            auto qx = Quaternion<float>::FromAxisAngle(Vertex::XAxis, ToRadian(y * .5f));
-            auto qy = Quaternion<float>::FromAxisAngle(Vertex::YAxis, ToRadian(x * .5f));
-            auto qr = Quaternion<float>::FromRotation(this->triangle.Rotation);
+            auto qx = Quaternion<>::FromAxisAngle(Vertex::XAxis, ToRadian(y * .5f));
+            auto qy = Quaternion<>::FromAxisAngle(Vertex::YAxis, ToRadian(x * .5f));
+            auto qr = Quaternion<>::FromRotation(this->triangle.Rotation);
 
             this->triangle.Rotation = (qx * qy * qr).ToRotation();
             this->Invalidate();

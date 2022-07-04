@@ -148,7 +148,7 @@ bool GLProgram::Uniform1i(const string& name, int value)
     return true;
 }
 
-bool GLProgram::UniformV2f(const string& name, const Vector<float, 2>& value)
+bool GLProgram::UniformV2f(const string& name, const Vector<2>& value)
 {
     auto loc = this->UniformLocation(name);
     if (loc < 0)
@@ -160,7 +160,7 @@ bool GLProgram::UniformV2f(const string& name, const Vector<float, 2>& value)
     return true;
 }
 
-bool GLProgram::UniformV3f(const string& name, const Vector<float, 3>& value)
+bool GLProgram::UniformV3f(const string& name, const Vector<3>& value)
 {
     auto loc = this->UniformLocation(name);
     if (loc < 0)
@@ -172,7 +172,7 @@ bool GLProgram::UniformV3f(const string& name, const Vector<float, 3>& value)
     return true;
 }
 
-bool GLProgram::UniformM3f(const string& name, const Matrix<float, 3>& value, bool transpose)
+bool GLProgram::UniformM3f(const string& name, const Matrix<3>& value, bool transpose)
 {
     auto loc = this->UniformLocation(name);
     if (loc < 0)
@@ -184,7 +184,7 @@ bool GLProgram::UniformM3f(const string& name, const Matrix<float, 3>& value, bo
     return true;
 }
 
-bool GLProgram::UniformV4f(const string& name, const Vector<float, 4>& value)
+bool GLProgram::UniformV4f(const string& name, const Vector<4>& value)
 {
     auto loc = this->UniformLocation(name);
     if (loc < 0)
@@ -196,7 +196,7 @@ bool GLProgram::UniformV4f(const string& name, const Vector<float, 4>& value)
     return true;
 }
 
-bool GLProgram::UniformM4f(const string& name, const Matrix<float, 4>& value, bool transpose)
+bool GLProgram::UniformM4f(const string& name, const Matrix<4>& value, bool transpose)
 {
     auto loc = this->UniformLocation(name);
     if (loc < 0)
