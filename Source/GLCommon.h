@@ -747,6 +747,29 @@ public:
 };
 
 template<typename Scalar = float>
+class Transform3D
+{
+public:
+    static Matrix<4, 4, Scalar> Identity()
+    {
+        return Matrix<4, 4, Scalar>{{ 1, 0, 0, 0 },
+                                    { 0, 1, 0, 0 },
+                                    { 0, 0, 1, 0 },
+                                    { 0, 0, 0, 1 }};
+    }
+
+    static Matrix<4, 4, Scalar> Perspective(Scalar vfov /*radian*/, Scalar aspect, Scalar near, Scalar far)
+    {
+        auto f = 1 / tan(vfov / 2);
+        auto i = 1 / (near - far);
+        return Matrix<4, 4, Scalar>{{ f / aspect,  0,                0,                  0 },
+                                    {          0,  f,                0,                  0 },
+                                    {          0,  0, (near + far) * i, near * far * i * 2 },
+                                    {          0,  0,               -1,                  0 }};
+    }
+};
+
+template<typename Scalar = float>
 struct Quaternion : public Vector<4, Scalar>
 {
     Quaternion() = default;
