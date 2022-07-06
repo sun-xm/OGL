@@ -765,7 +765,33 @@ public:
                                     { 0, 0, 0, 1 }};
     }
 
-    static Matrix<4, 4, Scalar> Perspective(Scalar vfov /*radian*/, Scalar aspect, Scalar near, Scalar far)
+    static Matrix<4, 4, Scalar> Shift(Scalar x, Scalar y, Scalar z)
+    {
+        return Matrix<4, 4, Scalar>{{ 1, 0, 0, x },
+                                    { 0, 1, 0, y },
+                                    { 0, 0, 1, z },
+                                    { 0, 0, 0, 1 }};
+    }
+
+    static Matrix<4, 4, Scalar> Shift(const Vector<3, Scalar>& v)
+    {
+        return Shift(v[0], v[1], v[2]);
+    }
+
+    static Matrix<4, 4, Scalar> Scale(Scalar x, Scalar y, Scalar z)
+    {
+        return Matrix<4, 4, Scalar>{{ x, 0, 0, 0},
+                                    { 0, y, 0, 0},
+                                    { 0, 0, z, 0},
+                                    { 0, 0, 0, 1}};
+    }
+
+    static Matrix<4, 4, Scalar> Scale(const Vector<3, Scalar>& v)
+    {
+        return Scale(v[0], v[1], v[2]);
+    }
+
+    static Matrix<4, 4, Scalar> Perspective(Scalar vfov /*in radian*/, Scalar aspect, Scalar near, Scalar far)
     {
         auto f = 1 / tan(vfov / 2);
         auto i = 1 / (near - far);
@@ -774,6 +800,15 @@ public:
                                     {          0,  0, (near + far) * i, near * far * i * 2 },
                                     {          0,  0,               -1,                  0 }};
     }
+
+    static Matrix<4, 4, Scalar> LookAt(const Vector<3, Scalar>& eye, const Vector<3, Scalar>& center, Scalar rotation /*in radian*/)
+    {
+        auto s = Shift(Vector<3, Scalar>::Zero - eye);
+        auto q = Quaternion<Scalar>::From2Vectors(center - eye, -Vector<3, Scalar>::ZAxis);
+        auto r = Quaternion<Scalar>::FromAxisAngle(q.Rotate(-Vector<3, Scalar>::ZAxis), rotation);
+        return r.ToMatrix() * q.ToMatrix() * s;
+    }
+
 };
 
 template<typename Scalar = float>
