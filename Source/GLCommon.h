@@ -4,6 +4,7 @@
 #include <cfloat>
 #include <cmath>
 #include <cstdint>
+#include <limits>
 
 #define SCALAR_TYPE(v) decltype(ScalarHelper(v))
 
@@ -576,12 +577,18 @@ struct Vector<4, Scalar>
         return this->v;
     }
 
-    static const Vector<4, Scalar> NaN, Zero;
+    static const Vector<4, Scalar> NaN, Zero, XYPlane, YZPlane, ZXPlane;
 };
 template<typename Scalar>
 const Vector<4, Scalar> Vector<4, Scalar>::NaN   = { std::numeric_limits<Scalar>::quiet_NaN(), std::numeric_limits<Scalar>::quiet_NaN(), std::numeric_limits<Scalar>::quiet_NaN(), std::numeric_limits<Scalar>::quiet_NaN() };
 template<typename Scalar>
 const Vector<4, Scalar> Vector<4, Scalar>::Zero  = { 0, 0, 0, 0 };
+template<typename Scalar>
+const Vector<4, Scalar> Vector<4, Scalar>::XYPlane = { 0, 0, 1, 0 };
+template<typename Scalar>
+const Vector<4, Scalar> Vector<4, Scalar>::YZPlane = { 1, 0, 0, 0 };
+template<typename Scalar>
+const Vector<4, Scalar> Vector<4, Scalar>::ZXPlane = { 0, 1, 0, 0 };
 
 typedef Vector<3, uint32_t> Element;
 typedef Vector<3> Vertex;
@@ -838,10 +845,10 @@ struct Quaternion : public Vector<4, Scalar>
         auto yw2 = this->Y * this->W * 2;
         auto zw2 = this->Z * this->W * 2;
 
-        return Matrix<Scalar, 4>{{ 1 - yy2 - zz2,     xy2 - zw2,     xz2 + yw2, 0 },
-                                 {     xy2 + zw2, 1 - xx2 - zz2,     yz2 - xw2, 0 },
-                                 {     xz2 - yw2,     yz2 + xw2, 1 - xx2 - yy2, 0 },
-                                 {             0,             0,             0, 1 }};
+        return Matrix<4, 4, Scalar>{{ 1 - yy2 - zz2,     xy2 - zw2,     xz2 + yw2, 0 },
+                                    {     xy2 + zw2, 1 - xx2 - zz2,     yz2 - xw2, 0 },
+                                    {     xz2 - yw2,     yz2 + xw2, 1 - xx2 - yy2, 0 },
+                                    {             0,             0,             0, 1 }};
     }
 
     static Quaternion<Scalar> FromEuler(const Vector<3, Scalar>& e)
@@ -874,14 +881,36 @@ struct Quaternion : public Vector<4, Scalar>
 
     static Quaternion<Scalar> From2Vectors(const Vector<3, Scalar>& v0, const Vector<3, Scalar>& v1)
     {
+        const auto e = std::numeric_limits<Scalar>::epsilon();
+
         auto n0 = v0.Normalize();
         auto n1 = v1.Normalize();
 
-        if (std::fabs(n0[0] - n1[0]) < 0.00001 &&
-            std::fabs(n0[1] - n1[1]) < 0.00001 &&
-            std::fabs(n0[2] - n1[2]) < 0.00001)
+        if ((n0 - n1).Length() < e)
         {
             return Identity;
+        }
+        else if ((n0 + n1).Length() < e)
+        {
+            auto cx = abs(Dot(n0, Vector<3, Scalar>::XAxis));
+            auto cy = abs(Dot(n0, Vector<3, Scalar>::YAxis));
+            auto cz = abs(Dot(n0, Vector<3, Scalar>::ZAxis));
+
+            auto axis = Vector<3, Scalar>::XAxis;
+            auto minc = cx;
+
+            if (cy < minc)
+            {
+                minc = cy;
+                axis = Vector<3, Scalar>::YAxis;
+            }
+            if (cz < minc)
+            {
+                axis = Vector<3, Scalar>::ZAxis;
+            }
+
+            auto v = n0.Cross(axis);
+            return Quaternion<Scalar>{ v[0], v[1], v[2], 0 };
         }
 
         auto h = (n0 + n1).Normalize();
