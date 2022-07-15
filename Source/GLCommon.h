@@ -805,7 +805,7 @@ public:
     {
         auto s = Shift(Vector<3, Scalar>::Zero - eye);
         auto q = Quaternion<Scalar>::From2Vectors(center - eye, -Vector<3, Scalar>::ZAxis);
-        auto r = Quaternion<Scalar>::FromAxisAngle(q.Rotate(-Vector<3, Scalar>::ZAxis), rotation);
+        auto r = Quaternion<Scalar>::FromAxisAngle(q.Rotate(Vector<3, Scalar>::ZAxis), rotation);
         return r.ToMatrix() * q.ToMatrix() * s;
     }
 
