@@ -29,3 +29,12 @@ add_subdirectory(Samples/Clouds  Clouds)
 add_subdirectory(Samples/Shapes  Shapes)
 add_subdirectory(Samples/Shaders Shaders)
 add_subdirectory(Samples/Images  Images)
+
+set(QT5_DIR $ENV{QT5_DIR})
+if(QT5_DIR)
+    set(COMPILE_QT ON CACHE BOOL "Compile Qt samples")
+endif()
+
+if(COMPILE_QT)
+    add_subdirectory(Samples/Qt/QtImage QtImage)
+endif()

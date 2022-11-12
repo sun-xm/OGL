@@ -1,0 +1,10 @@
+<!DOCTYPE RCC>
+<RCC version="1.0">
+    <qresource>
+        <file alias="ClrFrg.glsl">GLSL/ClrFrg.glsl</file>
+        <file alias="ClrVtx.glsl">GLSL/ClrVtx.glsl</file>
+        <file alias="TexFrg.glsl">GLSL/TexFrg.glsl</file>
+        <file alias="TexVtx.glsl">GLSL/TexVtx.glsl</file>
+        <file>Portrait.png</file>
+    </qresource>
+</RCC>

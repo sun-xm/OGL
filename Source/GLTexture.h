@@ -2,6 +2,7 @@
 
 #include "GLReference.h"
 #include <gl/glew.h>
+#include <cstdint>
 #include <vector>
 
 class GLTexture : public GLReference<GLuint>
