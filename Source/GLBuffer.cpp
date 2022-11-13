@@ -17,6 +17,7 @@ bool GLBuffer::Create()
 void GLBuffer::Release()
 {
     glDeleteBuffers(1, &this->buffer);
+    this->buffer = 0;
 }
 
 void GLBuffer::Bind() const

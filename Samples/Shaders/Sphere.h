@@ -2,6 +2,7 @@
 
 #include "GLShape.h"
 #include "GLProgram.h"
+#include <memory>
 #include <vector>
 
 class Sphere : public GLShape
@@ -9,7 +10,7 @@ class Sphere : public GLShape
 public:
     Sphere();
 
-    void Create(const GLProgram& program);
+    void Create(std::shared_ptr<GLProgram>& program);
     void Release() override;
 
     bool Colors(const Vector<3>* colors, int count);
@@ -22,7 +23,8 @@ protected:
 private:
     static void Split(uint32_t level, const Vertex& v0, const Vertex& v1, const Vertex& v2, std::vector<Vertex>& vertices);
 
-    GLProgram program;
+    std::shared_ptr<GLProgram> program;
+
     GLBuffer  cbo;
 
     Vector<3> lightPos;

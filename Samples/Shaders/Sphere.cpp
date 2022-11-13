@@ -11,7 +11,7 @@ Sphere::Sphere()
 {
 }
 
-void Sphere::Create(const GLProgram& program)
+void Sphere::Create(shared_ptr<GLProgram>& program)
 {
     this->program = program;
 
@@ -49,7 +49,6 @@ void Sphere::Release()
 {
     GLShape::Release();
     this->cbo.Release();
-    this->program.Release();
 }
 
 bool Sphere::Colors(const Vector<3>* colors, int count)
@@ -78,20 +77,20 @@ size_t Sphere::Apply(const GLScene& scene)
     auto count = this->vbo.Size() / sizeof(Vertex);
     if (count)
     {
-        this->program.Use();
+        this->program->Use();
 
-        this->program.UniformV3f("LightPos",  this->lightPos);
-        this->program.UniformM4f("WorldView", scene.WorldView());
+        this->program->UniformV3f("LightPos",  this->lightPos);
+        this->program->UniformM4f("WorldView", scene.WorldView());
 
         Matrix<4> modelView, projection;
         glGetFloatv(GL_MODELVIEW_MATRIX,  modelView);
         glGetFloatv(GL_PROJECTION_MATRIX, projection);
-        this->program.UniformM4f("ModelView",  modelView,  false);
-        this->program.UniformM4f("Projection", projection, false);
+        this->program->UniformM4f("ModelView",  modelView,  false);
+        this->program->UniformM4f("Projection", projection, false);
 
-        this->program.BindAttrib("vtx", this->vbo, 3, GL_FLOAT);
-        this->program.BindAttrib("clr", this->cbo, 3, GL_FLOAT);
-        this->program.BindAttrib("nml", this->nbo, 3, GL_FLOAT);
+        this->program->BindAttrib("vtx", this->vbo, 3, GL_FLOAT);
+        this->program->BindAttrib("clr", this->cbo, 3, GL_FLOAT);
+        this->program->BindAttrib("nml", this->nbo, 3, GL_FLOAT);
     }
 
     return count;
@@ -99,9 +98,9 @@ size_t Sphere::Apply(const GLScene& scene)
 
 void Sphere::Revoke()
 {
-    this->program.UnbindAttrib("vtx");
-    this->program.UnbindAttrib("clr");
-    this->program.UnbindAttrib("nml");
+    this->program->UnbindAttrib("vtx");
+    this->program->UnbindAttrib("clr");
+    this->program->UnbindAttrib("nml");
     glUseProgram(0);
 }
 

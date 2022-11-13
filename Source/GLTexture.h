@@ -1,15 +1,17 @@
 #pragma once
 
-#include "GLReference.h"
 #include <gl/glew.h>
 #include <cstdint>
 #include <vector>
 
-class GLTexture : public GLReference<GLuint>
+class GLTexture
 {
 public:
     GLTexture(GLenum target = GL_TEXTURE_2D);
-    GLTexture(const GLTexture& other);
+    GLTexture(const GLTexture& other) = delete;
+
+    bool Create();
+    void Release();
 
     void Mode(GLuint envMode);
     void Wrap(GLuint wrapS, GLuint wrapT);
@@ -31,16 +33,10 @@ public:
     operator bool() const { return !!this->tex; }
     operator GLuint() const { return this->tex; }
 
-    GLTexture& operator=(const GLTexture& other)
-    {
-        this->w = other.w;
-        this->h = other.h;
-        this->target = other.target;
-        return (GLTexture&)GLReference<GLuint>::operator=(other);
-    }
+    GLTexture& operator=(const GLTexture& other) = delete;
 
 private:
-    GLuint& tex;
+    GLuint  tex;
     GLenum  target;
     uint32_t w, h;
 };

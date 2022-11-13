@@ -1,30 +1,24 @@
 #include "GLTexture.h"
 
 GLTexture::GLTexture(GLenum target)
-  : w(0), h(0), tex(obj), target(target)
+  : w(0), h(0), tex(0), target(target)
 {
-    this->tex = 0;
-
-    this->create = [this]
-    {
-        glGenTextures(1, &this->tex);
-        return !! this->tex;
-    };
-
-    this->destroy = [this]
-    {
-        glDeleteTextures(1, &this->tex);
-    };
-
-    this->reset = [this]
-    {
-        this->tex = 0;
-    };
 }
 
-GLTexture::GLTexture(const GLTexture& other) : GLTexture(other.Target())
+bool GLTexture::Create()
 {
-    *this = other;
+    if (!this->tex)
+    {
+        glGenTextures(1, &this->tex);
+    }
+
+    return !!this->tex;
+}
+
+void GLTexture::Release()
+{
+    glDeleteTextures(1, &this->tex);
+    this->tex = 0;
 }
 
 void GLTexture::Mode(GLuint envMode)

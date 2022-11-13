@@ -1,17 +1,19 @@
 #pragma once
 
-#include "GLReference.h"
 #include "GLCommon.h"
 #include <gl/glew.h>
 #include <iostream>
 #include <string>
 #include <vector>
 
-class GLShader : public GLReference<GLuint>
+class GLShader
 {
 public:
     GLShader(GLenum type);
-    GLShader(const GLShader&);
+    GLShader(const GLShader&) = delete;
+
+    bool Create();
+    void Release();
 
     bool Source(std::istream& source);
     bool Source(const std::string& source);
@@ -28,15 +30,11 @@ public:
         return this->shader;
     }
 
-    GLShader& operator=(const GLShader& other)
-    {
-        this->type = other.type;
-        return (GLShader&)GLReference<GLuint>::operator=(other);
-    }
+    GLShader& operator=(const GLShader& other) = delete;
 
 protected:
-    GLenum  type;
-    GLuint& shader;
+    GLenum type;
+    GLuint shader;
 };
 
 class GLVShader : public GLShader

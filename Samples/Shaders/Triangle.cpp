@@ -1,10 +1,12 @@
 #include "Triangle.h"
 
+using namespace std;
+
 Triangle::Triangle()
 {
 }
 
-void Triangle::Create(const GLProgram& program)
+void Triangle::Create(shared_ptr<GLProgram>& program)
 {
     this->program = program;
 
@@ -22,7 +24,6 @@ void Triangle::Release()
 {
     GLShape::Release();
     this->cbo.Release();
-    this->program.Release();
 }
 
 bool Triangle::Colors(const Vector<3>* colors, int count)
@@ -51,20 +52,20 @@ size_t Triangle::Apply(const GLScene& scene)
     auto count = this->vbo.Size() / sizeof(Vertex);
     if (count)
     {
-        this->program.Use();
+        this->program->Use();
 
-        this->program.UniformV3f("LightPos",  this->lightPos);
-        this->program.UniformM4f("WorldView", scene.WorldView());
+        this->program->UniformV3f("LightPos",  this->lightPos);
+        this->program->UniformM4f("WorldView", scene.WorldView());
 
         Matrix<4> modelView, projection;
         glGetFloatv(GL_MODELVIEW_MATRIX,  modelView);
         glGetFloatv(GL_PROJECTION_MATRIX, projection);
-        this->program.UniformM4f("ModelView",  modelView,  false);
-        this->program.UniformM4f("Projection", projection, false);
+        this->program->UniformM4f("ModelView",  modelView,  false);
+        this->program->UniformM4f("Projection", projection, false);
 
-        this->program.BindAttrib("vtx", this->vbo, 3, GL_FLOAT);
-        this->program.BindAttrib("clr", this->cbo, 3, GL_FLOAT);
-        this->program.BindAttrib("nml", this->nbo, 3, GL_FLOAT);
+        this->program->BindAttrib("vtx", this->vbo, 3, GL_FLOAT);
+        this->program->BindAttrib("clr", this->cbo, 3, GL_FLOAT);
+        this->program->BindAttrib("nml", this->nbo, 3, GL_FLOAT);
     }
 
     return count;
@@ -72,8 +73,8 @@ size_t Triangle::Apply(const GLScene& scene)
 
 void Triangle::Revoke()
 {
-    this->program.UnbindAttrib("vtx");
-    this->program.UnbindAttrib("clr");
-    this->program.UnbindAttrib("nml");
+    this->program->UnbindAttrib("vtx");
+    this->program->UnbindAttrib("clr");
+    this->program->UnbindAttrib("nml");
     glUseProgram(0);
 }

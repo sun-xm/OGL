@@ -2,30 +2,24 @@
 
 using namespace std;
 
-GLProgram::GLProgram() : program(obj)
+GLProgram::GLProgram() : program(0)
 {
-    this->program = 0;
-
-    this->create = [this]
-    {
-        this->program = glCreateProgram();
-        return !!this->program;
-    };
-
-    this->destroy = [this]
-    {
-        glDeleteProgram(this->program);
-    };
-
-    this->reset = [this]
-    {
-        this->program = 0;
-    };
 }
 
-GLProgram::GLProgram(const GLProgram& other) : GLProgram()
+bool GLProgram::Create()
 {
-    *this = other;
+    if (!this->program)
+    {
+        this->program = glCreateProgram();
+    }
+
+    return !!this->program;
+}
+
+void GLProgram::Release()
+{
+    glDeleteProgram(this->program);
+    this->program = 0;
 }
 
 void GLProgram::Use()

@@ -5,7 +5,7 @@
 
 using namespace std;
 
-Viewport::Viewport()
+Viewport::Viewport() : program(new GLProgram())
 {
 }
 
@@ -111,8 +111,8 @@ bool Viewport::OnContextCreated()
         return false;
     }
 
-    this->program.Create();
-    if (!this->program.Link(vshader, fshader, log))
+    this->program->Create();
+    if (!this->program->Link(vshader, fshader, log))
     {
         OutputDebugStringA(("Failed to create link program\n" + log + '\n').c_str());
         return false;
@@ -131,6 +131,6 @@ void Viewport::OnContextDestroy()
 {
     this->sphere.Release();
     this->triangle.Release();
-    this->program.Release();
+    this->program->Release();
     GLWindow::OnContextDestroy();
 }

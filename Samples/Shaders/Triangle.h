@@ -2,13 +2,14 @@
 
 #include "GLShape.h"
 #include "GLProgram.h"
+#include <memory>
 
 class Triangle : public GLShape
 {
 public:
     Triangle();
 
-    void Create(const GLProgram& program);
+    void Create(std::shared_ptr<GLProgram>& program);
     void Release() override;
 
     bool Colors(const Vector<3>* colors, int count);
@@ -18,7 +19,7 @@ protected:
     size_t Apply(const GLScene& scene) override;
     void   Revoke() override;
 
-    GLProgram program;
+    std::shared_ptr<GLProgram> program;
     GLBuffer  cbo;
 
     Vector<3> lightPos;

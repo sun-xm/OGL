@@ -5,6 +5,7 @@
 #include "GLProgram.h"
 #include "Sphere.h"
 #include "Triangle.h"
+#include <memory>
 
 class Viewport : public GLWindow
 {
@@ -20,9 +21,10 @@ protected:
 
 private:
     GLScene   scene;
-    GLProgram program;
     Sphere    sphere;
     Triangle  triangle;
+
+    std::shared_ptr<GLProgram> program;
 
     Vertex lightPos;
 

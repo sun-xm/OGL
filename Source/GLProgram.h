@@ -1,16 +1,18 @@
 #pragma once
 
-#include "GLReference.h"
 #include "GLCommon.h"
 #include "GLBuffer.h"
 #include "GLShader.h"
 #include "GLTexture.h"
 
-class GLProgram : public GLReference<GLuint>
+class GLProgram
 {
 public:
     GLProgram();
-    GLProgram(const GLProgram&);
+    GLProgram(const GLProgram&) = delete;
+
+    bool Create();
+    void Release();
 
     void Use();
 
@@ -45,14 +47,11 @@ public:
         return this->program;
     }
 
-    GLProgram& operator=(const GLProgram& other)
-    {
-        return (GLProgram&)GLReference<GLuint>::operator=(other);
-    }
+    GLProgram& operator=(const GLProgram& other) = delete;
 
 private:
     GLint UniformLocation(const std::string& name);
 
 protected:
-    GLuint& program;
+    GLuint program;
 };
