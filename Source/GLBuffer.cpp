@@ -1,29 +1,22 @@
 #include "GLBuffer.h"
 
-GLBuffer::GLBuffer(GLenum target) : buffer(obj), target(target)
+GLBuffer::GLBuffer(GLenum target) : buffer((GLuint)0), target(target)
 {
-    this->buffer = 0;
-
-    this->create = [this]
-    {
-        glGenBuffers(1, &this->buffer);
-        return !!this->buffer;
-    };
-
-    this->destroy = [this]
-    {
-        glDeleteBuffers(1, &this->buffer);
-    };
-
-    this->reset = [this]
-    {
-        this->buffer = 0;
-    };
 }
 
-GLBuffer::GLBuffer(const GLBuffer& other) : GLBuffer(other.target)
+bool GLBuffer::Create()
 {
-    *this = other;
+    if (!this->buffer)
+    {
+        glCreateBuffers(1, &this->buffer);
+    }
+
+    return !!this->buffer;
+}
+
+void GLBuffer::Release()
+{
+    glDeleteBuffers(1, &this->buffer);
 }
 
 void GLBuffer::Bind() const
