@@ -18,8 +18,7 @@ public:
 
     void Attach(const GLShader&);
     void Detach(const GLShader&);
-    bool Link(const GLVShader&, const GLFShader&, std::string& log);
-    bool Link(std::string& log);
+    bool Link(const GLVShader&, const GLFShader&);
     bool Link();
 
     bool BindAttrib(const std::string& name, const GLBuffer& buffer, GLint size, GLenum type, GLboolean normalized = GL_FALSE, GLsizei stride = 0, const void* pointer = 0);
@@ -38,6 +37,11 @@ public:
     bool UniformM4f(const std::string& name, const Matrix<4>& value, bool transpose = true);
     bool UniformTex(const std::string& name, const GLTexture& texture, uint32_t index);
 
+    const std::string& Log()
+    {
+        return this->log;
+    }
+
     operator bool() const
     {
         return !!this->program;
@@ -54,4 +58,5 @@ private:
 
 protected:
     GLuint program;
+    std::string log;
 };

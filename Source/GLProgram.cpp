@@ -37,31 +37,17 @@ void GLProgram::Detach(const GLShader& shader)
     glDetachShader(this->program, shader);
 }
 
-bool GLProgram::Link(const GLVShader& vshader, const GLFShader& fshader, string& log)
+bool GLProgram::Link(const GLVShader& vshader, const GLFShader& fshader)
 {
     this->Attach(vshader);
     this->Attach(fshader);
 
-    auto res = this->Link(log);
+    auto res = this->Link();
+
     this->Detach(vshader);
     this->Detach(fshader);
 
     return res;
-}
-
-bool GLProgram::Link(string& log)
-{
-    if (!this->Link())
-    {
-        GLchar  buf[4096];
-        GLsizei len;
-        glGetProgramInfoLog(this->program, 4096, &len, buf);
-        log = buf;
-        return false;
-    }
-
-    log.clear();
-    return true;
 }
 
 bool GLProgram::Link()
@@ -76,7 +62,17 @@ bool GLProgram::Link()
     GLint status;
     glGetProgramiv(this->program, GL_LINK_STATUS, &status);
 
-    return !!status;
+    if (!status)
+    {
+        GLchar  buf[4096];
+        GLsizei len;
+        glGetProgramInfoLog(this->program, 4096, &len, buf);
+        this->log = buf;
+        return false;
+    }
+
+    this->log.clear();
+    return true;
 }
 
 bool GLProgram::BindAttrib(const string& name, const GLBuffer& buffer, GLint size, GLenum type, GLboolean normalized, GLsizei stride, const void* pointer)

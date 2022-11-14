@@ -103,18 +103,22 @@ bool Viewport::OnContextCreated()
         return false;
     }
 
-    string log;
-    if (!vshader.Source(vsrc) || !vshader.Compile(log) ||
-        !fshader.Source(fsrc) || !fshader.Compile(log))
+    if (!vshader.Source(vsrc) || !vshader.Compile())
     {
-        OutputDebugStringA(("Failed to create load shaders\n" + log + '\n').c_str());
+        OutputDebugStringA(("Failed to load vertex shader\n" + vshader.Log() + '\n').c_str());
+        return false;
+    }
+
+    if (!fshader.Source(fsrc) || !fshader.Compile())
+    {
+        OutputDebugStringA(("Failed to load fragment shader\n" + fshader.Log() + '\n').c_str());
         return false;
     }
 
     this->program->Create();
-    if (!this->program->Link(vshader, fshader, log))
+    if (!this->program->Link(vshader, fshader))
     {
-        OutputDebugStringA(("Failed to create link program\n" + log + '\n').c_str());
+        OutputDebugStringA(("Failed to create link program\n" + this->program->Log() + '\n').c_str());
         return false;
     }
 

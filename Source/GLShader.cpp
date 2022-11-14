@@ -62,26 +62,22 @@ bool GLShader::Source(const vector<string>& sources)
     return true;
 }
 
-bool GLShader::Compile(string& log)
-{
-    if (!this->Compile())
-    {
-        GLchar  buf[4096];
-        GLsizei len;
-        glGetShaderInfoLog(this->shader, 4096, &len, buf);
-        log = buf;
-        return false;
-    }
-
-    log.clear();
-    return true;
-}
-
 bool GLShader::Compile()
 {
     glCompileShader(this->shader);
 
     GLint status;
     glGetShaderiv(this->shader, GL_COMPILE_STATUS, &status);
-    return !!status;
+
+    if (!status)
+    {
+        GLchar  buf[4096];
+        GLsizei len;
+        glGetShaderInfoLog(this->shader, 4096, &len, buf);
+        this->log = buf;
+        return false;
+    }
+
+    this->log.clear();
+    return true;
 }

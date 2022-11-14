@@ -18,8 +18,12 @@ public:
     bool Source(std::istream& source);
     bool Source(const std::string& source);
     bool Source(const std::vector<std::string>& sources);
-    bool Compile(std::string& log);
     bool Compile();
+
+    const std::string& Log()
+    {
+        return this->log;
+    }
 
     operator bool() const
     {
@@ -35,6 +39,7 @@ public:
 protected:
     GLenum type;
     GLuint shader;
+    std::string log;
 };
 
 class GLVShader : public GLShader

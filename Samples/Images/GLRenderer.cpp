@@ -29,14 +29,21 @@ bool GLRenderer::Create(string& log)
         return false;
     }
 
-    if (!vshader.Source(texVtx) || !vshader.Compile(log) ||
-        !fshader.Source(texFrg) || !fshader.Compile(log))
+    if (!vshader.Source(texVtx) || !vshader.Compile())
     {
+        log = vshader.Log();
         return false;
     }
 
-    if (!this->texProg.Link(vshader, fshader, log))
+    if (!fshader.Source(texFrg) || !fshader.Compile())
     {
+        log = fshader.Log();
+        return false;
+    }
+
+    if (!this->texProg.Link(vshader, fshader))
+    {
+        log = this->texProg.Log();
         return false;
     }
 
@@ -51,14 +58,21 @@ bool GLRenderer::Create(string& log)
         return false;
     }
 
-    if (!vshader.Source(clrVtx) || !vshader.Compile(log) ||
-        !vshader.Source(clrFrg) || !fshader.Compile(log))
+    if (!vshader.Source(clrVtx) || !vshader.Compile())
     {
+        log = vshader.Log();
         return false;
     }
 
-    if (!this->clrProg.Link(vshader, fshader, log))
+    if (!fshader.Source(clrFrg) || !fshader.Compile())
     {
+        log = fshader.Log();
+        return false;
+    }
+
+    if (!this->clrProg.Link(vshader, fshader))
+    {
+        log = this->clrProg.Log();
         return false;
     }
 
