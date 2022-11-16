@@ -1,4 +1,5 @@
 #pragma once
+#include <cstdint>
 #include <vector>
 #include <Windows.h>
 #include <gdiplus.h>
@@ -9,7 +10,7 @@ public:
     Texture(const wchar_t* file);
    ~Texture();
 
-   const unsigned char* Pixels() const;
+   const uint32_t* Pixels() const;
    int Width() const;
    int Height() const;
 

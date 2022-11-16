@@ -14,7 +14,7 @@ public:
     bool Create();
     void Release();
 
-    void Use();
+    bool Use();
 
     void Attach(const GLShader&);
     void Detach(const GLShader&);
@@ -24,9 +24,9 @@ public:
     bool BindAttrib(const std::string& name, const GLBuffer& buffer, GLint size, GLenum type, GLboolean normalized = GL_FALSE, GLsizei stride = 0, const void* pointer = 0);
     void UnbindAttrib(const std::string& name);
 
-    void  BindAttribLocation(GLuint index, const std::string& name);
+    bool  BindAttribLocation(GLuint index, const std::string& name);
     GLint GetAttribLocation(const std::string& name);
-    void  BindFragDataLocation(GLuint index, const std::string& name);
+    bool  BindFragDataLocation(GLuint index, const std::string& name);
     GLint GetFragDataLocation(const std::string& name);
 
     bool Uniform1i(const std::string& name, int value);

@@ -33,11 +33,11 @@ Texture::~Texture()
 {
 }
 
-const unsigned char* Texture::Pixels() const
+const uint32_t* Texture::Pixels() const
 {
     if (this->pixels.size())
     {
-        return this->pixels.data();
+        return (uint32_t*)this->pixels.data();
     }
 
     return nullptr;

@@ -22,9 +22,17 @@ void GLProgram::Release()
     this->program = 0;
 }
 
-void GLProgram::Use()
+bool GLProgram::Use()
 {
+    if (!this->program)
+    {
+        return false;
+    }
+
     glUseProgram(this->program);
+
+    auto err = glGetError();
+    return GL_NO_ERROR == err;
 }
 
 void GLProgram::Attach(const GLShader& shader)
@@ -92,7 +100,8 @@ bool GLProgram::BindAttrib(const string& name, const GLBuffer& buffer, GLint siz
     glVertexAttribPointer(loc, size, type, normalized, stride, pointer);
     glEnableVertexAttribArray(loc);
 
-    return true;
+    auto err = glGetError();
+    return GL_NO_ERROR == err;
 }
 
 void GLProgram::UnbindAttrib(const string& name)
@@ -106,9 +115,12 @@ void GLProgram::UnbindAttrib(const string& name)
     glDisableVertexAttribArray(loc);
 }
 
-void GLProgram::BindAttribLocation(GLuint index, const string& name)
+bool GLProgram::BindAttribLocation(GLuint index, const string& name)
 {
     glBindAttribLocation(this->program, index, name.c_str());
+
+    auto err = glGetError();
+    return GL_NO_ERROR == err;
 }
 
 GLint GLProgram::GetAttribLocation(const string& name)
@@ -116,9 +128,12 @@ GLint GLProgram::GetAttribLocation(const string& name)
     return glGetAttribLocation(this->program, name.c_str());
 }
 
-void GLProgram::BindFragDataLocation(GLuint index, const string& name)
+bool GLProgram::BindFragDataLocation(GLuint index, const string& name)
 {
     glBindFragDataLocation(this->program, index, name.c_str());
+
+    auto err = glGetError();
+    return GL_NO_ERROR == err;
 }
 
 GLint GLProgram::GetFragDataLocation(const string& name)
@@ -210,7 +225,8 @@ bool GLProgram::UniformTex(const string& name, const GLTexture& texture, uint32_
     glBindTexture(texture.Target(), texture);
     glUniform1i(loc, index);
 
-    return true;
+    auto err = glGetError();
+    return GL_NO_ERROR == err;
 }
 
 GLint GLProgram::UniformLocation(const string& name)

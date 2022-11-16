@@ -13,11 +13,11 @@ public:
     bool Create();
     void Release();
 
-    void Mode(GLuint envMode);
-    void Wrap(GLuint wrapS, GLuint wrapT);
-    void Filter(GLuint minFilter, GLuint magFilter);
-    bool Data(GLenum format, const unsigned char* pixels, size_t size, uint32_t width, uint32_t height = 0);
-    void Apply() const;
+    bool Mode(GLuint envMode);
+    bool Wrap(GLuint wrapS, GLuint wrapT);
+    bool Filter(GLuint minFilter, GLuint magFilter);
+    bool Data(GLenum format, const uint32_t* pixels, size_t size, uint32_t width, uint32_t height = 0);
+    bool Apply() const;
     void Revoke() const;
 
     GLuint Mode() const;

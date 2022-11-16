@@ -21,36 +21,51 @@ void GLTexture::Release()
     this->tex = 0;
 }
 
-void GLTexture::Mode(GLuint envMode)
+bool GLTexture::Mode(GLuint envMode)
 {
-    if (this->tex)
+    if (!this->tex)
     {
-        glBindTexture(this->target, this->tex);
-        glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, envMode);
+        return false;
     }
+
+    glBindTexture(this->target, this->tex);
+    glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, envMode);
+
+    auto err = glGetError();
+    return GL_NO_ERROR == err;
 }
 
-void GLTexture::Wrap(GLuint wrapS, GLuint wrapT)
+bool GLTexture::Wrap(GLuint wrapS, GLuint wrapT)
 {
-    if (this->tex)
+    if (!this->tex)
     {
-        glBindTexture(this->target, this->tex);
-        glTexParameteri(this->target, GL_TEXTURE_WRAP_S, wrapS);
-        glTexParameteri(this->target, GL_TEXTURE_WRAP_T, wrapT);
+        return false;
     }
+
+    glBindTexture(this->target, this->tex);
+    glTexParameteri(this->target, GL_TEXTURE_WRAP_S, wrapS);
+    glTexParameteri(this->target, GL_TEXTURE_WRAP_T, wrapT);
+
+    auto err = glGetError();
+    return GL_NO_ERROR == err;
 }
 
-void GLTexture::Filter(GLuint minFilter, GLuint magFilter)
+bool GLTexture::Filter(GLuint minFilter, GLuint magFilter)
 {
-    if (this->tex)
+    if (!this->tex)
     {
-        glBindTexture(this->target, this->tex);
-        glTexParameteri(this->target, GL_TEXTURE_MIN_FILTER, minFilter);
-        glTexParameteri(this->target, GL_TEXTURE_MAG_FILTER, magFilter);
+        return false;
     }
+
+    glBindTexture(this->target, this->tex);
+    glTexParameteri(this->target, GL_TEXTURE_MIN_FILTER, minFilter);
+    glTexParameteri(this->target, GL_TEXTURE_MAG_FILTER, magFilter);
+
+    auto err = glGetError();
+    return GL_NO_ERROR == err;
 }
 
-bool GLTexture::Data(GLenum format, const unsigned char* pixels, size_t size, uint32_t width, uint32_t height)
+bool GLTexture::Data(GLenum format, const uint32_t* pixels, size_t size, uint32_t width, uint32_t height)
 {
     if (!pixels || !size || !width)
     {
@@ -65,13 +80,6 @@ bool GLTexture::Data(GLenum format, const unsigned char* pixels, size_t size, ui
     GLint internalFormat;
     switch (format)
     {
-        case GL_RGB:
-        case GL_BGR:
-        {
-            internalFormat = GL_RGB;
-            break;
-        }
-
         case GL_RGBA:
         case GL_BGRA:
         {
@@ -109,19 +117,30 @@ bool GLTexture::Data(GLenum format, const unsigned char* pixels, size_t size, ui
             return false;
     }
 
+    auto err = glGetError();
+    if (GL_NO_ERROR != err)
+    {
+        return false;
+    }
+
     this->w = width;
     this->h = height;
 
     return true;
 }
 
-void GLTexture::Apply() const
+bool GLTexture::Apply() const
 {
-    if (this->tex)
+    if (!this->tex)
     {
-        glBindTexture(this->target, this->tex);
-        glEnable(this->target);
+        return false;
     }
+
+    glBindTexture(this->target, this->tex);
+    glEnable(this->target);
+
+    auto err = glGetError();
+    return GL_NO_ERROR == err;
 }
 
 void GLTexture::Revoke() const

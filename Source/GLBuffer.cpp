@@ -35,7 +35,8 @@ bool GLBuffer::Data(const void* data, GLsizeiptr size, GLenum usage)
     this->Bind();
     glBufferData(this->target, size, data, usage);
 
-    return true;
+    auto err = glGetError();
+    return GL_NO_ERROR == err;
 }
 
 bool GLBuffer::Copy(const GLBuffer& other, GLenum usage)
@@ -68,7 +69,8 @@ bool GLBuffer::Copy(const GLBuffer& other, GLenum usage)
     glBindBuffer(GL_COPY_WRITE_BUFFER, this->buffer);
     glCopyBufferSubData(GL_COPY_READ_BUFFER, GL_COPY_WRITE_BUFFER, 0, 0, size);
 
-    return true;
+    auto err = glGetError();
+    return GL_NO_ERROR == err;
 }
 
 GLint GLBuffer::Size() const
