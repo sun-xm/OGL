@@ -1,6 +1,7 @@
 #pragma once
 
 #include "glview.h"
+#include <QOpenGLShaderProgram>
 
 class ClrView : public GLView
 {

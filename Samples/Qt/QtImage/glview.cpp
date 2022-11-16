@@ -1,8 +1,13 @@
 #include "glview.h"
+#include <iostream>
 
 using namespace std;
 
 GLView::GLView(QWidget* parent) : QOpenGLWidget(parent)
+{
+}
+
+GLView::~GLView()
 {
 }
 

@@ -1,9 +1,8 @@
 #pragma once
 
-#include <GLCommon.h>
+#include "GLCommon.h"
 #include <QOpenGLWidget>
 #include <QOpenGLFunctions>
-#include <QOpenGLShaderProgram>
 
 class GLView : public QOpenGLWidget, protected QOpenGLFunctions
 {
@@ -11,6 +10,7 @@ class GLView : public QOpenGLWidget, protected QOpenGLFunctions
 
 public:
     explicit GLView(QWidget* parent);
+    virtual ~GLView();
 
 protected:
     void initializeGL() override;

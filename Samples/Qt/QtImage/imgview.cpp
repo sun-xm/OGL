@@ -36,14 +36,13 @@ void ImgView::initializeGL()
     glGenBuffers(1, &this->vbo);
     glGenBuffers(1, &this->tbo);
 
-    Coordinate coords[] = {{ 0, 0 }, { 1, 0 }, { 1, 1 },
+    Coordinate texmap[] = {{ 0, 0 }, { 1, 0 }, { 1, 1 },
                            { 0, 0 }, { 0, 1 }, { 1, 1 }};
     glBindBuffer(GL_ARRAY_BUFFER, this->tbo);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(coords), coords, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(texmap), texmap, GL_STATIC_DRAW);
 
     QImage img;
     img.load(":Portrait.png");
-
     glGenTextures(1, &this->tex);
     glBindTexture(GL_TEXTURE_2D, this->tex);
     glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
@@ -52,14 +51,11 @@ void ImgView::initializeGL()
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-}
 
-void ImgView::resizeGL(int w, int h)
-{
-    GLView::resizeGL(w, h);
-
-    vector<Coordinate> coords = {{ 0, 0 }, { (float)w, 0 }, { (float)w, (float)h },
-                                 { 0, 0 }, { 0, (float)h }, { (float)w, (float)h }};
+    auto w = (float)img.width();
+    auto h = (float)img.height();
+    vector<Coordinate> coords = {{ 0, 0 }, { w, 0 }, { w, h },
+                                 { 0, 0 }, { 0, h }, { w, h }};
     this->Coordinates(coords, this->vbo, GL_STATIC_DRAW);
 }
 

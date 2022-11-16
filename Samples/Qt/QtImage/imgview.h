@@ -1,6 +1,7 @@
 #pragma once
 
 #include "glview.h"
+#include <QOpenGLShaderProgram>
 
 class ImgView : public GLView
 {
@@ -12,7 +13,6 @@ public:
 
 protected:
     void initializeGL() override;
-    void resizeGL(int width, int height) override;
     void paintGL() override;
 
 private:
