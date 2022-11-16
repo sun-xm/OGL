@@ -65,9 +65,9 @@ bool GLTexture::Filter(GLuint minFilter, GLuint magFilter)
     return GL_NO_ERROR == err;
 }
 
-bool GLTexture::Data(GLenum format, const uint32_t* pixels, size_t size, uint32_t width, uint32_t height)
+bool GLTexture::Data(GLenum format, const uint32_t* pixels, uint32_t width, uint32_t height)
 {
-    if (!pixels || !size || !width)
+    if (!pixels || !width || (GL_TEXTURE_2D == this->target && !height))
     {
         return false;
     }
@@ -104,12 +104,52 @@ bool GLTexture::Data(GLenum format, const uint32_t* pixels, size_t size, uint32_
 
         case GL_TEXTURE_2D:
         {
-            if (!height)
-            {
-                return false;
-            }
-
             glTexImage2D(this->target, 0, internalFormat, width, height, 0, format, GL_UNSIGNED_BYTE, pixels);
+            break;
+        }
+
+        default:
+            return false;
+    }
+
+    auto err = glGetError();
+    if (GL_NO_ERROR != err)
+    {
+        return false;
+    }
+
+    this->w = width;
+    this->h = height;
+
+    return true;
+}
+
+bool GLTexture::Data(const uint16_t* pixels, uint32_t width, uint32_t height)
+{
+    if (!pixels || !width || (GL_TEXTURE_2D == this->target && !height))
+    {
+        return false;
+    }
+
+    if (!this->tex && !this->Create())
+    {
+        return false;
+    }
+
+    glBindTexture(this->target, this->tex);
+    glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+
+    switch (this->target)
+    {
+        case GL_TEXTURE_1D:
+        {
+            glTexImage1D(this->target, 0, GL_R16UI, width, 0, GL_RED_INTEGER, GL_UNSIGNED_SHORT, pixels);
+            break;
+        }
+
+        case GL_TEXTURE_2D:
+        {
+            glTexImage2D(this->target, 0, GL_R16UI, width, height, 0, GL_RED_INTEGER, GL_UNSIGNED_SHORT, pixels);
             break;
         }
 

@@ -16,11 +16,11 @@ Texture::Texture(const wchar_t* file)
         auto data = new BitmapData();
         bmp->LockBits(nullptr, ImageLockModeRead, PixelFormat32bppARGB, data);
 
-        this->pixels.resize(this->width * this->height * 4);
+        this->pixels.resize(this->width * this->height);
 
         for (auto i = 0; i < this->height; i++)
         {
-            memcpy(&this->pixels[i * this->width * 4], (unsigned char*)data->Scan0 + data->Stride * i, this->width * 4);
+            memcpy(&this->pixels[i * this->width], (unsigned char*)data->Scan0 + data->Stride * i, this->width * 4);
         }
 
         bmp->UnlockBits(data);
@@ -37,7 +37,7 @@ const uint32_t* Texture::Pixels() const
 {
     if (this->pixels.size())
     {
-        return (uint32_t*)this->pixels.data();
+        return this->pixels.data();
     }
 
     return nullptr;

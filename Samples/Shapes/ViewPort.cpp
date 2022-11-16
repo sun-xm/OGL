@@ -78,7 +78,7 @@ void ViewPort::CreateShape(int shape)
         if (s)
         {
             Texture tex(L"Portrait.png");
-            s->Texture().Data(GL_BGRA, tex.Pixels(), tex.Width() * tex.Height() * 4, tex.Width(), tex.Height());
+            s->Texture().Data(GL_BGRA, tex.Pixels(), tex.Width(), tex.Height());
             s->Texture().Wrap(GL_REPEAT, GL_REPEAT);
             s->Texture().Filter(GL_LINEAR, GL_LINEAR);
 

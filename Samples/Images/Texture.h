@@ -16,5 +16,5 @@ public:
 
 private:
     int width, height;
-    std::vector<unsigned char> pixels;
+    std::vector<uint32_t> pixels;
 };
