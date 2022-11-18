@@ -14,7 +14,7 @@ public:
     {
         if (!this->buffer)
         {
-            glCreateBuffers(1, &this->buffer);
+            glGenBuffers(1, &this->buffer);
         }
 
         return !!this->buffer;
