@@ -9,16 +9,80 @@
 class GLShader
 {
 public:
-    GLShader(GLenum type);
+    GLShader(GLenum type) : shader(0), type(type) {}
     GLShader(const GLShader&) = delete;
+    virtual ~GLShader() {}
 
-    bool Create();
-    void Release();
+    bool Create()
+    {
+        if (!this->shader)
+        {
+            this->shader = glCreateShader(this->type);
+        }
 
-    bool Source(std::istream& source);
-    bool Source(const std::string& source);
-    bool Source(const std::vector<std::string>& sources);
-    bool Compile();
+        return !!this->shader;
+    }
+    void Release()
+    {
+        glDeleteShader(this->shader);
+        this->shader = 0;
+    }
+
+    bool Source(std::istream& source)
+    {
+        return this->Source(std::string(std::istreambuf_iterator<char>(source), std::istreambuf_iterator<char>()));
+    }
+    bool Source(const std::string& source)
+    {
+        if (!this->shader && !this->Create())
+        {
+            return false;
+        }
+        const GLchar* srcs[] = { source.c_str() };
+        const GLint   lens[] = { (GLint)source.length() };
+        glShaderSource(this->shader, 1, srcs, lens);
+
+        return true;
+    }
+    bool Source(const std::vector<std::string>& sources)
+    {
+        if (!this->shader && !this->Create())
+        {
+            return false;
+        }
+
+        std::vector<const GLchar*> srcs(sources.size());
+        std::vector<GLint> lens(sources.size());
+
+        for (size_t i = 0; i < sources.size(); i++)
+        {
+            srcs[i] = sources[i].c_str();
+            lens[i] = (GLint)sources[i].length();
+        }
+
+        glShaderSource(this->shader, (GLsizei)sources.size(), srcs.data(), lens.data());
+
+        return true;
+    }
+    bool Compile()
+    {
+        glCompileShader(this->shader);
+
+        GLint status;
+        glGetShaderiv(this->shader, GL_COMPILE_STATUS, &status);
+
+        if (!status)
+        {
+            GLchar  buf[4096];
+            GLsizei len;
+            glGetShaderInfoLog(this->shader, 4096, &len, buf);
+            this->log = buf;
+            return false;
+        }
+
+        this->log.clear();
+        return true;
+    }
 
     const std::string& Log()
     {

@@ -9,40 +9,236 @@
 class GLShape : public GLObject
 {
 public:
-    GLShape();
-    virtual ~GLShape();
+    GLShape() : mode(GL_TRIANGLES), parent(nullptr)
+    {
+        this->Position = { 0.f, 0.f, 0.f };
+        this->Rotation = { 0.f, 0.f, 0.f, 0.f };
+        this->Scaling  = { 1.f, 1.f, 1.f };
+    }
+    virtual ~GLShape() {}
 
-    bool Elements(const Element* elements, size_t count);
-    bool Vertices(const Vertex* vertices, size_t count);
-    bool Normals(const Normal* normals, size_t count);
-    bool TexCoords(const Coordinate* coords, size_t count);
+    bool Elements(const Element* elements, size_t count)
+    {
+        return this->ebo.Data(elements, count * sizeof(*elements), GL_STATIC_DRAW);
+    }
+    bool Vertices(const Vertex* vertices, size_t count)
+    {
+        return this->vbo.Data(vertices, count * sizeof(*vertices), GL_STATIC_DRAW);
+    }
+    bool Normals(const Normal* normals, size_t count)
+    {
+        return this->nbo.Data(normals, count * sizeof(*normals), GL_STATIC_DRAW);
+    }
+    bool TexCoords(const Coordinate* coords, size_t count)
+    {
+        return this->tbo.Data(coords, count * sizeof(*coords), GL_STATIC_DRAW);
+    }
 
-    GLenum Mode();
-    void Mode(GLenum);
+    GLenum Mode() const
+    {
+        return this->mode;
+    }
+    void Mode(GLenum mode)
+    {
+        switch (mode)
+        {
+            case GL_TRIANGLES:
+            case GL_TRIANGLE_STRIP:
+            case GL_TRIANGLE_FAN:
+                this->mode = mode;
+            default:
+                break;
+        }
+    }
 
-    GLTexture&  Texture();
-    GLMaterial& Material();
+    GLTexture&  Texture()
+    {
+        return this->texture;
+    }
+    GLMaterial& Material()
+    {
+        return this->material;
+    }
 
-    virtual void Render(const GLScene& scene);
-    virtual void Release();
+    virtual void Render(const GLScene& scene)
+    {
+        glPushMatrix();
 
-    bool HasChild() const;
-    bool HasChild(const GLShape* child) const;
-    void AddChild(GLShape* child);
-    void RemoveChild(const GLShape* child);
+        glTranslatef(this->Position[0], this->Position[1], this->Position[2]);
+        glRotatef(this->Rotation[3], this->Rotation[0], this->Rotation[1], this->Rotation[2]);
+        glScalef(this->Scaling[0], this->Scaling[1], this->Scaling[2]);
+
+        auto vc = this->Apply(scene);
+        if (vc)
+        {
+            auto ec = this->ebo.Size() / sizeof(GLuint);
+            if (ec)
+            {
+                glDrawElements(this->mode, (GLsizei)ec, GL_UNSIGNED_INT, 0);
+            }
+            else
+            {
+                glDrawArrays(this->mode, 0, (GLsizei)vc);
+            }
+
+            this->Revoke();
+        }
+
+        for (auto child : this->children)
+        {
+            child->Render(scene);
+        }
+
+        glPopMatrix();
+    }
+    virtual void Release()
+    {
+        for (auto& child : this->children)
+        {
+            child->Release();
+        }
+        this->children.clear();
+
+        this->texture.Release();
+        this->nbo.Release();
+        this->tbo.Release();
+        this->vbo.Release();
+        this->ebo.Release();
+    }
+
+    bool HasChild() const
+    {
+        return !this->children.empty();
+    }
+    bool HasChild(const GLShape* child) const
+    {
+        for (auto c : this->children)
+        {
+            if (c == child)
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+    void AddChild(GLShape* child)
+    {
+        if (child)
+        {
+            child->parent = this;
+            this->children.push_back(child);
+        }
+    }
+    void RemoveChild(const GLShape* child)
+    {
+        this->children.erase(std::find(this->children.begin(), this->children.end(), child));
+    }
 
 protected:
-    virtual size_t Apply(const GLScene&);
-    virtual size_t ApplyVertices();
-    virtual size_t ApplyNormals();
-    virtual size_t ApplyTexCoords();
-    virtual void   ApplyTexture();
+    virtual size_t Apply(const GLScene&)
+    {
+        auto vc = this->ApplyVertices();
+        if (vc)
+        {
+            this->ApplyNormals();
+            this->ApplyTexCoords();
+            this->ApplyTexture();
+            this->material.Apply();
+        }
+        return vc;
+    }
+    virtual size_t ApplyVertices()
+    {
+        if (this->vbo && this->vbo.Size())
+        {
+            this->vbo.Bind();
+            glVertexPointer(3, GL_FLOAT, 0, 0);
+            glEnableClientState(GL_VERTEX_ARRAY);
+            return this->vbo.Size() / sizeof(Vertex);
+        }
 
-    virtual void Revoke();
-    virtual void RevokeVertices();
-    virtual void RevokeNormals();
-    virtual void RevokeTexCoords();
-    virtual void RevokeTexture();
+        return 0;
+    }
+    virtual size_t ApplyNormals()
+    {
+        if (this->nbo && this->nbo.Size())
+        {
+            this->nbo.Bind();
+            glNormalPointer(GL_FLOAT, 0, 0);
+            glEnableClientState(GL_NORMAL_ARRAY);
+            return this->nbo.Size() / sizeof(Normal);
+        }
+
+        return 0;
+    }
+    virtual size_t ApplyTexCoords()
+    {
+        if (this->tbo && this->tbo.Size())
+        {
+            this->tbo.Bind();
+            glTexCoordPointer(2, GL_FLOAT, 0, 0);
+            glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+            return this->tbo.Size() / sizeof(Coordinate);
+        }
+
+        return 0;
+    }
+    virtual void   ApplyTexture()
+    {
+        if (this->texture)
+        {
+            this->texture.Apply();
+        }
+        else if (this->parent)
+        {
+            this->parent->ApplyTexture();
+        }
+    }
+
+    virtual void Revoke()
+    {
+        this->material.Revoke();
+        this->RevokeTexture();
+        this->RevokeTexCoords();
+        this->RevokeNormals();
+        this->RevokeVertices();
+    }
+    virtual void RevokeVertices()
+    {
+        if (this->vbo)
+        {
+            this->vbo.Bind();
+            glDisableClientState(GL_VERTEX_ARRAY);
+        }
+    }
+    virtual void RevokeNormals()
+    {
+        if (this->nbo)
+        {
+            this->nbo.Bind();
+            glDisableClientState(GL_NORMAL_ARRAY);
+        }
+    }
+    virtual void RevokeTexCoords()
+    {
+        if (this->tbo)
+        {
+            this->tbo.Bind();
+            glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+        }
+    }
+    virtual void RevokeTexture()
+    {
+        if (this->texture)
+        {
+            this->texture.Revoke();
+        }
+        else if (this->parent)
+        {
+            this->parent->RevokeTexture();
+        }
+    }
 
     GLenum mode;
     GLElmBuf ebo;
