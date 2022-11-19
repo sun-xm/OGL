@@ -38,11 +38,13 @@ public:
         {
             return false;
         }
+
         const GLchar* srcs[] = { source.c_str() };
         const GLint   lens[] = { (GLint)source.length() };
         glShaderSource(this->shader, 1, srcs, lens);
 
-        return true;
+        auto err = glGetError();
+        return GL_NO_ERROR == err;
     }
     bool Source(const std::vector<std::string>& sources)
     {
@@ -62,7 +64,8 @@ public:
 
         glShaderSource(this->shader, (GLsizei)sources.size(), srcs.data(), lens.data());
 
-        return true;
+        auto err = glGetError();
+        return GL_NO_ERROR == err;
     }
     bool Compile()
     {

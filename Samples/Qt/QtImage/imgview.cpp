@@ -1,62 +1,113 @@
 #include "imgview.h"
+#include <QFile>
 
 using namespace std;
 
-ImgView::ImgView(QWidget* parent) : GLView(parent), program(nullptr), vbo(0), tbo(0), tex(0)
+ImgView::ImgView(QWidget* parent) : QOpenGLWidget(parent)
 {
 }
 
 ImgView::~ImgView()
 {
-    delete this->program;
-
-    if (vbo)
-    {
-        glDeleteBuffers(1, &this->vbo);
-    }
-    if (tbo)
-    {
-        glDeleteBuffers(1, &this->tbo);
-    }
-    if (tex)
-    {
-        glDeleteTextures(1, &this->tex);
-    }
+    this->makeCurrent();
+    this->vbo.Release();
+    this->tbo.Release();
+    this->tex.Release();
+    this->program.Release();
 }
 
 void ImgView::initializeGL()
 {
-    GLView::initializeGL();
+    if (GLEW_OK != glewInit())
+    {
+        cout << "Failed to init glew" << endl;
+        return;
+    }
 
-    this->program = new QOpenGLShaderProgram();
-    this->program->addShaderFromSourceFile(QOpenGLShader::Vertex, ":TexVtx.glsl");
-    this->program->addShaderFromSourceFile(QOpenGLShader::Fragment, ":TexFrg.glsl");
-    this->program->link();
+    QFile vsrc(":TexVtx.glsl");
+    if (!vsrc.open(QIODevice::ReadOnly))
+    {
+        cout << "Failed to open vertex source" << endl;
+        return;
+    }
 
-    glGenBuffers(1, &this->vbo);
-    glGenBuffers(1, &this->tbo);
+    GLVShader vshader;
+    if (!vshader.Source(vsrc.readAll().toStdString()) || !vshader.Compile())
+    {
+        cout << "Failed to compile vertex source" << vshader.Log() << endl;
+        return;
+    }
 
-    Coordinate texmap[] = {{ 0, 0 }, { 1, 0 }, { 1, 1 },
-                           { 0, 0 }, { 0, 1 }, { 1, 1 }};
-    glBindBuffer(GL_ARRAY_BUFFER, this->tbo);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(texmap), texmap, GL_STATIC_DRAW);
+    QFile fsrc(":TexFrg.glsl");
+    if (!fsrc.open(QIODevice::ReadOnly))
+    {
+        cout << "Failed to open fragment source" << endl;
+        return;
+    }
+
+    GLFShader fshader;
+    if (!fshader.Source(fsrc.readAll().toStdString()) || !fshader.Compile())
+    {
+        cout << "Failed to compile fragment source: " << fshader.Log() << endl;
+        return;
+    }
+
+    if (!this->program.Link(vshader, fshader))
+    {
+        cout << "Failed to line program: " << this->program.Log() << endl;
+        return;
+    }
 
     QImage img;
-    img.load(":Portrait.png");
-    glGenTextures(1, &this->tex);
-    glBindTexture(GL_TEXTURE_2D, this->tex);
-    glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, img.width(), img.height(), 0, GL_BGRA, GL_UNSIGNED_BYTE, img.bits());
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    if (!img.load(":Portrait.png"))
+    {
+        cout << "Failed to load texture" << endl;
+        return;
+    }
+
+    if (!this->tex.Data(GL_BGRA, (uint32_t*)img.constBits(), img.width(), img.height()))
+    {
+        cout << "Failed to set texture data" << endl;
+        return;
+    }
+    this->tex.Wrap(GL_CLAMP, GL_CLAMP);
+    this->tex.Filter(GL_LINEAR, GL_LINEAR);
 
     auto w = (float)img.width();
     auto h = (float)img.height();
-    vector<Coordinate> coords = {{ 0, 0 }, { w, 0 }, { w, h },
-                                 { 0, 0 }, { 0, h }, { w, h }};
-    this->Coordinates(coords, this->vbo, GL_STATIC_DRAW);
+
+    Coordinate coords[] = {{ 0, 0 }, { w, 0 }, { w, h },
+                           { 0, 0 }, { 0, h }, { w, h }};
+    Vertex vertices[COUNTOF(coords)];
+    for (size_t i = 0; i < COUNTOF(coords); i++)
+    {
+        auto& c = coords[i];
+        vertices[i] = { c.X, -c.Y, 1 };
+    }
+    if (!this->vbo.Data(vertices, sizeof(vertices), GL_STATIC_DRAW))
+    {
+        cout << "Failed to set vertex data" << endl;
+        return;
+    }
+
+    Coordinate texmap[] = {{ 0, 0 }, { 1, 0 }, { 1, 1 },
+                           { 0, 0 }, { 0, 1 }, { 1, 1 }};
+    if (!this->tbo.Data(texmap, sizeof(texmap), GL_STATIC_DRAW))
+    {
+        cout << "Failed to set texture coodinates" << endl;
+        return;
+    }
+
+
+    QOpenGLWidget::initializeGL();
+}
+
+void ImgView::resizeGL(int w, int h)
+{
+    QOpenGLWidget::resizeGL(w, h);
+    glViewport(0, 0, w, h);
+    this->unify  = Transform2D<>::Scale(2.f / w, 2.f / h);
+    this->origin = Transform2D<>::Shift(-w * .5f, h * .5f);
 }
 
 void ImgView::paintGL()
@@ -69,11 +120,16 @@ void ImgView::paintGL()
 
     glClear(GL_COLOR_BUFFER_BIT);
 
-    this->program->bind();
-    this->BindAttrib(this->program->programId(), "vtx", this->vbo, 3, GL_FLOAT);
-    this->BindAttrib(this->program->programId(), "crd", this->tbo, 2, GL_FLOAT);
-    this->UniformM3f(this->program->programId(), "Matrix", this->unify * this->origin);
-    this->UniformTex(this->program->programId(), "tex", this->tex, GL_TEXTURE_2D, 0);
+    auto x = this->size().width()  - (int)this->tex.Width();
+    auto y = this->size().height() - (int)this->tex.Height();
+    auto t = Transform2D<>::Shift(x * 0.5f, -y * 0.5f);
 
-    glDrawArrays(GL_TRIANGLES, 0, this->BufferSize(this->vbo) / sizeof(Vertex));
+    this->program.Use();
+    this->program.BindAttrib("vtx", this->vbo, 3, GL_FLOAT);
+    this->program.BindAttrib("crd", this->tbo, 2, GL_FLOAT);
+    this->program.UniformTex("tex", this->tex, 0);
+    this->program.UniformM3f("Matrix", this->unify * this->origin * t);
+
+    glDrawArrays(GL_TRIANGLES, 0, this->vbo.Size() / sizeof(Vertex));
+    glUseProgram(0);
 }

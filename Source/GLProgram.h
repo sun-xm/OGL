@@ -39,19 +39,38 @@ public:
         return GL_NO_ERROR == err;
     }
 
-    void Attach(const GLShader& shader)
+    bool Attach(const GLShader& shader)
     {
+        if (!this->program && !this->Create())
+        {
+            return false;
+        }
+
         glAttachShader(this->program, shader);
+
+        auto err = glGetError();
+        return GL_NO_ERROR == err;
     }
     void Detach(const GLShader& shader)
     {
-        glDetachShader(this->program, shader);
+        if (this->program)
+        {
+            glDetachShader(this->program, shader);
+        }
     }
 
     bool Link(const GLVShader& vshader, const GLFShader& fshader)
     {
-        this->Attach(vshader);
-        this->Attach(fshader);
+        if (!this->Attach(vshader))
+        {
+            return false;
+        }
+
+        if (!this->Attach(fshader))
+        {
+            this->Detach(fshader);
+            return false;
+        }
 
         auto res = this->Link();
 

@@ -1,9 +1,10 @@
 #pragma once
 
-#include "glview.h"
-#include <QOpenGLShaderProgram>
+#include <GLBuffer.h>
+#include <GLProgram.h>
+#include <QOpenGLWidget>
 
-class ImgView : public GLView
+class ImgView : public QOpenGLWidget
 {
     Q_OBJECT
 
@@ -13,10 +14,13 @@ public:
 
 protected:
     void initializeGL() override;
+    void resizeGL(int, int) override;
     void paintGL() override;
 
 private:
-    QOpenGLShaderProgram* program;
-    GLuint vbo, tbo;
-    GLuint tex;
+    GLBuffer vbo, tbo;
+    GLTexture tex;
+    GLProgram program;
+
+    Matrix<3> unify, origin;
 };
