@@ -98,7 +98,6 @@ void ImgView::initializeGL()
         return;
     }
 
-
     QOpenGLWidget::initializeGL();
 }
 
