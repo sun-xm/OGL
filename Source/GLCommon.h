@@ -718,100 +718,6 @@ inline Vector<MCols, Scalar> operator*(const Matrix<MRows, MCols, Scalar>& m, co
 }
 
 template<typename Scalar = float>
-class Transform2D
-{
-public:
-    static Matrix<3, 3, Scalar> Identity()
-    {
-        return Matrix<3, 3, Scalar>{{ 1, 0, 0 },
-                                    { 0, 1, 0 },
-                                    { 0, 0, 1 }};
-    }
-
-    static Matrix<3, 3, Scalar> Shift(Scalar x, Scalar y)
-    {
-        return Matrix<3, 3, Scalar>{{ 1, 0, x },
-                                    { 0, 1, y },
-                                    { 0, 0, 1 }};
-    }
-
-    static Matrix<3, 3, Scalar> Scale(Scalar x, Scalar y)
-    {
-        return Matrix<3, 3, Scalar>{{ x, 0, 0 },
-                                    { 0, y, 0 },
-                                    { 0, 0, 1 }};
-    }
-
-    static Matrix<3, 3, Scalar> Rotate(Scalar x, Scalar y, Scalar radian)
-    {
-        auto s = std::sin(radian);
-        auto c = std::cos(radian);
-        auto m = Matrix<3, 3, Scalar>{{ c, -s, 0 },
-                                      { s,  c, 0 },
-                                      { 0,  0, 1 }};
-        return Shift(x, y) * m * Shift(-x, -y);
-    }
-};
-
-template<typename Scalar = float>
-class Transform3D
-{
-public:
-    static Matrix<4, 4, Scalar> Identity()
-    {
-        return Matrix<4, 4, Scalar>{{ 1, 0, 0, 0 },
-                                    { 0, 1, 0, 0 },
-                                    { 0, 0, 1, 0 },
-                                    { 0, 0, 0, 1 }};
-    }
-
-    static Matrix<4, 4, Scalar> Shift(Scalar x, Scalar y, Scalar z)
-    {
-        return Matrix<4, 4, Scalar>{{ 1, 0, 0, x },
-                                    { 0, 1, 0, y },
-                                    { 0, 0, 1, z },
-                                    { 0, 0, 0, 1 }};
-    }
-
-    static Matrix<4, 4, Scalar> Shift(const Vector<3, Scalar>& v)
-    {
-        return Shift(v[0], v[1], v[2]);
-    }
-
-    static Matrix<4, 4, Scalar> Scale(Scalar x, Scalar y, Scalar z)
-    {
-        return Matrix<4, 4, Scalar>{{ x, 0, 0, 0},
-                                    { 0, y, 0, 0},
-                                    { 0, 0, z, 0},
-                                    { 0, 0, 0, 1}};
-    }
-
-    static Matrix<4, 4, Scalar> Scale(const Vector<3, Scalar>& v)
-    {
-        return Scale(v[0], v[1], v[2]);
-    }
-
-    static Matrix<4, 4, Scalar> Perspective(Scalar vfov /*in radian*/, Scalar aspect, Scalar near, Scalar far)
-    {
-        auto f = 1 / tan(vfov / 2);
-        auto i = 1 / (near - far);
-        return Matrix<4, 4, Scalar>{{ f / aspect,  0,                0,                  0 },
-                                    {          0,  f,                0,                  0 },
-                                    {          0,  0, (near + far) * i, near * far * i * 2 },
-                                    {          0,  0,               -1,                  0 }};
-    }
-
-    static Matrix<4, 4, Scalar> LookAt(const Vector<3, Scalar>& eye, const Vector<3, Scalar>& center, Scalar rotation /*in radian*/)
-    {
-        auto s = Shift(Vector<3, Scalar>::Zero - eye);
-        auto q = Quaternion<Scalar>::From2Vectors(center - eye, -Vector<3, Scalar>::ZAxis);
-        auto r = Quaternion<Scalar>::FromAxisAngle(q.Rotate(Vector<3, Scalar>::ZAxis), rotation);
-        return r.ToMatrix() * q.ToMatrix() * s;
-    }
-
-};
-
-template<typename Scalar = float>
 struct Quaternion : public Vector<4, Scalar>
 {
     Quaternion() = default;
@@ -969,6 +875,99 @@ struct Quaternion : public Vector<4, Scalar>
 
 template<typename Scalar>
 const Quaternion<Scalar> Quaternion<Scalar>::Identity = { 0, 0, 0, 1 };
+
+template<typename Scalar = float>
+class Transform2D
+{
+public:
+    static Matrix<3, 3, Scalar> Identity()
+    {
+        return Matrix<3, 3, Scalar>{{ 1, 0, 0 },
+                                    { 0, 1, 0 },
+                                    { 0, 0, 1 }};
+    }
+
+    static Matrix<3, 3, Scalar> Shift(Scalar x, Scalar y)
+    {
+        return Matrix<3, 3, Scalar>{{ 1, 0, x },
+                                    { 0, 1, y },
+                                    { 0, 0, 1 }};
+    }
+
+    static Matrix<3, 3, Scalar> Scale(Scalar x, Scalar y)
+    {
+        return Matrix<3, 3, Scalar>{{ x, 0, 0 },
+                                    { 0, y, 0 },
+                                    { 0, 0, 1 }};
+    }
+
+    static Matrix<3, 3, Scalar> Rotate(Scalar x, Scalar y, Scalar radian)
+    {
+        auto s = std::sin(radian);
+        auto c = std::cos(radian);
+        auto m = Matrix<3, 3, Scalar>{{ c, -s, 0 },
+                                      { s,  c, 0 },
+                                      { 0,  0, 1 }};
+        return Shift(x, y) * m * Shift(-x, -y);
+    }
+};
+
+template<typename Scalar = float>
+class Transform3D
+{
+public:
+    static Matrix<4, 4, Scalar> Identity()
+    {
+        return Matrix<4, 4, Scalar>{{ 1, 0, 0, 0 },
+                                    { 0, 1, 0, 0 },
+                                    { 0, 0, 1, 0 },
+                                    { 0, 0, 0, 1 }};
+    }
+
+    static Matrix<4, 4, Scalar> Shift(Scalar x, Scalar y, Scalar z)
+    {
+        return Matrix<4, 4, Scalar>{{ 1, 0, 0, x },
+                                    { 0, 1, 0, y },
+                                    { 0, 0, 1, z },
+                                    { 0, 0, 0, 1 }};
+    }
+
+    static Matrix<4, 4, Scalar> Shift(const Vector<3, Scalar>& v)
+    {
+        return Shift(v[0], v[1], v[2]);
+    }
+
+    static Matrix<4, 4, Scalar> Scale(Scalar x, Scalar y, Scalar z)
+    {
+        return Matrix<4, 4, Scalar>{{ x, 0, 0, 0},
+                                    { 0, y, 0, 0},
+                                    { 0, 0, z, 0},
+                                    { 0, 0, 0, 1}};
+    }
+
+    static Matrix<4, 4, Scalar> Scale(const Vector<3, Scalar>& v)
+    {
+        return Scale(v[0], v[1], v[2]);
+    }
+
+    static Matrix<4, 4, Scalar> Perspective(Scalar vfov /*in radian*/, Scalar aspect, Scalar _near, Scalar _far)
+    {
+        auto f = 1 / tan(vfov / 2);
+        auto i = 1 / (_near - _far);
+        return Matrix<4, 4, Scalar>{{ f / aspect,  0,                  0,                    0 },
+                                    {          0,  f,                  0,                    0 },
+                                    {          0,  0, (_near + _far) * i, _near * _far * i * 2 },
+                                    {          0,  0,                 -1,                    0 }};
+    }
+
+    static Matrix<4, 4, Scalar> LookAt(const Vector<3, Scalar>& eye, const Vector<3, Scalar>& center, Scalar rotation /*in radian*/)
+    {
+        auto s = Shift(Vector<3, Scalar>::Zero - eye);
+        auto q = Quaternion<Scalar>::From2Vectors(center - eye, -Vector<3, Scalar>::ZAxis);
+        auto r = Quaternion<Scalar>::FromAxisAngle(q.Rotate(Vector<3, Scalar>::ZAxis), rotation);
+        return r.ToMatrix() * q.ToMatrix() * s;
+    }
+};
 
 template<typename T, size_t N>
 char(&_ArraySizeHelper(T(&array)[N]))[N];

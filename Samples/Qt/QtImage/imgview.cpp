@@ -20,54 +20,54 @@ void ImgView::initializeGL()
 {
     if (GLEW_OK != glewInit())
     {
-        cout << "Failed to init glew" << endl;
+        cerr << "Failed to init glew" << endl;
         return;
     }
 
     QFile vsrc(":TexVtx.glsl");
     if (!vsrc.open(QIODevice::ReadOnly))
     {
-        cout << "Failed to open vertex source" << endl;
+        cerr << "Failed to open vertex source" << endl;
         return;
     }
 
     GLVShader vshader;
     if (!vshader.Source(vsrc.readAll().toStdString()) || !vshader.Compile())
     {
-        cout << "Failed to compile vertex source" << vshader.Log() << endl;
+        cerr << "Failed to compile vertex source:" << endl << vshader.Log() << endl;
         return;
     }
 
     QFile fsrc(":TexFrg.glsl");
     if (!fsrc.open(QIODevice::ReadOnly))
     {
-        cout << "Failed to open fragment source" << endl;
+        cerr << "Failed to open fragment source" << endl;
         return;
     }
 
     GLFShader fshader;
     if (!fshader.Source(fsrc.readAll().toStdString()) || !fshader.Compile())
     {
-        cout << "Failed to compile fragment source: " << fshader.Log() << endl;
+        cerr << "Failed to compile fragment source: " << endl << fshader.Log() << endl;
         return;
     }
 
     if (!this->program.Link(vshader, fshader))
     {
-        cout << "Failed to line program: " << this->program.Log() << endl;
+        cerr << "Failed to line program: " << this->program.Log() << endl;
         return;
     }
 
     QImage img;
     if (!img.load(":Portrait.png"))
     {
-        cout << "Failed to load texture" << endl;
+        cerr << "Failed to load texture" << endl;
         return;
     }
 
     if (!this->tex.Data(GL_BGRA, (uint32_t*)img.constBits(), img.width(), img.height()))
     {
-        cout << "Failed to set texture data" << endl;
+        cerr << "Failed to set texture data" << endl;
         return;
     }
     this->tex.Wrap(GL_CLAMP, GL_CLAMP);
@@ -86,7 +86,7 @@ void ImgView::initializeGL()
     }
     if (!this->vbo.Data(vertices, sizeof(vertices), GL_STATIC_DRAW))
     {
-        cout << "Failed to set vertex data" << endl;
+        cerr << "Failed to set vertex data" << endl;
         return;
     }
 
@@ -94,7 +94,7 @@ void ImgView::initializeGL()
                            { 0, 0 }, { 0, 1 }, { 1, 1 }};
     if (!this->tbo.Data(texmap, sizeof(texmap), GL_STATIC_DRAW))
     {
-        cout << "Failed to set texture coodinates" << endl;
+        cerr << "Failed to set texture coodinates" << endl;
         return;
     }
 
