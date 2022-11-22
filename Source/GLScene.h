@@ -3,7 +3,7 @@
 #include "GLCommon.h"
 #include "GLLight.h"
 #include "GLCamera.h"
-#include <gl/glew.h>
+#include <GL/glew.h>
 #include <stdexcept>
 
 class GLScene

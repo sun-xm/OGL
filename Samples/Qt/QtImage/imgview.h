@@ -1,6 +1,5 @@
 #pragma once
 
-#include <GLBuffer.h>
 #include <GLProgram.h>
 #include <QOpenGLWidget>
 

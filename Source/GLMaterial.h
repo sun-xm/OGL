@@ -1,7 +1,7 @@
 #pragma once
 
 #include "GLCommon.h"
-#include "gl/GL.h"
+#include "GL/glew.h"
 
 class GLMaterial
 {

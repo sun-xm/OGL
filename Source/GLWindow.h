@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Window.h"
-#include <gl/glew.h>
+#include <GL/glew.h>
 
 class GLWindow : public Window
 {

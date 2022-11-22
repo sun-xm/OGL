@@ -1,6 +1,6 @@
 #include "GLRenderer.h"
 #include "Cleanup.h"
-#include <gl/glew.h>
+#include <GL/glew.h>
 #include <fstream>
 
 using namespace std;

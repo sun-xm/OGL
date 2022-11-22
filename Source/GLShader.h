@@ -1,7 +1,7 @@
 #pragma once
 
 #include "GLCommon.h"
-#include <gl/glew.h>
+#include <GL/glew.h>
 #include <iostream>
 #include <string>
 #include <vector>
