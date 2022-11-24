@@ -1,8 +1,11 @@
 #version 400 core
 
-in vec3 color;
+uniform float Ambient;
+
+in vec3  color;
+in float lumen;
 
 void main()
 {
-    gl_FragColor = vec4(color, 1);
+    gl_FragColor = mix(vec4(color * lumen, 1), vec4(color, 1), Ambient);
 }

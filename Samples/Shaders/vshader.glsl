@@ -9,7 +9,8 @@ in vec3 vtx;
 in vec3 clr;
 in vec3 nml;
 
-out vec3 color;
+out vec3  color;
+out float lumen;
 
 void main()
 {
@@ -19,8 +20,7 @@ void main()
     vec4 lpos = WorldView * vec4(LightPos, 1);
     vec3 nvec = mat3(ModelView) * nml;
 
-    float lumen = max(0, dot(nvec, normalize(lpos.xyz - vpos.xyz)));
+    lumen = max(0, dot(nvec, normalize(lpos.xyz - vpos.xyz)));
     lumen = dot(nvec, normalize(vpos.xyz)) > 0 ? 0 : lumen;
-
-    color = clr * lumen;
+    color = clr;
 }

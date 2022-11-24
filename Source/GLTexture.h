@@ -28,7 +28,7 @@ public:
 
     bool Mode(GLuint envMode)
     {
-        if (!this->tex)
+        if (!this->tex && !this->Create())
         {
             return false;
         }
@@ -41,7 +41,7 @@ public:
     }
     bool Wrap(GLuint wrapS, GLuint wrapT)
     {
-        if (!this->tex)
+        if (!this->tex && !this->Create())
         {
             return false;
         }
@@ -55,7 +55,7 @@ public:
     }
     bool Filter(GLuint minFilter, GLuint magFilter)
     {
-        if (!this->tex)
+        if (!this->tex && !this->Create())
         {
             return false;
         }

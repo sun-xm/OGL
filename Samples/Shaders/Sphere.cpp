@@ -85,6 +85,7 @@ size_t Sphere::Apply(const GLScene& scene)
         Matrix<4> modelView, projection;
         glGetFloatv(GL_MODELVIEW_MATRIX,  modelView);
         glGetFloatv(GL_PROJECTION_MATRIX, projection);
+        this->program->UniformFlt("Ambient", 0.2f);
         this->program->UniformM4f("ModelView",  modelView,  false);
         this->program->UniformM4f("Projection", projection, false);
 

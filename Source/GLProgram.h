@@ -158,7 +158,7 @@ public:
         return glGetFragDataLocation(this->program, name.c_str());
     }
 
-    bool Uniform1i(const std::string& name, int value)
+    bool UniformInt(const std::string& name, int value)
     {
         auto loc = this->UniformLocation(name);
         if (loc < 0)
@@ -167,7 +167,22 @@ public:
         }
 
         glUniform1i(loc, value);
-        return true;
+
+        auto err = glGetError();
+        return GL_NO_ERROR == err;
+    }
+    bool UniformFlt(const std::string& name, float value)
+    {
+        auto loc = this->UniformLocation(name);
+        if (loc < 0)
+        {
+            return false;
+        }
+
+        glUniform1f(loc, value);
+
+        auto err = glGetError();
+        return GL_NO_ERROR == err;
     }
     bool UniformV2f(const std::string& name, const Vector<2>& value)
     {
@@ -178,7 +193,9 @@ public:
         }
 
         glUniform2f(loc, value[0], value[1]);
-        return true;
+
+        auto err = glGetError();
+        return GL_NO_ERROR == err;
     }
     bool UniformV3f(const std::string& name, const Vector<3>& value)
     {
@@ -189,7 +206,9 @@ public:
         }
 
         glUniform3f(loc, value[0], value[1], value[2]);
-        return true;
+
+        auto err = glGetError();
+        return GL_NO_ERROR == err;
     }
     bool UniformM3f(const std::string& name, const Matrix<3>& value, bool transpose = true)
     {
@@ -200,7 +219,9 @@ public:
         }
 
         glUniformMatrix3fv(loc, 1, transpose ? GL_TRUE : GL_FALSE, value);
-        return true;
+
+        auto err = glGetError();
+        return GL_NO_ERROR == err;
     }
     bool UniformV4f(const std::string& name, const Vector<4>& value)
     {
@@ -211,7 +232,9 @@ public:
         }
 
         glUniform4f(loc, value[0], value[1], value[2], value[3]);
-        return true;
+
+        auto err = glGetError();
+        return GL_NO_ERROR == err;
     }
     bool UniformM4f(const std::string& name, const Matrix<4>& value, bool transpose = true)
     {
@@ -222,7 +245,9 @@ public:
         }
 
         glUniformMatrix4fv(loc, 1, transpose ? GL_TRUE : GL_FALSE, value);
-        return true;
+
+        auto err = glGetError();
+        return GL_NO_ERROR == err;
     }
     bool UniformTex(const std::string& name, const GLTexture& texture, uint32_t index)
     {
