@@ -9,12 +9,12 @@ using namespace std;
 
 Sphere::Sphere()
 {
+    this->Position = {0};
+    this->Rotation = {0};
 }
 
-void Sphere::Create(shared_ptr<GLProgram>& program)
+void Sphere::Create()
 {
-    this->program = program;
-
     vector<Vertex> vertices;
 
     Vertex v0 = { RADIUS, 0, 0 };
@@ -32,22 +32,23 @@ void Sphere::Create(shared_ptr<GLProgram>& program)
     Split(1, -v0,  v1, -v2, vertices);
     Split(1, -v0, -v1, -v2, vertices);
 
-    this->Vertices(vertices.data(), vertices.size());
+    this->vbo.Data(vertices.data(), vertices.size() * sizeof(vertices[0]), GL_STATIC_DRAW);
 
     auto ratio = 1.f / RADIUS;
     for (auto& v : vertices)
     {
         v *= ratio;
     }
-    this->Normals(vertices.data(), vertices.size());
+    this->nbo.Data(vertices.data(), vertices.size() * sizeof(vertices[0]), GL_STATIC_DRAW);
 
     vector<Vector<3>> colors(vertices.size(), { 1, 1, 1 });
-    this->Colors(colors.data(), (int)colors.size());
+    this->cbo.Data(colors.data(), colors.size() * sizeof(colors[0]), GL_STATIC_DRAW);
 }
 
 void Sphere::Release()
 {
-    GLShape::Release();
+    this->vbo.Release();
+    this->nbo.Release();
     this->cbo.Release();
 }
 
@@ -66,43 +67,15 @@ bool Sphere::Colors(const Vector<3>* colors, int count)
     return true;
 }
 
-void Sphere::Render(const GLScene& scene, const Vertex& lightPos)
+void Sphere::Render(GLProgram& program, const Vertex& lightPos)
 {
-    this->lightPos = lightPos;
-    GLShape::Render(scene);
-}
+    program.UniformM4f("ModelView",  Transform3D<>::Shift(this->Position) * Quaternion<>::FromRotation(this->Rotation).ToMatrix());
 
-size_t Sphere::Apply(const GLScene& scene)
-{
-    auto count = this->vbo.Size() / sizeof(Vertex);
-    if (count)
-    {
-        this->program->Use();
+    program.BindAttrib("vtx", this->vbo, 3, GL_FLOAT);
+    program.BindAttrib("clr", this->cbo, 3, GL_FLOAT);
+    program.BindAttrib("nml", this->nbo, 3, GL_FLOAT);
 
-        this->program->UniformV3f("LightPos",  this->lightPos);
-        this->program->UniformM4f("WorldView", scene.WorldView());
-
-        Matrix<4> modelView, projection;
-        glGetFloatv(GL_MODELVIEW_MATRIX,  modelView);
-        glGetFloatv(GL_PROJECTION_MATRIX, projection);
-        this->program->UniformFlt("Ambient", 0.2f);
-        this->program->UniformM4f("ModelView",  modelView,  false);
-        this->program->UniformM4f("Projection", projection, false);
-
-        this->program->BindAttrib("vtx", this->vbo, 3, GL_FLOAT);
-        this->program->BindAttrib("clr", this->cbo, 3, GL_FLOAT);
-        this->program->BindAttrib("nml", this->nbo, 3, GL_FLOAT);
-    }
-
-    return count;
-}
-
-void Sphere::Revoke()
-{
-    this->program->UnbindAttrib("vtx");
-    this->program->UnbindAttrib("clr");
-    this->program->UnbindAttrib("nml");
-    glUseProgram(0);
+    glDrawArrays(GL_TRIANGLES, 0, this->vbo.Size() / sizeof(Vertex));
 }
 
 void Sphere::Split(uint32_t level, const Vertex& v0, const Vertex& v1, const Vertex& v2, vector<Vertex>& vertices)

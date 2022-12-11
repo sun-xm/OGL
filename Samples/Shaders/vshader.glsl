@@ -14,11 +14,11 @@ out float lumen;
 
 void main()
 {
-    vec4 vpos = ModelView * vec4(vtx, 1);
+    vec4 vpos = WorldView * ModelView * vec4(vtx, 1);
     gl_Position = Projection * vpos;
 
     vec4 lpos = WorldView * vec4(LightPos, 1);
-    vec3 nvec = mat3(ModelView) * nml;
+    vec3 nvec = mat3(WorldView * ModelView) * nml;
 
     lumen = max(0, dot(nvec, normalize(lpos.xyz - vpos.xyz)));
     lumen = dot(nvec, normalize(vpos.xyz)) > 0 ? 0 : lumen;

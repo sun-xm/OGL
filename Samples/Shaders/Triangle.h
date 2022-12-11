@@ -1,26 +1,20 @@
 #pragma once
 
-#include "GLShape.h"
+#include "GLObject.h"
 #include "GLProgram.h"
 #include <memory>
 
-class Triangle : public GLShape
+class Triangle : public GLObject
 {
 public:
     Triangle();
 
-    void Create(std::shared_ptr<GLProgram>& program);
-    void Release() override;
+    void Create();
+    void Release();
 
     bool Colors(const Vector<3>* colors, int count);
-    void Render(const GLScene& scene, const Vertex& lightPos);
+    void Render(GLProgram& program, const Vertex& lightPos);
 
 protected:
-    size_t Apply(const GLScene& scene) override;
-    void   Revoke() override;
-
-    std::shared_ptr<GLProgram> program;
-    GLBuffer  cbo;
-
-    Vector<3> lightPos;
+    GLBuffer  vbo, nbo, cbo;
 };

@@ -4,25 +4,26 @@ using namespace std;
 
 Triangle::Triangle()
 {
+    this->Position = {0};
+    this->Rotation = {0};
 }
 
-void Triangle::Create(shared_ptr<GLProgram>& program)
+void Triangle::Create()
 {
-    this->program = program;
-
     Vertex vertices[] = {{ -.5f, -.5f, 0.f }, { .5f, -.5f, 0.f }, { 0.f, .5f, 0.f }};
-    this->Vertices(vertices, 3);
+    this->vbo.Data(vertices, sizeof(vertices), GL_STATIC_DRAW);
 
     Vector<3> colors[] = {{ 1.f, 0.f, 0.f }, { 0.f, 1.f, 0.f }, { 0.f, 0.f, 1.f }};
-    this->Colors(colors, 3);
+    this->cbo.Data(colors, sizeof(colors), GL_STATIC_DRAW);
 
     Normal normals[] = {{ 0.f, 0.f, 1.f }, { 0.f, 0.f, 1.f }, { 0.f, 0.f, 1.f }};
-    this->Normals(normals, 3);
+    this->nbo.Data(normals, sizeof(normals), GL_STATIC_DRAW);
 }
 
 void Triangle::Release()
 {
-    GLShape::Release();
+    this->vbo.Release();
+    this->nbo.Release();
     this->cbo.Release();
 }
 
@@ -41,41 +42,13 @@ bool Triangle::Colors(const Vector<3>* colors, int count)
     return true;
 }
 
-void Triangle::Render(const GLScene& scene, const Vertex& lightPos)
+void Triangle::Render(GLProgram& program, const Vertex& lightPos)
 {
-    this->lightPos = lightPos;
-    GLShape::Render(scene);
-}
+    program.UniformM4f("ModelView",  Transform3D<>::Shift(this->Position) * Quaternion<>::FromRotation(this->Rotation).ToMatrix());
 
-size_t Triangle::Apply(const GLScene& scene)
-{
-    auto count = this->vbo.Size() / sizeof(Vertex);
-    if (count)
-    {
-        this->program->Use();
+    program.BindAttrib("vtx", this->vbo, 3, GL_FLOAT);
+    program.BindAttrib("clr", this->cbo, 3, GL_FLOAT);
+    program.BindAttrib("nml", this->nbo, 3, GL_FLOAT);
 
-        this->program->UniformV3f("LightPos",  this->lightPos);
-        this->program->UniformM4f("WorldView", scene.WorldView());
-
-        Matrix<4> modelView, projection;
-        glGetFloatv(GL_MODELVIEW_MATRIX,  modelView);
-        glGetFloatv(GL_PROJECTION_MATRIX, projection);
-        this->program->UniformFlt("Ambient", 0.2f);
-        this->program->UniformM4f("ModelView",  modelView,  false);
-        this->program->UniformM4f("Projection", projection, false);
-
-        this->program->BindAttrib("vtx", this->vbo, 3, GL_FLOAT);
-        this->program->BindAttrib("clr", this->cbo, 3, GL_FLOAT);
-        this->program->BindAttrib("nml", this->nbo, 3, GL_FLOAT);
-    }
-
-    return count;
-}
-
-void Triangle::Revoke()
-{
-    this->program->UnbindAttrib("vtx");
-    this->program->UnbindAttrib("clr");
-    this->program->UnbindAttrib("nml");
-    glUseProgram(0);
+    glDrawArrays(GL_TRIANGLES, 0, this->vbo.Size() / sizeof(Vertex));
 }

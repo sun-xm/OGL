@@ -5,7 +5,7 @@
 
 using namespace std;
 
-Viewport::Viewport() : program(new GLProgram())
+Viewport::Viewport()
 {
 }
 
@@ -17,9 +17,6 @@ bool Viewport::OnCreated()
     }
 
     this->lightPos = { 0, 0, 1 };
-
-    this->scene.Camera().Clip(0.01f, 100.f);
-    this->scene.Camera().Position(0.f, 0.f, 4.f);
 
     this->RegisterMessage(WM_LBUTTONDOWN, [this]
     {
@@ -69,12 +66,18 @@ void Viewport::OnPaint()
 {
     if (this->AttachContext())
     {
-        this->scene.Begin(this->ClientWidth(), this->ClientHeight());
+        glViewport(0, 0, this->ClientWidth(), this->ClientHeight());
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        glEnable(GL_DEPTH_TEST);
 
-        this->sphere.Render(this->scene, this->lightPos);
-        this->triangle.Render(this->scene, this->lightPos);
+        this->program.Use();
+        this->program.UniformFlt("Ambient", 0.2f);
+        this->program.UniformV3f("LightPos", this->lightPos);
+        this->program.UniformM4f("WorldView", Transform3D<>::LookAt({ 0, 0, 4 }, { 0, 0, 0 }, 0.f));
+        this->program.UniformM4f("Projection", Transform3D<>::Perspective(ToRadian(45.f), (float)this->ClientWidth() / this->ClientHeight(), 0.01f, 100.f));
 
-        this->scene.End();
+        this->sphere.Render(this->program, this->lightPos);
+        this->triangle.Render(this->program, this->lightPos);
 
         this->SwapBuffers();
         this->DetachContext();
@@ -115,17 +118,17 @@ bool Viewport::OnContextCreated()
         return false;
     }
 
-    this->program->Create();
-    if (!this->program->Link(vshader, fshader))
+    this->program.Create();
+    if (!this->program.Link(vshader, fshader))
     {
-        OutputDebugStringA(("Failed to create link program\n" + this->program->Log() + '\n').c_str());
+        OutputDebugStringA(("Failed to create link program\n" + this->program.Log() + '\n').c_str());
         return false;
     }
 
-    this->sphere.Create(this->program);
+    this->sphere.Create();
     this->sphere.Position = { 1, 0, 0 };
 
-    this->triangle.Create(this->program);
+    this->triangle.Create();
     this->triangle.Position = { -1, 0, 0 };
 
     return true;
@@ -135,6 +138,6 @@ void Viewport::OnContextDestroy()
 {
     this->sphere.Release();
     this->triangle.Release();
-    this->program->Release();
+    this->program.Release();
     GLWindow::OnContextDestroy();
 }

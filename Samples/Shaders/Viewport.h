@@ -1,7 +1,6 @@
 #pragma once
 
 #include "GLWindow.h"
-#include "GLScene.h"
 #include "GLProgram.h"
 #include "Sphere.h"
 #include "Triangle.h"
@@ -20,11 +19,10 @@ protected:
     void OnContextDestroy() override;
 
 private:
-    GLScene   scene;
     Sphere    sphere;
     Triangle  triangle;
 
-    std::shared_ptr<GLProgram> program;
+    GLProgram program;
 
     Vertex lightPos;
 
