@@ -1,6 +1,6 @@
 #include "GLWindow.h"
 
-GLWindow::GLWindow(HINSTANCE instance) : Window(instance), hdc(nullptr), hrc(nullptr)
+GLWindow::GLWindow() : hdc(nullptr), hrc(nullptr)
 {
 }
 
@@ -25,7 +25,7 @@ void GLWindow::SwapBuffers()
 
 bool GLWindow::OnCreated()
 {
-    this->hdc = GetDC(this->Handle());
+    this->hdc = GetDC(this->hwnd);
     if (!this->hdc)
     {
         return false;
@@ -89,7 +89,7 @@ void GLWindow::OnDestroy()
             this->hrc = nullptr;
         }
 
-        ReleaseDC(this->Handle(), this->hdc);
+        ReleaseDC(this->hwnd, this->hdc);
         this->hdc = nullptr;
     }
 

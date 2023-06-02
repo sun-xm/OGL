@@ -145,7 +145,7 @@ bool ViewPort::OnContextCreated()
     });
     this->RegisterMessage(WM_LBUTTONDOWN, [this]
     {
-        SetCapture(this->Handle());
+        SetCapture(*this);
         GetCursorPos(&this->cursor);
         return 0;
     });
@@ -196,7 +196,7 @@ void ViewPort::Render()
 {
     if (this->AttachContext())
     {
-        this->scene.Begin(this->ClientWidth(), this->ClientHeight());
+        this->scene.Begin(this->ClientW(), this->ClientH());
         if (this->shape)
         {
             this->shape->Render(this->scene);

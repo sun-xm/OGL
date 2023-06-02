@@ -33,7 +33,7 @@ LRESULT ViewPort::WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
         break;
 
     case WM_LBUTTONDOWN:
-        SetCapture(this->Handle());
+        SetCapture(*this);
         GetCursorPos(&this->cursor);
         break;
 
@@ -87,7 +87,7 @@ void ViewPort::OnPaint()
 {
     if (this->AttachContext())
     {
-        this->scene.Begin(this->ClientWidth(), this->ClientHeight());
+        this->scene.Begin(this->ClientW(), this->ClientH());
         this->cloud.Render(this->scene);
         this->scene.End();
 

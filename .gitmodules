@@ -1,4 +1,3 @@
-[submodule "GUI"]
-	path = GUI
-	url = https://github.com/sun-xm/GUI.git
-	branch = master
+[submodule "W32"]
+	path = W32
+	url = https://github.com/sun-xm/W32.git

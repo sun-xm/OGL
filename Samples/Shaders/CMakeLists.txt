@@ -1,13 +1,12 @@
 cmake_minimum_required(VERSION 3.10)
 project(Shaders)
 
+file(GLOB APP_CPP ${CMAKE_CURRENT_LIST_DIR}/*.cpp)
+
 add_executable(${PROJECT_NAME} WIN32
-               ${GUI_CPP}
+               ${W32_CPP}
                ${SRC_CPP}
-               Application.cpp
-               Viewport.cpp
-               Sphere.cpp
-               Triangle.cpp)
+               ${APP_CPP})
 target_link_libraries(${PROJECT_NAME} opengl32 glu32 ${GLEW_LIB})
 
 add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD

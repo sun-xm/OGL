@@ -15,8 +15,8 @@ public:
 protected:
     bool OnContextCreated() override;
     void OnContextDestroy() override;
-    void OnTimer() override;
     void OnPaint() override;
+    void OnTimer();
 
 private:
     GLRenderer renderer;

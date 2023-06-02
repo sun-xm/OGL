@@ -1,11 +1,7 @@
-#include "MainWindow.h"
 #include "ViewPort.h"
 
-class Application : public MainWindow
+class MainWindow : public Window
 {
-public:
-    Application(HINSTANCE instance);
-
 protected:
     bool OnCreated() override;
     void OnSize() override;

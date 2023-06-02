@@ -1,12 +1,12 @@
 #pragma once
 
-#include "Window.h"
+#include <Window.h>
 #include <GL/glew.h>
 
 class GLWindow : public Window
 {
 public:
-    GLWindow(HINSTANCE instance = nullptr);
+    GLWindow();
     virtual ~GLWindow();
 
 protected:

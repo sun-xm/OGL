@@ -26,7 +26,8 @@ bool Viewport::OnContextCreated()
     this->texture.Wrap(GL_CLAMP, GL_CLAMP);
     this->texture.Filter(GL_LINEAR, GL_LINEAR);
 
-    this->SetTimer(0, 17);
+    this->RegisterMessage(WM_TIMER, [this]{ this->OnTimer(); return 0; });
+    SetTimer(*this, 0, 17, nullptr);
 
     return true;
 }
@@ -39,21 +40,10 @@ void Viewport::OnContextDestroy()
     GLWindow::OnContextDestroy();
 }
 
-void Viewport::OnTimer()
-{
-    this->rotate += .5f;
-    if (this->rotate > 360.f)
-    {
-        this->rotate -= 360.f;
-    }
-
-    this->Invalidate();
-}
-
 void Viewport::OnPaint()
 {
-    auto w = this->ClientWidth();
-    auto h = this->ClientHeight();
+    auto w = this->ClientW();
+    auto h = this->ClientH();
 
     if (this->AttachContext())
     {
@@ -73,4 +63,15 @@ void Viewport::OnPaint()
     }
 
     GLWindow::OnPaint();
+}
+
+void Viewport::OnTimer()
+{
+    this->rotate += .5f;
+    if (this->rotate > 360.f)
+    {
+        this->rotate -= 360.f;
+    }
+
+    this->Invalidate();
 }

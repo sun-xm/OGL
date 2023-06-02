@@ -1,21 +1,12 @@
 cmake_minimum_required(VERSION 3.10)
 project(Shapes)
 
+file(GLOB APP_CPP ${CMAKE_CURRENT_LIST_DIR}/*.cpp)
+
 add_executable(${PROJECT_NAME} WIN32
-               ${GUI_CPP}
+               ${W32_CPP}
                ${SRC_CPP}
-               Application.cpp
-               ViewPort.cpp
-               Panel.cpp
-               Texture.cpp
-               Triangle.cpp
-               Square.cpp
-               Plate.cpp
-               Cone.cpp
-               Cube.cpp
-               Cylinder.cpp
-               Sphere.cpp
-               Donut.cpp
+               ${APP_CPP}
                Shapes.rc)
 target_link_libraries(${PROJECT_NAME} opengl32 glu32 gdiplus ${GLEW_LIB})
 

@@ -6,7 +6,6 @@ bool MainWindow::OnCreated()
     {
         return false;
     }
-    this->Text(L"Shaders");
 
     if (!this->view.Create(*this))
     {
@@ -19,7 +18,6 @@ bool MainWindow::OnCreated()
 
 void MainWindow::OnSize()
 {
-    Window::OnSize();
-    this->view.MoveTo(0, 0);
     this->view.Resize(this->ClientW(), this->ClientH());
+    Window::OnSize();
 }

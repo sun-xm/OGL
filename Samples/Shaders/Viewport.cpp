@@ -20,7 +20,7 @@ bool Viewport::OnCreated()
 
     this->RegisterMessage(WM_LBUTTONDOWN, [this]
     {
-        SetCapture(this->Handle());
+        SetCapture(*this);
         GetCursorPos(&this->pos);
         return 0;
     });
@@ -66,7 +66,7 @@ void Viewport::OnPaint()
 {
     if (this->AttachContext())
     {
-        glViewport(0, 0, this->ClientWidth(), this->ClientHeight());
+        glViewport(0, 0, this->ClientW(), this->ClientH());
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         glEnable(GL_DEPTH_TEST);
 
@@ -74,7 +74,7 @@ void Viewport::OnPaint()
         this->program.UniformFlt("Ambient", 0.2f);
         this->program.UniformV3f("LightPos", this->lightPos);
         this->program.UniformM4f("WorldView", Transform3D<>::LookAt({ 0, 0, 4 }, { 0, 0, 0 }, 0.f));
-        this->program.UniformM4f("Projection", Transform3D<>::Perspective(ToRadian(45.f), (float)this->ClientWidth() / this->ClientHeight(), 0.01f, 100.f));
+        this->program.UniformM4f("Projection", Transform3D<>::Perspective(ToRadian(45.f), (float)this->ClientW() / this->ClientH(), 0.01f, 100.f));
 
         this->sphere.Render(this->program, this->lightPos);
         this->triangle.Render(this->program, this->lightPos);
