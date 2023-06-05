@@ -26,6 +26,8 @@ if(WIN32)
 
     add_compile_definitions(WIN32 _WINDOWS _UNICODE UNICODE)
 
+    add_library(W32LIB STATIC ${W32_CPP})
+
     add_subdirectory(Samples/Clouds  Clouds)
     add_subdirectory(Samples/Shapes  Shapes)
     add_subdirectory(Samples/Shaders Shaders)
