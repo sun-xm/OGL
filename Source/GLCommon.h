@@ -248,6 +248,25 @@ inline Vector<Dimensions, Scalar>& operator/=(Vector<Dimensions, Scalar>& vector
 }
 
 template<typename Scalar, size_t Dimensions>
+inline bool operator==(const Vector<Dimensions, Scalar>& v0, const Vector<Dimensions, Scalar>& v1)
+{
+    for (size_t i = 0; i < Dimensions; i++)
+    {
+        if (v0.v[i] != v1.v[i])
+        {
+            return false;
+        }
+    }
+    return true;
+}
+
+template<typename Scalar, size_t Dimensions>
+inline bool operator!=(const Vector<Dimensions, Scalar>& v0, const Vector<Dimensions, Scalar>& v1)
+{
+    return !(v0 == v1);
+}
+
+template<typename Scalar, size_t Dimensions>
 inline Scalar Dot(const Vector<Dimensions, Scalar>& v0, const Vector<Dimensions, Scalar>& v1)
 {
     Scalar product = 0;
