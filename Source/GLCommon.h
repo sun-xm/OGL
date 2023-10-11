@@ -736,6 +736,25 @@ inline Vector<MCols, Scalar> operator*(const Matrix<MRows, MCols, Scalar>& m, co
     return p;
 }
 
+template<size_t MRows, size_t MCols, typename Scalar>
+inline bool operator==(const Matrix<MRows, MCols, Scalar>& m0, const Matrix<MRows, MCols, Scalar>& m1)
+{
+    for (size_t i = 0; i < MRows; i++)
+    {
+        if (m0.v[i] != m1.v[i])
+        {
+            return false;
+        }
+    }
+    return true;
+}
+
+template<size_t MRows, size_t MCols, typename Scalar>
+inline bool operator!=(const Matrix<MRows, MCols, Scalar>& m0, const Matrix<MRows, MCols, Scalar>& m1)
+{
+    return !(m0 == m1);
+}
+
 template<typename Scalar = float>
 struct Quaternion : public Vector<4, Scalar>
 {
