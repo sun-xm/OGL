@@ -677,13 +677,19 @@ struct Matrix
     {
         return this->v[index];
     }
+
+    const Vector<MCols * MRows, Scalar>& ToVector() const
+    {
+        return *(Vector<MCols * MRows, Scalar>*)this->v[0].v;
+    }
+
     operator Scalar*()
     {
-        return this->v[0];
+        return (Scalar*)this->v[0];
     }
     operator const Scalar*() const
     {
-        return this->v[0];
+        return (const Scalar*)this->v[0];
     }
 };
 
