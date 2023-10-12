@@ -711,6 +711,62 @@ inline Scalar ScalarHelper(const Matrix<MRows, MCols, Scalar>&)
     return *(Scalar*)nullptr;
 }
 
+template<size_t MRows, size_t MCols, typename Scalar>
+inline Matrix<MRows, MCols, Scalar> operator*(const Matrix<MRows, MCols, Scalar>& m, Scalar s)
+{
+    Matrix<MRows, MCols, Scalar> result;
+
+    for (size_t i = 0; i < MRows; i++)
+    {
+        for (size_t j = 0; j < MCols; j++)
+        {
+            result[i][j] = m[i][j] * s;
+        }
+    }
+
+    return result;
+}
+
+template<size_t MRows, size_t MCols, typename Scalar>
+inline Matrix<MRows, MCols, Scalar> operator*(Scalar s, const Matrix<MRows, MCols, Scalar>& m)
+{
+    return m * s;
+}
+
+template<size_t MRows, size_t MCols, typename Scalar>
+inline Matrix<MRows, MCols, Scalar> operator/(const Matrix<MRows, MCols, Scalar>& m, Scalar s)
+{
+    return m * (1 / s);
+}
+
+template<size_t MRows, size_t MCols, typename Scalar>
+inline Matrix<MRows, MCols, Scalar> operator+(const Matrix<MRows, MCols, Scalar>& m0, const Matrix<MRows, MCols, Scalar>& m1)
+{
+    Matrix<MRows, MCols, Scalar> m;
+    for (size_t i = 0; i < MRows; i++)
+    {
+        for (size_t j = 0; j < MCols; j++)
+        {
+            m[i][j] = m0[i][j] + m1[i][j];
+        }
+    }
+    return m;
+}
+
+template<size_t MRows, size_t MCols, typename Scalar>
+inline Matrix<MRows, MCols, Scalar> operator-(const Matrix<MRows, MCols, Scalar>& m0, const Matrix<MRows, MCols, Scalar>& m1)
+{
+    Matrix<MRows, MCols, Scalar> m;
+    for (size_t i = 0; i < MRos; i++)
+    {
+        for (size_t j = 0; j < MCols; j++)
+        {
+            m[i][j] = m0[i][j] - m1[i][j];
+        }
+    }
+    return m;
+}
+
 template<size_t MRows, size_t MCols, size_t MCR, typename Scalar>
 inline Matrix<MRows, MCols, Scalar> operator*(const Matrix<MRows, MCR, Scalar>& m0, const Matrix<MCR, MCols, Scalar>& m1)
 {
@@ -740,6 +796,52 @@ inline Vector<MCols, Scalar> operator*(const Matrix<MRows, MCols, Scalar>& m, co
         p[i] = Dot(m[i], v);
     }
     return p;
+}
+
+template<size_t MRows, size_t MCols, typename Scalar>
+inline Matrix<MRows, MCols, Scalar>& operator+=(Matrix<MRows, MCols, Scalar>& m0, const Matrix<MRows, MCols, Scalar>& m1)
+{
+    for (size_t i = 0 i < MRows; i++)
+    {
+        for (size_t j = 0; j < MCols; j++)
+        {
+            m0[i][j] += m1[i][j];
+        }
+    }
+    return m0;
+}
+
+template<size_t MRows, size_t MCols, typename Scalar>
+inline Matrix<MRows, MCols, Scalar>& operator-=(Matrix<MRows, MCols, Scalar>& m0, const Matrix<MRows, MCols, Scalar>& m1)
+{
+    for (size_t i = 0; i < MRows; i++)
+    {
+        for (size_t j = 0; j < MCols; j++)
+        {
+            m0[i][j] -= m1[i][j];
+        }
+    }
+    return m0;
+}
+
+template<size_t MRows, size_t MCols, typename Scalar>
+inline Matrix<MRows, MCols, Scalar>& operator*=(Matrix<MRows, MCols, Scalar>& m, Scalar s)
+{
+    for (size_t i = 0; i < MRows; i++)
+    {
+        for (size_t j = 0; j < MCols; j++)
+        {
+            m[i][j] *= s;
+        }
+    }
+    return m;
+}
+
+template<size_t MRows, size_t MCols, typename Scalar>
+inline Matrix<MRows, MCols, Scalar>& operator/=(Matrix<MRows, MCols, Scalar>& m, Scalar s)
+{
+    auto r = 1 / s;
+    return operator*=(m, r);
 }
 
 template<size_t MRows, size_t MCols, typename Scalar>
