@@ -757,7 +757,7 @@ template<size_t MRows, size_t MCols, typename Scalar>
 inline Matrix<MRows, MCols, Scalar> operator-(const Matrix<MRows, MCols, Scalar>& m0, const Matrix<MRows, MCols, Scalar>& m1)
 {
     Matrix<MRows, MCols, Scalar> m;
-    for (size_t i = 0; i < MRos; i++)
+    for (size_t i = 0; i < MRows; i++)
     {
         for (size_t j = 0; j < MCols; j++)
         {
