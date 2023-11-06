@@ -801,7 +801,7 @@ inline Vector<MCols, Scalar> operator*(const Matrix<MRows, MCols, Scalar>& m, co
 template<size_t MRows, size_t MCols, typename Scalar>
 inline Matrix<MRows, MCols, Scalar>& operator+=(Matrix<MRows, MCols, Scalar>& m0, const Matrix<MRows, MCols, Scalar>& m1)
 {
-    for (size_t i = 0 i < MRows; i++)
+    for (size_t i = 0; i < MRows; i++)
     {
         for (size_t j = 0; j < MCols; j++)
         {
