@@ -1113,6 +1113,17 @@ public:
         auto r = Quaternion<Scalar>::FromAxisAngle(q.Rotate(Vector<3, Scalar>::ZAxis), rotation);
         return r.ToMatrix() * q.ToMatrix() * s;
     }
+
+    static void ToAxisAngle(const Matrix<4, 4, Scalar>& matrix, Vector<3, Scalar>& axis, Scalar& radian)
+    {
+        auto trace = matrix[0][0] + matrix[1][1] + matrix[2][2];
+        radian = acos((trace - 1) / 2);
+
+        auto factor = 1 / (2 * sqrtx(1 + trace));
+        axis = { factor * (matrix[2][1] - matrix[1][2]),
+                 factor * (matrix[0][2] - matrix[2][0]),
+                 factor * (matrix[1][0] - matrix[0][1]) };
+    }
 };
 
 template<typename T, size_t N>
