@@ -1114,7 +1114,12 @@ public:
         return r.ToMatrix() * q.ToMatrix() * s;
     }
 
-    static void ToAxisAngle(const Matrix<4, 4, Scalar>& matrix, Vector<3, Scalar>& axis, Scalar& radian)
+    static void GetTranslation(const Matrix<4, 4, Scalar>& matrix, Vector<3, Scalar>& translation)
+    {
+        translation = { matrix[0][3], matrix[1][3], matrix[2][3] };
+    }
+
+    static void GetRotation(const Matrix<4, 4, Scalar>& matrix, Vector<3, Scalar>& axis, Scalar& radian)
     {
         auto trace = matrix[0][0] + matrix[1][1] + matrix[2][2];
         radian = acos((trace - 1) / 2);
