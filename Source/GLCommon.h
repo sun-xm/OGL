@@ -335,6 +335,31 @@ inline Scalar CosOfVectors(const Vector<3, Scalar>& v0, const Vector<3, Scalar>&
 }
 
 template<typename Scalar>
+inline Scalar operator*(const Vector<2, Scalar>& v0, const Vector<2, Scalar>& v1)
+{
+    return Dot(v0, v1);
+}
+
+template<typename Scalar>
+inline Scalar operator*(const Vector<3, Scalar>& v0, const Vector<3, Scalar>& v1)
+{
+    return Dot(v0, v1);
+}
+
+template<typename Scalar>
+inline Vector<3, Scalar> operator^(const Vector<3, Scalar>& v0, const Vector<3, Scalar>& v1)
+{
+    return Cross(v0, v1);
+}
+
+template<typename Scalar>
+inline Vector<3, Scalar>& operator^=(Vector<3, Scalar>& v0, const Vector<3, Scalar>& v1)
+{
+    v0 = Cross(v0, v1);
+    return v0;
+}
+
+template<typename Scalar>
 struct Vector<2, Scalar>
 {
     union
