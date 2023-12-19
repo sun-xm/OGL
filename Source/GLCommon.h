@@ -1129,12 +1129,18 @@ public:
                                     {          0,  f,                  0,                    0 },
                                     {          0,  0, (_near + _far) * i, _near * _far * i * 2 },
                                     {          0,  0,                 -1,                    0 }};
+        // Default camera direction is negtive Z axis in OpenGL. Use following matrix if camera direction is default to positive Z axis.
+        // Noted the -1 in last row is changed to +1.
+        // Matrix<4, 4, Scalar>{{ f / aspect,  0,                  0,                    0 },
+        //                      {          0,  f,                  0,                    0 },
+        //                      {          0,  0, (_near + _far) * i, _near * _far * i * 2 },
+        //                      {          0,  0,                  1,                    0 }};
     }
 
     static Matrix<4, 4, Scalar> LookAt(const Vector<3, Scalar>& eye, const Vector<3, Scalar>& center, Scalar rotation /*in radian*/)
     {
         auto s = Shift(Vector<3, Scalar>::Zero - eye);
-        auto q = Quaternion<Scalar>::From2Vectors(center - eye, -Vector<3, Scalar>::ZAxis);
+        auto q = Quaternion<Scalar>::From2Vectors(center - eye, -Vector<3, Scalar>::ZAxis /*Perspective matrix has defaulted camera direction to negtive Z axis*/);
         auto r = Quaternion<Scalar>::FromAxisAngle(q.Rotate(Vector<3, Scalar>::ZAxis), rotation);
         return r.ToMatrix() * q.ToMatrix() * s;
     }
