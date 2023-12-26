@@ -934,10 +934,10 @@ struct Quaternion : public Vector<4, Scalar>
 
     Vector<4, Scalar> ToRotation() const
     {
-        auto a = acos(this->v[3]);
-        auto s = sin(a);
+        auto a = std::acos(this->v[3]);
+        auto s = std::sin(a);
 
-        if (abs(s) < FLT_EPSILON)
+        if (std::abs(s) < FLT_EPSILON)
         {
             return Vector<4, Scalar>{ 0, 0, 0, 0 };
         }
@@ -1004,9 +1004,9 @@ struct Quaternion : public Vector<4, Scalar>
         }
         else if ((n0 + n1).Length() < e)
         {
-            auto cx = abs(Dot(n0, Vector<3, Scalar>::XAxis));
-            auto cy = abs(Dot(n0, Vector<3, Scalar>::YAxis));
-            auto cz = abs(Dot(n0, Vector<3, Scalar>::ZAxis));
+            auto cx = std::abs(Dot(n0, Vector<3, Scalar>::XAxis));
+            auto cy = std::abs(Dot(n0, Vector<3, Scalar>::YAxis));
+            auto cz = std::abs(Dot(n0, Vector<3, Scalar>::ZAxis));
 
             auto axis = Vector<3, Scalar>::XAxis;
             auto minc = cx;
@@ -1034,8 +1034,8 @@ struct Quaternion : public Vector<4, Scalar>
     static Quaternion<Scalar> FromAxisAngle(const Vector<3, Scalar>& axis, float radian)
     {
         auto a = radian / 2;
-        auto c = cos(a);
-        auto s = sin(a);
+        auto c = std::cos(a);
+        auto s = std::sin(a);
         auto n = axis.Normalize();
 
         return Quaternion<Scalar>{ s * n.v[0], s * n.v[1], s * n.v[2], c };
@@ -1148,8 +1148,8 @@ public:
 
     static Matrix<4, 4, Scalar> FromAxisAngle(const Vector<3, Scalar>& axis, float radian)
     {
-        auto c = cos(radian);
-        auto s = sin(radian);
+        auto c = std::cos(radian);
+        auto s = std::sin(radian);
         auto n = axis.Normalize();
 
         auto cc = 1 - c;
@@ -1195,7 +1195,7 @@ public:
     static void GetRotation(const Matrix<4, 4, Scalar>& matrix, Vector<3, Scalar>& axis, Scalar& radian)
     {
         auto trace = matrix[0][0] + matrix[1][1] + matrix[2][2];
-        radian = acos((trace - 1) / 2);
+        radian = std::acos((trace - 1) / 2);
 
         auto factor = 1 / (2 * sqrtx(1 + trace));
         axis = { factor * (matrix[2][1] - matrix[1][2]),
