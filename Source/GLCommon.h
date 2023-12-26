@@ -1121,6 +1121,54 @@ public:
         return Scale(v[0], v[1], v[2]);
     }
 
+    static Matrix<4, 4, Scalar> From2Vectors(const Vector<3, Scalar>& v0, const Vector<3, Scalar>& v1)
+    {
+        auto n0 = v0.Normalize();
+        auto n1 = v1.Normalize();
+        auto n = (n0 ^ n1).Normalize();
+        auto c = n0 * n1;
+        auto s = sqrtx(1 - c * c);
+
+        auto x2 = n.X * n.X;
+        auto y2 = n.Y * n.Y;
+        auto z2 = n.Z * n.Z;
+        auto xy = n.X * n.Y;
+        auto yz = n.Y * n.Z;
+        auto zx = n.Z * n.X;
+        auto cc = 1 - c;
+
+        return Matrix<4, 4, Scalar>
+        {
+            {       c + x2 * cc,  xy * cc - n.Z * s,  zx * cc + n.Y * s,  0 },
+            { xy * cc + n.Z * s,        c + y2 * cc,  yz * cc - n.X * s,  0 },
+            { zx * cc - n.Y * s,  yz * cc + n.X * s,        c + z2 * cc,  0 },
+            {                 0,                  0,                  0,  1 }
+        };
+    }
+
+    static Matrix<4, 4, Scalar> FromAxisAngle(const Vector<3, Scalar>& axis, float radian)
+    {
+        auto c = cos(radian);
+        auto s = sin(radian);
+        auto n = axis.Normalize();
+
+        auto cc = 1 - c;
+        auto x2 = n.X * n.X;
+        auto y2 = n.Y * n.Y;
+        auto z2 = n.Z * n.Z;
+        auto xy = n.X * n.Y;
+        auto yz = n.Y * n.Z;
+        auto zx = n.Z * n.X;
+
+        return Matrix<4, 4, Scalar>
+        {
+            {       c + x2 * cc,  xy * cc - n.Z * s,  zx * cc + n.Y * s,  0 },
+            { xy * cc + n.Z * s,        c + y2 * cc,  yz * cc - n.X * s,  0 },
+            { zx * cc - n.Y * s,  yz * cc + n.X * s,        c + z2 * cc,  0 },
+            {                 0,                  0,                  0,  1 }
+        };
+    }
+
     static Matrix<4, 4, Scalar> Perspective(Scalar vfov /*in radian*/, Scalar aspect, Scalar _near, Scalar _far)
     {
         auto f = 1 / tan(vfov / 2);
@@ -1129,18 +1177,12 @@ public:
                                     {          0,  f,                  0,                    0 },
                                     {          0,  0, (_near + _far) * i, _near * _far * i * 2 },
                                     {          0,  0,                 -1,                    0 }};
-        // Default camera direction is negtive Z axis in OpenGL. Use following matrix if camera direction is default to positive Z axis.
-        // Noted the -1 in last row is changed to +1.
-        // Matrix<4, 4, Scalar>{{ f / aspect,  0,                  0,                    0 },
-        //                      {          0,  f,                  0,                    0 },
-        //                      {          0,  0, (_near + _far) * i, _near * _far * i * 2 },
-        //                      {          0,  0,                  1,                    0 }};
     }
 
     static Matrix<4, 4, Scalar> LookAt(const Vector<3, Scalar>& eye, const Vector<3, Scalar>& center, Scalar rotation /*in radian*/)
     {
         auto s = Shift(Vector<3, Scalar>::Zero - eye);
-        auto q = Quaternion<Scalar>::From2Vectors(center - eye, -Vector<3, Scalar>::ZAxis /*Perspective matrix has defaulted camera direction to negtive Z axis*/);
+        auto q = Quaternion<Scalar>::From2Vectors(center - eye, -Vector<3, Scalar>::ZAxis);
         auto r = Quaternion<Scalar>::FromAxisAngle(q.Rotate(Vector<3, Scalar>::ZAxis), rotation);
         return r.ToMatrix() * q.ToMatrix() * s;
     }
