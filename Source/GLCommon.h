@@ -67,6 +67,15 @@ struct Vector
         }
     }
 
+    template<typename S>
+    explicit Vector(const Vector<Dimensions, S>& other)
+    {
+        for (size_t i = 0; i < Dimensions; i++)
+        {
+            this->v[i] = (Scalar)other.v[i];
+        }
+    }
+
     bool IsNaN() const
     {
         for (Scalar v : this->v)
@@ -98,7 +107,321 @@ struct Vector
     }
 };
 
-template<size_t Dimensions, typename Scalar = float>
+template<typename Scalar>
+struct Vector<2, Scalar>
+{
+    union
+    {
+        Scalar v[2];
+        struct
+        {
+            Scalar X;
+            Scalar Y;
+        };
+    };
+
+    Vector() = default;
+    Vector(Scalar v)
+    {
+        for (size_t i = 0; i < 2; i++)
+        {
+            this->v[i] = v;
+        }
+    }
+    Vector(const Scalar* v)
+    {
+        for (size_t i = 0; i < 2; i++)
+        {
+            this->v[i] = v[i];
+        }
+    }
+    Vector(const std::initializer_list<Scalar>& list)
+    {
+        auto l = list.begin();
+
+        for (size_t i = 0; i < 2; i++)
+        {
+            this->v[i] = (list.end() == l) ? 0 : *l++;
+        }
+    }
+
+    template<typename S>
+    explicit Vector(const Vector<2, S>& other)
+    {
+        for (size_t i = 0; i < 2; i++)
+        {
+            this->v[i] = (Scalar)other.v[i];
+        }
+    }
+
+    bool IsNaN() const
+    {
+        for (Scalar v : this->v)
+        {
+            if (isnan(v))
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    Scalar& operator[](size_t index)
+    {
+        return this->v[index];
+    }
+    const Scalar& operator[](size_t index) const
+    {
+        return this->v[index];
+    }
+    operator Scalar*()
+    {
+        return this->v;
+    }
+    operator const Scalar*() const
+    {
+        return this->v;
+    }
+
+    Scalar Dot() const
+    {
+        return ::Dot(*this, *this);
+    }
+    Scalar Dot(const Vector<3, Scalar>& other) const
+    {
+        return ::Dot(*this, other);
+    }
+    Scalar Length() const
+    {
+        return ::Length(*this);
+    }
+    Vector<2, Scalar> Normalize() const
+    {
+        return ::Normalize(*this);
+    }
+
+    static const Vector<2, Scalar> NaN, Zero, XAxis, YAxis;
+};
+template<typename Scalar>
+const Vector<2, Scalar> Vector<2, Scalar>::NaN   = { std::numeric_limits<Scalar>::quiet_NaN(), std::numeric_limits<Scalar>::quiet_NaN() };
+template<typename Scalar>
+const Vector<2, Scalar> Vector<2, Scalar>::Zero  = { 0, 0 };
+template<typename Scalar>
+const Vector<2, Scalar> Vector<2, Scalar>::XAxis = { 1, 0 };
+template<typename Scalar>
+const Vector<2, Scalar> Vector<2, Scalar>::YAxis = { 0, 1 };
+
+template<typename Scalar>
+struct Vector<3, Scalar>
+{
+    union
+    {
+        Scalar v[3];
+        struct
+        {
+            Scalar X;
+            Scalar Y;
+            Scalar Z;
+        };
+    };
+
+    Vector() = default;
+    Vector(Scalar v)
+    {
+        for (size_t i = 0; i < 3; i++)
+        {
+            this->v[i] = v;
+        }
+    }
+    Vector(const Scalar* v)
+    {
+        for (size_t i = 0; i < 3; i++)
+        {
+            this->v[i] = v[i];
+        }
+    }
+    Vector(const std::initializer_list<Scalar>& list)
+    {
+        auto l = list.begin();
+
+        for (size_t i = 0; i < 3; i++)
+        {
+            this->v[i] = (list.end() == l) ? 0 : *l++;
+        }
+    }
+
+    template<typename S>
+    explicit Vector(const Vector<3, S>& other)
+    {
+        for (size_t i = 0; i < 3; i++)
+        {
+            this->v[i] = (Scalar)other.v[i];
+        }
+    }
+
+    bool IsNaN() const
+    {
+        for (Scalar v : this->v)
+        {
+            if (isnan(v))
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    Scalar& operator[](size_t index)
+    {
+        return this->v[index];
+    }
+    const Scalar& operator[](size_t index) const
+    {
+        return this->v[index];
+    }
+    operator Scalar*()
+    {
+        return this->v;
+    }
+    operator const Scalar*() const
+    {
+        return this->v;
+    }
+
+    Scalar Dot() const
+    {
+        return ::Dot(*this, *this);
+    }
+    Scalar Dot(const Vector<3, Scalar>& other) const
+    {
+        return ::Dot(*this, other);
+    }
+    Scalar Length() const
+    {
+        return ::Length(*this);
+    }
+    Vector<3, Scalar> Cross(const Vector<3, Scalar>& other) const
+    {
+        return ::Cross(*this, other);
+    }
+    Vector<3, Scalar> Normalize() const
+    {
+        return ::Normalize(*this);
+    }
+
+    static const Vector<3, Scalar> NaN, Zero, XAxis, YAxis, ZAxis;
+};
+template<typename Scalar>
+const Vector<3, Scalar> Vector<3, Scalar>::NaN   = { std::numeric_limits<Scalar>::quiet_NaN(), std::numeric_limits<Scalar>::quiet_NaN(), std::numeric_limits<Scalar>::quiet_NaN() };
+template<typename Scalar>
+const Vector<3, Scalar> Vector<3, Scalar>::Zero  = { 0, 0, 0 };
+template<typename Scalar>
+const Vector<3, Scalar> Vector<3, Scalar>::XAxis = { 1, 0, 0 };
+template<typename Scalar>
+const Vector<3, Scalar> Vector<3, Scalar>::YAxis = { 0, 1, 0 };
+template<typename Scalar>
+const Vector<3, Scalar> Vector<3, Scalar>::ZAxis = { 0, 0, 1 };
+
+template<typename Scalar>
+struct Vector<4, Scalar>
+{
+    union
+    {
+        Scalar v[4];
+        struct
+        {
+            Scalar X;
+            Scalar Y;
+            Scalar Z;
+            Scalar W;
+        };
+    };
+
+    Vector() = default;
+    Vector(Scalar v)
+    {
+        for (size_t i = 0; i < 4; i++)
+        {
+            this->v[i] = v;
+        }
+    }
+    Vector(const Scalar* v)
+    {
+        for (size_t i = 0; i < 4; i++)
+        {
+            this->v[i] = v[i];
+        }
+    }
+    Vector(const std::initializer_list<Scalar>& list)
+    {
+        auto l = list.begin();
+
+        for (size_t i = 0; i < 4; i++)
+        {
+            this->v[i] = (list.end() == l) ? 0 : *l++;
+        }
+    }
+
+    template<typename S>
+    explicit Vector(const Vector<4, S>& other)
+    {
+        for (size_t i = 0; i < 4; i++)
+        {
+            this->v[i] = (Scalar)other.v[i];
+        }
+    }
+
+    bool IsNaN() const
+    {
+        for (Scalar v : this->v)
+        {
+            if (isnan(v))
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    Scalar& operator[](size_t index)
+    {
+        return this->v[index];
+    }
+    const Scalar& operator[](size_t index) const
+    {
+        return this->v[index];
+    }
+    operator Scalar*()
+    {
+        return this->v;
+    }
+    operator const Scalar*() const
+    {
+        return this->v;
+    }
+
+    static const Vector<4, Scalar> NaN, Zero, XYPlane, YZPlane, ZXPlane;
+};
+template<typename Scalar>
+const Vector<4, Scalar> Vector<4, Scalar>::NaN   = { std::numeric_limits<Scalar>::quiet_NaN(), std::numeric_limits<Scalar>::quiet_NaN(), std::numeric_limits<Scalar>::quiet_NaN(), std::numeric_limits<Scalar>::quiet_NaN() };
+template<typename Scalar>
+const Vector<4, Scalar> Vector<4, Scalar>::Zero  = { 0, 0, 0, 0 };
+template<typename Scalar>
+const Vector<4, Scalar> Vector<4, Scalar>::XYPlane = { 0, 0, 1, 0 };
+template<typename Scalar>
+const Vector<4, Scalar> Vector<4, Scalar>::YZPlane = { 1, 0, 0, 0 };
+template<typename Scalar>
+const Vector<4, Scalar> Vector<4, Scalar>::ZXPlane = { 0, 1, 0, 0 };
+
+typedef Vector<3, uint32_t> Element;
+typedef Vector<3> Vertex;
+typedef Vector<3> Normal;
+typedef Vector<2> Coordinate;
+
+template<size_t Dimensions, typename Scalar>
 inline size_t Dims(const Vector<Dimensions, Scalar>&)
 {
     return Dimensions;
@@ -359,286 +682,6 @@ inline Vector<3, Scalar>& operator^=(Vector<3, Scalar>& v0, const Vector<3, Scal
     return v0;
 }
 
-template<typename Scalar>
-struct Vector<2, Scalar>
-{
-    union
-    {
-        Scalar v[2];
-        struct
-        {
-            Scalar X;
-            Scalar Y;
-        };
-    };
-
-    Vector() = default;
-    Vector(const Scalar* v)
-    {
-        for (size_t i = 0; i < 2; i++)
-        {
-            this->v[i] = v[i];
-        }
-    }
-    Vector(const std::initializer_list<Scalar>& list)
-    {
-        auto l = list.begin();
-
-        for (size_t i = 0; i < 2; i++)
-        {
-            this->v[i] = (list.end() == l) ? 0 : *l++;
-        }
-    }
-
-    bool IsNaN() const
-    {
-        for (Scalar v : this->v)
-        {
-            if (isnan(v))
-            {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    Scalar& operator[](size_t index)
-    {
-        return this->v[index];
-    }
-    const Scalar& operator[](size_t index) const
-    {
-        return this->v[index];
-    }
-    operator Scalar*()
-    {
-        return this->v;
-    }
-    operator const Scalar*() const
-    {
-        return this->v;
-    }
-
-    Scalar Dot() const
-    {
-        return ::Dot(*this, *this);
-    }
-    Scalar Dot(const Vector<3, Scalar>& other) const
-    {
-        return ::Dot(*this, other);
-    }
-    Scalar Length() const
-    {
-        return ::Length(*this);
-    }
-    Vector<2, Scalar> Normalize() const
-    {
-        return ::Normalize(*this);
-    }
-
-    static const Vector<2, Scalar> NaN, Zero, XAxis, YAxis;
-};
-template<typename Scalar>
-const Vector<2, Scalar> Vector<2, Scalar>::NaN   = { std::numeric_limits<Scalar>::quiet_NaN(), std::numeric_limits<Scalar>::quiet_NaN() };
-template<typename Scalar>
-const Vector<2, Scalar> Vector<2, Scalar>::Zero  = { 0, 0 };
-template<typename Scalar>
-const Vector<2, Scalar> Vector<2, Scalar>::XAxis = { 1, 0 };
-template<typename Scalar>
-const Vector<2, Scalar> Vector<2, Scalar>::YAxis = { 0, 1 };
-
-template<typename Scalar>
-struct Vector<3, Scalar>
-{
-    union
-    {
-        Scalar v[3];
-        struct
-        {
-            Scalar X;
-            Scalar Y;
-            Scalar Z;
-        };
-    };
-
-    Vector() = default;
-    Vector(Scalar v)
-    {
-        for (size_t i = 0; i < 3; i++)
-        {
-            this->v[i] = v;
-        }
-    }
-    Vector(const Scalar* v)
-    {
-        for (size_t i = 0; i < 3; i++)
-        {
-            this->v[i] = v[i];
-        }
-    }
-    Vector(const std::initializer_list<Scalar>& list)
-    {
-        auto l = list.begin();
-
-        for (size_t i = 0; i < 3; i++)
-        {
-            this->v[i] = (list.end() == l) ? 0 : *l++;
-        }
-    }
-
-    bool IsNaN() const
-    {
-        for (Scalar v : this->v)
-        {
-            if (isnan(v))
-            {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    Scalar& operator[](size_t index)
-    {
-        return this->v[index];
-    }
-    const Scalar& operator[](size_t index) const
-    {
-        return this->v[index];
-    }
-    operator Scalar*()
-    {
-        return this->v;
-    }
-    operator const Scalar*() const
-    {
-        return this->v;
-    }
-
-    Scalar Dot() const
-    {
-        return ::Dot(*this, *this);
-    }
-    Scalar Dot(const Vector<3, Scalar>& other) const
-    {
-        return ::Dot(*this, other);
-    }
-    Scalar Length() const
-    {
-        return ::Length(*this);
-    }
-    Vector<3, Scalar> Cross(const Vector<3, Scalar>& other) const
-    {
-        return ::Cross(*this, other);
-    }
-    Vector<3, Scalar> Normalize() const
-    {
-        return ::Normalize(*this);
-    }
-
-    static const Vector<3, Scalar> NaN, Zero, XAxis, YAxis, ZAxis;
-};
-template<typename Scalar>
-const Vector<3, Scalar> Vector<3, Scalar>::NaN   = { std::numeric_limits<Scalar>::quiet_NaN(), std::numeric_limits<Scalar>::quiet_NaN(), std::numeric_limits<Scalar>::quiet_NaN() };
-template<typename Scalar>
-const Vector<3, Scalar> Vector<3, Scalar>::Zero  = { 0, 0, 0 };
-template<typename Scalar>
-const Vector<3, Scalar> Vector<3, Scalar>::XAxis = { 1, 0, 0 };
-template<typename Scalar>
-const Vector<3, Scalar> Vector<3, Scalar>::YAxis = { 0, 1, 0 };
-template<typename Scalar>
-const Vector<3, Scalar> Vector<3, Scalar>::ZAxis = { 0, 0, 1 };
-
-template<typename Scalar>
-struct Vector<4, Scalar>
-{
-    union
-    {
-        Scalar v[4];
-        struct
-        {
-            Scalar X;
-            Scalar Y;
-            Scalar Z;
-            Scalar W;
-        };
-    };
-
-    Vector() = default;
-    Vector(Scalar v)
-    {
-        for (size_t i = 0; i < 4; i++)
-        {
-            this->v[i] = v;
-        }
-    }
-    Vector(const Scalar* v)
-    {
-        for (size_t i = 0; i < 4; i++)
-        {
-            this->v[i] = v[i];
-        }
-    }
-    Vector(const std::initializer_list<Scalar>& list)
-    {
-        auto l = list.begin();
-
-        for (size_t i = 0; i < 4; i++)
-        {
-            this->v[i] = (list.end() == l) ? 0 : *l++;
-        }
-    }
-
-    bool IsNaN() const
-    {
-        for (Scalar v : this->v)
-        {
-            if (isnan(v))
-            {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    Scalar& operator[](size_t index)
-    {
-        return this->v[index];
-    }
-    const Scalar& operator[](size_t index) const
-    {
-        return this->v[index];
-    }
-    operator Scalar*()
-    {
-        return this->v;
-    }
-    operator const Scalar*() const
-    {
-        return this->v;
-    }
-
-    static const Vector<4, Scalar> NaN, Zero, XYPlane, YZPlane, ZXPlane;
-};
-template<typename Scalar>
-const Vector<4, Scalar> Vector<4, Scalar>::NaN   = { std::numeric_limits<Scalar>::quiet_NaN(), std::numeric_limits<Scalar>::quiet_NaN(), std::numeric_limits<Scalar>::quiet_NaN(), std::numeric_limits<Scalar>::quiet_NaN() };
-template<typename Scalar>
-const Vector<4, Scalar> Vector<4, Scalar>::Zero  = { 0, 0, 0, 0 };
-template<typename Scalar>
-const Vector<4, Scalar> Vector<4, Scalar>::XYPlane = { 0, 0, 1, 0 };
-template<typename Scalar>
-const Vector<4, Scalar> Vector<4, Scalar>::YZPlane = { 1, 0, 0, 0 };
-template<typename Scalar>
-const Vector<4, Scalar> Vector<4, Scalar>::ZXPlane = { 0, 1, 0, 0 };
-
-typedef Vector<3, uint32_t> Element;
-typedef Vector<3> Vertex;
-typedef Vector<3> Normal;
-typedef Vector<2> Coordinate;
-
 template<size_t MRows, size_t MCols = MRows, typename Scalar = float>
 struct Matrix
 {
@@ -673,10 +716,12 @@ struct Matrix
     }
     Matrix(const std::initializer_list<const Vector<MCols, Scalar>>& list)
     {
+        static const Vector<MCols, Scalar> Zero = {0};
+
         auto l = list.begin();
         for (size_t i = 0; i < MRows; i++)
         {
-            this->v[i] = (list.end() == l) ? Vector<MCols, Scalar>((Scalar)0) : *l++;
+            this->v[i] = (list.end() == l) ? Zero : *l++;
         }
     }
 
@@ -692,6 +737,62 @@ struct Matrix
         }
 
         return m;
+    }
+
+    // Not reliable because of numerical stability. Need elimination with pivoting before LU decompose.
+    Matrix<MRows, MRows, Scalar> Inverse() const
+    {
+        Vector<MRows, size_t> s;
+        for (size_t i = 0; i < MRows; i++) s[i] = i;
+
+        Matrix<MRows, MRows, Scalar> m = *this;
+        for (size_t i = 0; i < MRows; i++)
+        {
+            auto row = i;
+            auto max = std::abs(m[i][i]);
+
+            for (size_t j = i + 1; j < MRows; j++)
+            {
+                auto c = std::abs(m[j][i]);
+                if (c > max)
+                {
+                    max = c;
+                    row = j;
+                }
+            }
+
+            if (row != i)
+            {
+                auto v = m[i];
+                m[i] = m[row];
+                m[row] = v;
+
+                auto x = s[i];
+                s[i] = s[row];
+                s[row] = x;
+            }
+        }
+
+        auto id = MatrixIdentity<MRows, Scalar>();
+
+        Matrix<4> p;
+        for (size_t i = 0; i < MRows; i++)
+        {
+            p[i] = id[s[i]];
+        }
+
+        auto u = UpperTriangle(m);
+        auto l = UpperTriangle(m.Transpose());
+
+        for (size_t i = 0; i < MRows; i++)
+        {
+            l[i] /= l[i][i];
+        }
+
+        auto iu = UpperInverse(u);
+        auto il = UpperInverse(l);
+
+        return iu * il.Transpose() * p;
     }
 
     Vector<MCols, Scalar>& operator[](size_t index)
@@ -737,6 +838,17 @@ inline Scalar ScalarHelper(const Matrix<MRows, MCols, Scalar>&)
 }
 
 template<size_t MRows, typename Scalar>
+inline Matrix<MRows, MRows, Scalar> MatrixIdentity()
+{
+    Matrix<MRows, MRows, Scalar> m = {0};
+    for (size_t i = 0; i < MRows; i++)
+    {
+        m[i][i] = 1;
+    }
+    return m;
+}
+
+template<size_t MRows, typename Scalar>
 inline Matrix<MRows, MRows, Scalar> UpperTriangle(const Matrix<MRows, MRows, Scalar>& m)
 {
     auto u = m;
@@ -748,6 +860,7 @@ inline Matrix<MRows, MRows, Scalar> UpperTriangle(const Matrix<MRows, MRows, Sca
         for (size_t j = 0; j < i; j++)
         {
             row -= row[j] / u[j][j] * u[j];
+            row[j] = 0;
         }
     }
 
@@ -755,16 +868,78 @@ inline Matrix<MRows, MRows, Scalar> UpperTriangle(const Matrix<MRows, MRows, Sca
 }
 
 template<size_t MRows, typename Scalar>
-inline void DecomposeLU(const Matrix<MRows, MRows, Scalar>& m, Matrix<MRows, MRows, Scalar>& l, Matrix<MRows, MRows, Scalar>& u)
+inline Matrix<MRows, MRows, Scalar> UpperInverse(const Matrix<MRows, MRows, Scalar>& upperTriangle)
 {
-    u = UpperTriangle(m);
-    l = UpperTriangle(m.Transpose());
+    Matrix<MRows, MRows, Scalar> inv = {0};
+
+    for (int n = (int)(MRows - 1); n >= 0; n--)
+    {
+        inv[n][n] = 1 / upperTriangle[n][n];
+
+        for (int i = n - 1; i >= 0; i--)
+        {
+            Scalar sum = 0;
+            for (int j = i + 1; j <= n; j++)
+            {
+                sum += upperTriangle[i][j] * inv[j][n];
+            }
+
+            inv[i][n] = -sum / upperTriangle[i][i];
+        }
+    }
+
+    return inv;
+}
+
+template<size_t MRows, typename Scalar>
+inline void DecomposeLU(const Matrix<MRows, MRows, Scalar>& m, Matrix<MRows, MRows, Scalar>& p, Matrix<MRows, MRows, Scalar>& l, Matrix<MRows, MRows, Scalar>& u)
+{
+    Vector<MRows, size_t> s;
+    for (size_t i = 0; i < MRows; i++) s[i] = i;
+
+    auto mtx = m;
+    for (size_t i = 0; i < MRows; i++)
+    {
+        auto row = i;
+        auto max = std::abs(mtx[i][i]);
+
+        for (size_t j = i + 1; j < MRows; j++)
+        {
+            auto c = std::abs(mtx[j][i]);
+            if (c > max)
+            {
+                max = c;
+                row = j;
+            }
+        }
+
+        if (row != i)
+        {
+            auto v = mtx[i];
+            mtx[i] = mtx[row];
+            mtx[row] = v;
+
+            auto x = s[i];
+            s[i] = s[row];
+            s[row] = x;
+        }
+    }
+
+    u = UpperTriangle(mtx);
+    l = UpperTriangle(mtx.Transpose());
 
     for (size_t i = 0; i < MRows; i++)
     {
         l[i] /= l[i][i];
     }
     l = l.Transpose();
+
+    auto id = MatrixIdentity<MRows, Scalar>();
+    for (size_t i = 0; i < MRows; i++)
+    {
+        p[i] = id[s[i]];
+    }
+    p = p.Transpose();
 }
 
 template<size_t MRows, size_t MCols, typename Scalar>
@@ -1177,7 +1352,7 @@ public:
         };
     }
 
-    static Matrix<4, 4, Scalar> FromAxisAngle(const Vector<3, Scalar>& axis, float radian)
+    static Matrix<4, 4, Scalar> FromAxisAngle(const Vector<3, Scalar>& axis, Scalar radian)
     {
         auto c = std::cos(radian);
         auto s = std::sin(radian);
