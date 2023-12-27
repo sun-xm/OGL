@@ -104,13 +104,13 @@ inline size_t Dims(const Vector<Dimensions, Scalar>&)
     return Dimensions;
 }
 
-template<typename Scalar, size_t Dimensions>
+template<size_t Dimensions, typename Scalar>
 inline Scalar ScalarHelper(const Vector<Dimensions, Scalar>&)
 {
     return *(Scalar*)nullptr;
 }
 
-template<typename Scalar, size_t Dimensions>
+template<size_t Dimensions, typename Scalar>
 inline Vector<Dimensions, Scalar> operator+(const Vector<Dimensions, Scalar>& first, const Vector<Dimensions, Scalar>& second)
 {
     Vector<Dimensions, Scalar> result;
@@ -123,7 +123,7 @@ inline Vector<Dimensions, Scalar> operator+(const Vector<Dimensions, Scalar>& fi
     return result;
 }
 
-template<typename Scalar, size_t Dimensions>
+template<size_t Dimensions, typename Scalar>
 inline Vector<Dimensions, Scalar> operator-(const Vector<Dimensions, Scalar>& first, const Vector<Dimensions, Scalar>& second)
 {
     Vector<Dimensions, Scalar> result;
@@ -136,7 +136,7 @@ inline Vector<Dimensions, Scalar> operator-(const Vector<Dimensions, Scalar>& fi
     return result;
 }
 
-template<typename Scalar, size_t Dimensions>
+template<size_t Dimensions, typename Scalar>
 inline Vector<Dimensions, Scalar> operator*(const Vector<Dimensions, Scalar>& vector, Scalar scale)
 {
     Vector<Dimensions, Scalar> result;
@@ -149,13 +149,13 @@ inline Vector<Dimensions, Scalar> operator*(const Vector<Dimensions, Scalar>& ve
     return result;
 }
 
-template<typename Scalar, size_t Dimensions>
+template<size_t Dimensions, typename Scalar>
 inline Vector<Dimensions, Scalar> operator*(Scalar scale, const Vector<Dimensions, Scalar>& vector)
 {
     return vector * scale;
 }
 
-template<typename Scalar, size_t Dimensions>
+template<size_t Dimensions, typename Scalar>
 inline Vector<Dimensions, Scalar> operator/(const Vector<Dimensions, Scalar>& vector, Scalar scale)
 {
     Vector<Dimensions, Scalar> result;
@@ -168,7 +168,7 @@ inline Vector<Dimensions, Scalar> operator/(const Vector<Dimensions, Scalar>& ve
     return result;
 }
 
-template<typename Scalar, size_t Dimensions>
+template<size_t Dimensions, typename Scalar>
 inline Vector<Dimensions, Scalar> operator-(const Vector<Dimensions, Scalar>& vector)
 {
     Vector<Dimensions, Scalar> result;
@@ -181,7 +181,7 @@ inline Vector<Dimensions, Scalar> operator-(const Vector<Dimensions, Scalar>& ve
     return result;
 }
 
-template<typename Scalar, size_t Dimensions>
+template<size_t Dimensions, typename Scalar>
 inline Vector<Dimensions, Scalar>& operator+=(Vector<Dimensions, Scalar>& first, const Vector<Dimensions, Scalar>& second)
 {
     for (size_t i = 0; i < Dimensions; i++)
@@ -192,7 +192,7 @@ inline Vector<Dimensions, Scalar>& operator+=(Vector<Dimensions, Scalar>& first,
     return first;
 }
 
-template<typename Scalar, size_t Dimensions>
+template<size_t Dimensions, typename Scalar>
 inline Vector<Dimensions, Scalar>& operator-=(Vector<Dimensions, Scalar>& first, const Vector<Dimensions, Scalar>& second)
 {
     for (size_t i = 0; i < Dimensions; i++)
@@ -203,7 +203,7 @@ inline Vector<Dimensions, Scalar>& operator-=(Vector<Dimensions, Scalar>& first,
     return first;
 }
 
-template<typename Scalar, size_t Dimensions>
+template<size_t Dimensions, typename Scalar>
 inline Vector<Dimensions, Scalar>& operator+=(Vector<Dimensions, Scalar>& first, Scalar second)
 {
     for (size_t i = 0; i < Dimensions; i++)
@@ -214,7 +214,7 @@ inline Vector<Dimensions, Scalar>& operator+=(Vector<Dimensions, Scalar>& first,
     return first;
 }
 
-template<typename Scalar, size_t Dimensions>
+template<size_t Dimensions, typename Scalar>
 inline Vector<Dimensions, Scalar>& operator-=(Vector<Dimensions, Scalar>& first, Scalar second)
 {
     for (size_t i = 0; i < Dimensions; i++)
@@ -225,7 +225,7 @@ inline Vector<Dimensions, Scalar>& operator-=(Vector<Dimensions, Scalar>& first,
     return first;
 }
 
-template<typename Scalar, size_t Dimensions>
+template<size_t Dimensions, typename Scalar>
 inline Vector<Dimensions, Scalar>& operator*=(Vector<Dimensions, Scalar>& vector, Scalar scale)
 {
     for (size_t i = 0; i < Dimensions; i++)
@@ -236,7 +236,7 @@ inline Vector<Dimensions, Scalar>& operator*=(Vector<Dimensions, Scalar>& vector
     return vector;
 }
 
-template<typename Scalar, size_t Dimensions>
+template<size_t Dimensions, typename Scalar>
 inline Vector<Dimensions, Scalar>& operator/=(Vector<Dimensions, Scalar>& vector, Scalar scale)
 {
     for (size_t i = 0; i < Dimensions; i++)
@@ -247,7 +247,7 @@ inline Vector<Dimensions, Scalar>& operator/=(Vector<Dimensions, Scalar>& vector
     return vector;
 }
 
-template<typename Scalar, size_t Dimensions>
+template<size_t Dimensions, typename Scalar>
 inline bool operator==(const Vector<Dimensions, Scalar>& v0, const Vector<Dimensions, Scalar>& v1)
 {
     for (size_t i = 0; i < Dimensions; i++)
@@ -260,13 +260,13 @@ inline bool operator==(const Vector<Dimensions, Scalar>& v0, const Vector<Dimens
     return true;
 }
 
-template<typename Scalar, size_t Dimensions>
+template<size_t Dimensions, typename Scalar>
 inline bool operator!=(const Vector<Dimensions, Scalar>& v0, const Vector<Dimensions, Scalar>& v1)
 {
     return !(v0 == v1);
 }
 
-template<typename Scalar, size_t Dimensions>
+template<size_t Dimensions, typename Scalar>
 inline Scalar Dot(const Vector<Dimensions, Scalar>& v0, const Vector<Dimensions, Scalar>& v1)
 {
     Scalar product = 0;
@@ -277,13 +277,13 @@ inline Scalar Dot(const Vector<Dimensions, Scalar>& v0, const Vector<Dimensions,
     return product;
 }
 
-template<typename Scalar, size_t Dimensions>
+template<size_t Dimensions, typename Scalar>
 inline Scalar Length(const Vector<Dimensions, Scalar>& v)
 {
     return sqrtx(Dot(v, v));
 }
 
-template<typename Scalar, size_t Dimensions>
+template<size_t Dimensions, typename Scalar>
 inline Vector<Dimensions, Scalar> Normalize(const Vector<Dimensions, Scalar>& v)
 {
     return v / Length(v);
@@ -734,6 +734,37 @@ template<size_t MRows, size_t MCols, typename Scalar>
 inline Scalar ScalarHelper(const Matrix<MRows, MCols, Scalar>&)
 {
     return *(Scalar*)nullptr;
+}
+
+template<size_t MRows, typename Scalar>
+inline Matrix<MRows, MRows, Scalar> UpperTriangle(const Matrix<MRows, MRows, Scalar>& m)
+{
+    auto u = m;
+
+    for (size_t i = 1; i < MRows; i++)
+    {
+        auto& row = u[i];
+
+        for (size_t j = 0; j < i; j++)
+        {
+            row -= row[j] / u[j][j] * u[j];
+        }
+    }
+
+    return u;
+}
+
+template<size_t MRows, typename Scalar>
+inline void DecomposeLU(const Matrix<MRows, MRows, Scalar>& m, Matrix<MRows, MRows, Scalar>& l, Matrix<MRows, MRows, Scalar>& u)
+{
+    u = UpperTriangle(m);
+    l = UpperTriangle(m.Transpose());
+
+    for (size_t i = 0; i < MRows; i++)
+    {
+        l[i] /= l[i][i];
+    }
+    l = l.Transpose();
 }
 
 template<size_t MRows, size_t MCols, typename Scalar>
