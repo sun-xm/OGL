@@ -38,73 +38,71 @@ inline Scalar ToDegree(Scalar radian)
     return radian / (Scalar)3.14159265358979323846264338327950288419716939937510l * (Scalar)180.0;
 }
 
+#define VECTOR_IMP(Dimensions, Scalar)\
+    Vector() = default;\
+    explicit Vector(Scalar v)\
+    {\
+        for (size_t i = 0; i < Dimensions; i++)\
+        {\
+            this->v[i] = v;\
+        }\
+    }\
+    explicit Vector(const Scalar* v)\
+    {\
+        for (size_t i = 0; i < Dimensions; i++)\
+        {\
+            this->v[i] = v[i];\
+        }\
+    }\
+    Vector(const std::initializer_list<Scalar>& list)\
+    {\
+        auto l = list.begin();\
+        for (size_t i = 0; i < Dimensions; i++)\
+        {\
+            this->v[i] = (list.end() == l) ? 0 : *l++;\
+        }\
+    }\
+    template<typename S>\
+    explicit Vector(const Vector<Dimensions, S>& other)\
+    {\
+        for (size_t i = 0; i < Dimensions; i++)\
+        {\
+            this->v[i] = (Scalar)other.v[i];\
+        }\
+    }\
+    bool IsNaN() const\
+    {\
+        for (Scalar v : this->v)\
+        {\
+            if (isnan(v))\
+            {\
+                return true;\
+            }\
+        }\
+        return false;\
+    }\
+    Scalar& operator[](size_t index)\
+    {\
+        return this->v[index];\
+    }\
+    const Scalar& operator[](size_t index) const\
+    {\
+        return this->v[index];\
+    }\
+    operator Scalar*()\
+    {\
+        return this->v;\
+    }\
+    operator const Scalar*() const\
+    {\
+        return this->v;\
+    }\
+
 template<size_t Dimensions, typename Scalar = float>
 struct Vector
 {
     Scalar v[Dimensions];
-
-    Vector() = default;
-    Vector(Scalar v)
-    {
-        for (size_t i = 0; i < Dimensions; i++)
-        {
-            this->v[i] = v;
-        }
-    }
-    Vector(const Scalar* v)
-    {
-        for (size_t i = 0; i < Dimensions; i++)
-        {
-            this->v[i] = v[i];
-        }
-    }
-    Vector(const std::initializer_list<Scalar>& list)
-    {
-        auto l = list.begin();
-        for (size_t i = 0; i < Dimensions; i++)
-        {
-            this->v[i] = (list.end() == l) ? 0 : *l++;
-        }
-    }
-
-    template<typename S>
-    explicit Vector(const Vector<Dimensions, S>& other)
-    {
-        for (size_t i = 0; i < Dimensions; i++)
-        {
-            this->v[i] = (Scalar)other.v[i];
-        }
-    }
-
-    bool IsNaN() const
-    {
-        for (Scalar v : this->v)
-        {
-            if (isnan(v))
-            {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    Scalar& operator[](size_t index)
-    {
-        return this->v[index];
-    }
-    const Scalar& operator[](size_t index) const
-    {
-        return this->v[index];
-    }
-    operator Scalar*()
-    {
-        return this->v;
-    }
-    operator const Scalar*() const
-    {
-        return this->v;
-    }
+    VECTOR_IMP(Dimensions, Scalar)
 };
 
 template<typename Scalar>
@@ -120,69 +118,7 @@ struct Vector<2, Scalar>
         };
     };
 
-    Vector() = default;
-    Vector(Scalar v)
-    {
-        for (size_t i = 0; i < 2; i++)
-        {
-            this->v[i] = v;
-        }
-    }
-    Vector(const Scalar* v)
-    {
-        for (size_t i = 0; i < 2; i++)
-        {
-            this->v[i] = v[i];
-        }
-    }
-    Vector(const std::initializer_list<Scalar>& list)
-    {
-        auto l = list.begin();
-
-        for (size_t i = 0; i < 2; i++)
-        {
-            this->v[i] = (list.end() == l) ? 0 : *l++;
-        }
-    }
-
-    template<typename S>
-    explicit Vector(const Vector<2, S>& other)
-    {
-        for (size_t i = 0; i < 2; i++)
-        {
-            this->v[i] = (Scalar)other.v[i];
-        }
-    }
-
-    bool IsNaN() const
-    {
-        for (Scalar v : this->v)
-        {
-            if (isnan(v))
-            {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    Scalar& operator[](size_t index)
-    {
-        return this->v[index];
-    }
-    const Scalar& operator[](size_t index) const
-    {
-        return this->v[index];
-    }
-    operator Scalar*()
-    {
-        return this->v;
-    }
-    operator const Scalar*() const
-    {
-        return this->v;
-    }
+    VECTOR_IMP(2, Scalar)
 
     Scalar Dot() const
     {
@@ -226,69 +162,7 @@ struct Vector<3, Scalar>
         };
     };
 
-    Vector() = default;
-    Vector(Scalar v)
-    {
-        for (size_t i = 0; i < 3; i++)
-        {
-            this->v[i] = v;
-        }
-    }
-    Vector(const Scalar* v)
-    {
-        for (size_t i = 0; i < 3; i++)
-        {
-            this->v[i] = v[i];
-        }
-    }
-    Vector(const std::initializer_list<Scalar>& list)
-    {
-        auto l = list.begin();
-
-        for (size_t i = 0; i < 3; i++)
-        {
-            this->v[i] = (list.end() == l) ? 0 : *l++;
-        }
-    }
-
-    template<typename S>
-    explicit Vector(const Vector<3, S>& other)
-    {
-        for (size_t i = 0; i < 3; i++)
-        {
-            this->v[i] = (Scalar)other.v[i];
-        }
-    }
-
-    bool IsNaN() const
-    {
-        for (Scalar v : this->v)
-        {
-            if (isnan(v))
-            {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    Scalar& operator[](size_t index)
-    {
-        return this->v[index];
-    }
-    const Scalar& operator[](size_t index) const
-    {
-        return this->v[index];
-    }
-    operator Scalar*()
-    {
-        return this->v;
-    }
-    operator const Scalar*() const
-    {
-        return this->v;
-    }
+    VECTOR_IMP(3, Scalar)
 
     Scalar Dot() const
     {
@@ -339,69 +213,7 @@ struct Vector<4, Scalar>
         };
     };
 
-    Vector() = default;
-    Vector(Scalar v)
-    {
-        for (size_t i = 0; i < 4; i++)
-        {
-            this->v[i] = v;
-        }
-    }
-    Vector(const Scalar* v)
-    {
-        for (size_t i = 0; i < 4; i++)
-        {
-            this->v[i] = v[i];
-        }
-    }
-    Vector(const std::initializer_list<Scalar>& list)
-    {
-        auto l = list.begin();
-
-        for (size_t i = 0; i < 4; i++)
-        {
-            this->v[i] = (list.end() == l) ? 0 : *l++;
-        }
-    }
-
-    template<typename S>
-    explicit Vector(const Vector<4, S>& other)
-    {
-        for (size_t i = 0; i < 4; i++)
-        {
-            this->v[i] = (Scalar)other.v[i];
-        }
-    }
-
-    bool IsNaN() const
-    {
-        for (Scalar v : this->v)
-        {
-            if (isnan(v))
-            {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    Scalar& operator[](size_t index)
-    {
-        return this->v[index];
-    }
-    const Scalar& operator[](size_t index) const
-    {
-        return this->v[index];
-    }
-    operator Scalar*()
-    {
-        return this->v;
-    }
-    operator const Scalar*() const
-    {
-        return this->v;
-    }
+    VECTOR_IMP(4, Scalar)
 
     static const Vector<4, Scalar> NaN, Zero, XYPlane, YZPlane, ZXPlane;
 };
@@ -447,6 +259,25 @@ inline Vector<Dimensions, Scalar> operator+(const Vector<Dimensions, Scalar>& fi
 }
 
 template<size_t Dimensions, typename Scalar>
+inline Vector<Dimensions, Scalar> operator+(const Vector<Dimensions, Scalar>& v, Scalar s)
+{
+    Vector<Dimensions, Scalar> result;
+
+    for (size_t i = 0; i < Dimensions; i++)
+    {
+        result.v[i] = v.v[i] + s;
+    }
+
+    return result;
+}
+
+template<size_t Dimensions, typename Scalar>
+inline Vector<Dimensions, Scalar> operator+(Scalar s, const Vector<Dimensions, Scalar>& v)
+{
+    return v + s;
+}
+
+template<size_t Dimensions, typename Scalar>
 inline Vector<Dimensions, Scalar> operator-(const Vector<Dimensions, Scalar>& first, const Vector<Dimensions, Scalar>& second)
 {
     Vector<Dimensions, Scalar> result;
@@ -454,6 +285,32 @@ inline Vector<Dimensions, Scalar> operator-(const Vector<Dimensions, Scalar>& fi
     for (size_t i = 0; i < Dimensions; i++)
     {
         result.v[i] = first.v[i] - second.v[i];
+    }
+
+    return result;
+}
+
+template<size_t Dimensions, typename Scalar>
+inline Vector<Dimensions, Scalar> operator-(const Vector<Dimensions, Scalar>& v, Scalar s)
+{
+    Vector<Dimensions, Scalar> result;
+
+    for (size_t i = 0; i < Dimensions; i++)
+    {
+        result.v[i] = v.v[i] - s;
+    }
+
+    return result;
+}
+
+template<size_t Dimensions, typename Scalar>
+inline Vector<Dimensions, Scalar> operator-(Scalar s, const Vector<Dimensions, Scalar>& v)
+{
+    Vector<Dimensions, Scalar> result;
+
+    for (size_t i = 0; i < Dimensions; i++)
+    {
+        result.v[i] = s - v.v[i];
     }
 
     return result;
@@ -682,71 +539,96 @@ inline Vector<3, Scalar>& operator^=(Vector<3, Scalar>& v0, const Vector<3, Scal
     return v0;
 }
 
+#define MATRIX_IMP(MRows, MCols, Scalar)\
+    Vector<MCols, Scalar> v[MRows];\
+    Matrix() = default;\
+    explicit Matrix(Scalar v)\
+    {\
+        for (size_t i = 0; i < MRows; i++)\
+        {\
+            this->v[i] = Vector<MCols, Scalar>(v);\
+        }\
+    }\
+    explicit Matrix(const Scalar* v)\
+    {\
+        for (size_t i = 0; i < MRows; i++)\
+        {\
+            this->v[i] = v + i * MCols;\
+        }\
+    }\
+    Matrix(const std::initializer_list<Scalar>& list)\
+    {\
+        auto l = list.begin();\
+        for (size_t i = 0; i < MRows; i++)\
+        {\
+            auto& v = this->v[i];\
+            for (size_t j = 0; j < MCols; j++)\
+            {\
+                v[j] = (list.end() == l) ? (Scalar)0 : *l++;\
+            }\
+        }\
+    }\
+    Matrix(const std::initializer_list<const Vector<MCols, Scalar>>& list)\
+    {\
+        static const Vector<MCols, Scalar> Zero = {0};\
+        auto l = list.begin();\
+        for (size_t i = 0; i < MRows; i++)\
+        {\
+            this->v[i] = (list.end() == l) ? Zero : *l++;\
+        }\
+    }\
+    template<typename S>\
+    Matrix(const Matrix<MRows, MCols, S>& other)\
+    {\
+        for (size_t i = 0; i < MRows; i++)\
+        {\
+            this->v[i] = Vector<MCols, Scalar>(other.v[i]);\
+        }\
+    }\
+    Matrix<MCols, MRows, Scalar> Transpose() const\
+    {\
+        Matrix<MCols, MRows, Scalar> m;\
+        for (size_t i = 0; i < MRows; i++)\
+        {\
+            for (size_t j = 0; j < MCols; j++)\
+            {\
+                m[j][i] = this->v[i][j];\
+            }\
+        }\
+        return m;\
+    }\
+    Vector<MCols, Scalar>& operator[](size_t index)\
+    {\
+        return this->v[index];\
+    }\
+    const Vector<MCols, Scalar>& operator[](size_t index) const\
+    {\
+        return this->v[index];\
+    }\
+    const Vector<MCols * MRows, Scalar>& ToVector() const\
+    {\
+        return *(Vector<MCols * MRows, Scalar>*)this->v[0].v;\
+    }\
+    operator Scalar*()\
+    {\
+        return (Scalar*)this->v[0];\
+    }\
+    operator const Scalar*() const\
+    {\
+        return (const Scalar*)this->v[0];\
+    }\
+
 template<size_t MRows, size_t MCols = MRows, typename Scalar = float>
 struct Matrix
 {
-    Vector<MCols, Scalar> v[MRows];
+    MATRIX_IMP(MRows, MCols, Scalar)
+};
 
-    Matrix() = default;
-    Matrix(Scalar v)
-    {
-        for (size_t i = 0; i < MRows; i++)
-        {
-            this->v[i] = v;
-        }
-    }
-    Matrix(const Scalar* v)
-    {
-        for (size_t i = 0; i < MRows; i++)
-        {
-            this->v[i] = v + i * MCols;
-        }
-    }
-    Matrix(const std::initializer_list<Scalar>& list)
-    {
-        auto l = list.begin();
-        for (size_t i = 0; i < MRows; i++)
-        {
-            auto& v = this->v[i];
-            for (size_t j = 0; j < MCols; j++)
-            {
-                v[j] = (list.end() == l) ? (Scalar)0 : *l++;
-            }
-        }
-    }
-    Matrix(const std::initializer_list<const Vector<MCols, Scalar>>& list)
-    {
-        static const Vector<MCols, Scalar> Zero = {0};
+template<size_t MRows, typename Scalar>
+struct Matrix<MRows, MRows, Scalar>
+{
+    MATRIX_IMP(MRows, MRows, Scalar)
 
-        auto l = list.begin();
-        for (size_t i = 0; i < MRows; i++)
-        {
-            this->v[i] = (list.end() == l) ? Zero : *l++;
-        }
-    }
-
-    template<typename S>
-    Matrix(const Matrix<MRows, MCols, S>& other)
-    {
-        for (size_t i = 0; i < MRows; i++)
-        {
-            this->v[i] = Vector<MCols, Scalar>(other.v[i]);
-        }
-    }
-
-    Matrix<MCols, MRows, Scalar> Transpose() const
-    {
-        Matrix<MCols, MRows, Scalar> m;
-        for (size_t i = 0; i < MRows; i++)
-        {
-            for (size_t j = 0; j < MCols; j++)
-            {
-                m[j][i] = this->v[i][j];
-            }
-        }
-
-        return m;
-    }
     Matrix<MRows, MRows, Scalar> Inverse() const
     {
         Vector<MRows, size_t> s;
@@ -802,27 +684,16 @@ struct Matrix
         return iu * il.Transpose() * p;
     }
 
-    Vector<MCols, Scalar>& operator[](size_t index)
+    static Matrix<MRows, MRows, Scalar> Identity()
     {
-        return this->v[index];
-    }
-    const Vector<MCols, Scalar>& operator[](size_t index) const
-    {
-        return this->v[index];
-    }
+        Matrix<MRows, MRows, Scalar> id((Scalar)0);
 
-    const Vector<MCols * MRows, Scalar>& ToVector() const
-    {
-        return *(Vector<MCols * MRows, Scalar>*)this->v[0].v;
-    }
+        for (size_t i = 0; i < MRows; i++)
+        {
+            id[i][i] = 1;
+        }
 
-    operator Scalar*()
-    {
-        return (Scalar*)this->v[0];
-    }
-    operator const Scalar*() const
-    {
-        return (const Scalar*)this->v[0];
+        return id;
     }
 };
 
