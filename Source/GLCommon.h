@@ -553,7 +553,7 @@ inline Vector<3, Scalar>& operator^=(Vector<3, Scalar>& v0, const Vector<3, Scal
     {\
         for (size_t i = 0; i < MRows; i++)\
         {\
-            this->v[i] = v + i * MCols;\
+            this->v[i] = Vector<MCols, Scalar>(v + i * MCols);\
         }\
     }\
     Matrix(const std::initializer_list<Scalar>& list)\
