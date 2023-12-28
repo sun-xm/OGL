@@ -738,8 +738,6 @@ struct Matrix
 
         return m;
     }
-
-    // Not reliable because of numerical stability. Need elimination with pivoting before LU decompose.
     Matrix<MRows, MRows, Scalar> Inverse() const
     {
         Vector<MRows, size_t> s;
