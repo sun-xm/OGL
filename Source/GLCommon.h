@@ -725,6 +725,15 @@ struct Matrix
         }
     }
 
+    template<typename S>
+    Matrix(const Matrix<MRows, MCols, S>& other)
+    {
+        for (size_t i = 0; i < MRows; i++)
+        {
+            this->v[i] = Vector<MCols, Scalar>(other.v[i]);
+        }
+    }
+
     Matrix<MCols, MRows, Scalar> Transpose() const
     {
         Matrix<MCols, MRows, Scalar> m;
@@ -773,7 +782,7 @@ struct Matrix
 
         auto id = MatrixIdentity<MRows, Scalar>();
 
-        Matrix<4> p;
+        Matrix<MRows, MRows, Scalar> p;
         for (size_t i = 0; i < MRows; i++)
         {
             p[i] = id[s[i]];
