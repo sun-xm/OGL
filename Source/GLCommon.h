@@ -62,12 +62,17 @@ inline Scalar ToDegree(Scalar radian)
             this->v[i] = (list.end() == l) ? 0 : *l++;\
         }\
     }\
-    template<typename S>\
-    explicit Vector(const Vector<Dimensions, S>& other)\
+    template<size_t D, typename S>\
+    explicit Vector(const Vector<D, S>& other, const std::initializer_list<Scalar>& list = {})\
     {\
-        for (size_t i = 0; i < Dimensions; i++)\
+        for (size_t i = 0; i < (D < Dimensions ? D : Dimensions); i++)\
         {\
             this->v[i] = (Scalar)other.v[i];\
+        }\
+        auto l = list.begin();\
+        for (size_t i = D; i < Dimensions; i++)\
+        {\
+            this->v[i] = (list.end() == l) ? 0 : *l++;\
         }\
     }\
     bool IsNaN() const\
