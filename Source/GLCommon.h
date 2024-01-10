@@ -709,17 +709,17 @@ inline void DecomposePLU(const Matrix<MRows, MRows, Scalar>& m, Matrix<MRows, MR
             p[row] = x;
         }
 
+        auto& ui = U[p[i]];
         for (size_t j = i + 1; j < MRows; j++)
         {
             auto& uj = U[p[j]];
-            auto& ui = U[p[i]];
 
             auto r = uj[i] / ui[i];
             L[p[j]][i] = r;
 
             for (size_t k = i + 1; k < MRows; k++)
             {
-                U[p[j]][k] -= r * U[p[i]][k];
+                uj[k] -= r * ui[k];
             }
             uj[i] = 0;
         }
