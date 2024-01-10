@@ -636,57 +636,22 @@ struct Matrix<MRows, MRows, Scalar>
 
     Matrix<MRows, MRows, Scalar> Inverse() const
     {
-        Vector<MRows, size_t> s;
-        for (size_t i = 0; i < MRows; i++) s[i] = i;
+        static const auto id = Matrix<MRows, MRows, Scalar>::Identity();
 
-        Matrix<MRows, MRows, Scalar> m = *this;
-        for (size_t i = 0; i < MRows; i++)
-        {
-            auto row = i;
-            auto max = std::abs(m[i][i]);
-
-            for (size_t j = i + 1; j < MRows; j++)
-            {
-                auto c = std::abs(m[j][i]);
-                if (c > max)
-                {
-                    max = c;
-                    row = j;
-                }
-            }
-
-            if (row != i)
-            {
-                auto v = m[i];
-                m[i] = m[row];
-                m[row] = v;
-
-                auto x = s[i];
-                s[i] = s[row];
-                s[row] = x;
-            }
-        }
-
-        auto id = MatrixIdentity<MRows, Scalar>();
+        Matrix<MRows, MRows, Scalar> l, u;
+        Vector<MRows, size_t> v;
+        DecomposePLU(*this, l, u, v);
 
         Matrix<MRows, MRows, Scalar> p;
         for (size_t i = 0; i < MRows; i++)
         {
-            p[i] = id[s[i]];
-        }
-
-        auto u = UpperTriangle(m);
-        auto l = UpperTriangle(m.Transpose());
-
-        for (size_t i = 0; i < MRows; i++)
-        {
-            l[i] /= l[i][i];
+            p[i] = id[v[i]];
         }
 
         auto iu = UpperInverse(u);
-        auto il = UpperInverse(l);
+        auto il = LowerInverse(l);
 
-        return iu * il.Transpose() * p;
+        return iu * il * p;
     }
 
     static Matrix<MRows, MRows, Scalar> Identity()
@@ -714,60 +679,83 @@ inline size_t Cols(const Matrix<MRows, MCols, Scalar>&)
     return MCols;
 }
 
-template<size_t MRows, size_t MCols, typename Scalar>
-inline Scalar ScalarHelper(const Matrix<MRows, MCols, Scalar>&)
-{
-    return *(Scalar*)nullptr;
-}
-
 template<size_t MRows, typename Scalar>
-inline Matrix<MRows, MRows, Scalar> MatrixIdentity()
+inline void DecomposePLU(const Matrix<MRows, MRows, Scalar>& m, Matrix<MRows, MRows, Scalar>& l, Matrix<MRows, MRows, Scalar>& u, Vector<MRows, size_t>& p)
 {
-    Matrix<MRows, MRows, Scalar> m = {0};
-    for (size_t i = 0; i < MRows; i++)
+    for (size_t i = 0; i < MRows; i++) p[i] = i;
+
+    Matrix<MRows, MRows, Scalar> L, U;
+    U = m;
+
+    for (size_t i = 0; i < MRows - 1; i++)
     {
-        m[i][i] = 1;
-    }
-    return m;
-}
+        auto row = i;
+        auto max = std::abs(U[p[i]][i]);
 
-template<size_t MRows, typename Scalar>
-inline Matrix<MRows, MRows, Scalar> UpperTriangle(const Matrix<MRows, MRows, Scalar>& m)
-{
-    auto u = m;
-
-    for (size_t i = 1; i < MRows; i++)
-    {
-        auto& row = u[i];
-
-        for (size_t j = 0; j < i; j++)
+        for (size_t j = i + 1; j < MRows; j++)
         {
-            row -= row[j] / u[j][j] * u[j];
-            row[j] = 0;
+            auto uji = std::abs(U[p[j]][i]);
+            if (uji > max)
+            {
+                max = uji;
+                row = j;
+            }
+        }
+
+        if (row != i)
+        {
+            auto x = p[i];
+            p[i] = p[row];
+            p[row] = x;
+        }
+
+        for (size_t j = i + 1; j < MRows; j++)
+        {
+            auto& uj = U[p[j]];
+            auto& ui = U[p[i]];
+
+            auto r = uj[i] / ui[i];
+            L[p[j]][i] = r;
+
+            for (size_t k = i + 1; k < MRows; k++)
+            {
+                U[p[j]][k] -= r * U[p[i]][k];
+            }
+            uj[i] = 0;
         }
     }
 
-    return u;
+    for (size_t i = 0; i < MRows; i++)
+    {
+        u[i] = U[p[i]];
+
+        auto& Li = L[p[i]];
+        auto& li = l[i];
+        for (size_t j = 0; j < MRows; j++)
+        {
+            li[j] = (j < i ? Li[j] : (j == i ? 1 : 0));
+        }
+    }
 }
 
 template<size_t MRows, typename Scalar>
-inline Matrix<MRows, MRows, Scalar> UpperInverse(const Matrix<MRows, MRows, Scalar>& upperTriangle)
+inline Matrix<MRows, MRows, Scalar> UpperInverse(const Matrix<MRows, MRows, Scalar>& u)
 {
-    Matrix<MRows, MRows, Scalar> inv = {0};
+    Matrix<MRows, MRows, Scalar> inv((Scalar)0);
 
     for (int n = (int)(MRows - 1); n >= 0; n--)
     {
-        inv[n][n] = 1 / upperTriangle[n][n];
+        inv[n][n] = 1 / u[n][n];
 
         for (int i = n - 1; i >= 0; i--)
         {
             Scalar sum = 0;
             for (int j = i + 1; j <= n; j++)
             {
-                sum += upperTriangle[i][j] * inv[j][n];
+                sum += u[i][j] * inv[j][n];
             }
 
-            inv[i][n] = -sum / upperTriangle[i][i];
+            inv[i][n] = -sum / u[i][i];
         }
     }
 
@@ -775,54 +763,27 @@ inline Matrix<MRows, MRows, Scalar> UpperInverse(const Matrix<MRows, MRows, Scal
 }
 
 template<size_t MRows, typename Scalar>
-inline void DecomposeLU(const Matrix<MRows, MRows, Scalar>& m, Matrix<MRows, MRows, Scalar>& p, Matrix<MRows, MRows, Scalar>& l, Matrix<MRows, MRows, Scalar>& u)
+inline Matrix<MRows, MRows, Scalar> LowerInverse(const Matrix<MRows, MRows, Scalar>& l)
 {
-    Vector<MRows, size_t> s;
-    for (size_t i = 0; i < MRows; i++) s[i] = i;
+    Matrix<MRows, MRows, Scalar> inv((Scalar)0);
 
-    auto mtx = m;
-    for (size_t i = 0; i < MRows; i++)
+    for (int n = 0; n < (int)MRows; n++)
     {
-        auto row = i;
-        auto max = std::abs(mtx[i][i]);
+        inv[n][n] = 1 / l[n][n];
 
-        for (size_t j = i + 1; j < MRows; j++)
+        for (int i = n + 1; i < MRows; i++)
         {
-            auto c = std::abs(mtx[j][i]);
-            if (c > max)
+            Scalar sum = 0;
+            for (int j = n; j < i; j++)
             {
-                max = c;
-                row = j;
+                sum += l[i][j] * inv[j][n];
             }
-        }
 
-        if (row != i)
-        {
-            auto v = mtx[i];
-            mtx[i] = mtx[row];
-            mtx[row] = v;
-
-            auto x = s[i];
-            s[i] = s[row];
-            s[row] = x;
+            inv[i][n] = -sum / l[i][i];
         }
     }
 
-    u = UpperTriangle(mtx);
-    l = UpperTriangle(mtx.Transpose());
-
-    for (size_t i = 0; i < MRows; i++)
-    {
-        l[i] /= l[i][i];
-    }
-    l = l.Transpose();
-
-    auto id = MatrixIdentity<MRows, Scalar>();
-    for (size_t i = 0; i < MRows; i++)
-    {
-        p[i] = id[s[i]];
-    }
-    p = p.Transpose();
+    return inv;
 }
 
 template<size_t MRows, size_t MCols, typename Scalar>
