@@ -989,7 +989,7 @@ struct Quaternion : public Vector<4, Scalar>
 
         if (std::abs(s) < FLT_EPSILON)
         {
-            return Vector<4, Scalar>{ 0, 0, 0, 0 };
+            return Vector<4, Scalar>{ 1, 0, 0, 0 };
         }
 
         return Vector<4, Scalar>{ this->v[0] / s, this->v[1] / s, this->v[2] / s, ToDegree(a * 2) };
