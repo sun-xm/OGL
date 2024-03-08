@@ -590,6 +590,17 @@ inline Vector<3, Scalar>& operator^=(Vector<3, Scalar>& v0, const Vector<3, Scal
             this->v[i] = Vector<MCols, Scalar>(other.v[i]);\
         }\
     }\
+    bool IsNaN() const\
+    {\
+        for (size_t i = 0; i < MRows; i++)\
+        {\
+            if (this->v[i].IsNaN())\
+            {\
+                return true;\
+            }\
+        }\
+        return false;\
+    }\
     Matrix<MCols, MRows, Scalar> Transpose() const\
     {\
         Matrix<MCols, MRows, Scalar> m;\
