@@ -236,6 +236,7 @@ const Vector<4, Scalar> Vector<4, Scalar>::ZXPlane = { 0, 1, 0, 0 };
 typedef Vector<3, uint32_t> Element;
 typedef Vector<3> Vertex;
 typedef Vector<3> Normal;
+typedef Vector<4> Color;
 typedef Vector<2> Coordinate;
 
 template<size_t Dimensions, typename Scalar>

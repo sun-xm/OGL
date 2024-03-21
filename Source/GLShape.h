@@ -29,6 +29,10 @@ public:
     {
         return this->nbo.Data(normals, count * sizeof(*normals), GL_STATIC_DRAW);
     }
+    bool Colors(const Color* colors, size_t count)
+    {
+        return this->cbo.Data(colors, count * sizeof(*colors), GL_STATIC_DRAW);
+    }
     bool TexCoords(const Coordinate* coords, size_t count)
     {
         return this->tbo.Data(coords, count * sizeof(*coords), GL_STATIC_DRAW);
@@ -103,6 +107,7 @@ public:
         this->nbo.Release();
         this->tbo.Release();
         this->vbo.Release();
+        this->cbo.Release();
         this->ebo.Release();
     }
 
@@ -142,6 +147,7 @@ protected:
         if (vc)
         {
             this->ApplyNormals();
+            this->ApplyColors();
             this->ApplyTexCoords();
             this->ApplyTexture();
             this->material.Apply();
@@ -168,6 +174,18 @@ protected:
             glNormalPointer(GL_FLOAT, 0, 0);
             glEnableClientState(GL_NORMAL_ARRAY);
             return this->nbo.Size() / sizeof(Normal);
+        }
+
+        return 0;
+    }
+    virtual size_t ApplyColors()
+    {
+        if (this->cbo && this->cbo.Size())
+        {
+            this->cbo.Bind();
+            glColorPointer(4, GL_FLOAT, 0, 0);
+            glEnableClientState(GL_COLOR_ARRAY);
+            return this->cbo.Size() / sizeof(Color);
         }
 
         return 0;
@@ -220,6 +238,14 @@ protected:
             glDisableClientState(GL_NORMAL_ARRAY);
         }
     }
+    virtual void RevokeColors()
+    {
+        if (this->cbo)
+        {
+            this->cbo.Bind();
+            glDisableClientState(GL_COLOR_ARRAY);
+        }
+    }
     virtual void RevokeTexCoords()
     {
         if (this->tbo)
@@ -242,7 +268,7 @@ protected:
 
     GLenum mode;
     GLElmBuf ebo;
-    GLBuffer vbo, nbo, tbo;
+    GLBuffer vbo, nbo, tbo, cbo;
     GLTexture  texture;
     GLMaterial material;
 
