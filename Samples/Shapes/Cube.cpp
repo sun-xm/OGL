@@ -5,7 +5,7 @@ Cube::Cube()
 {
     for (int i = 0; i < 6; i++)
     {
-        this->AddChild(new Square());
+        this->AddChild(std::make_shared<Square>());
     }
 
     this->children[0]->Position.Z =  .5f;  // front
@@ -20,13 +20,4 @@ Cube::Cube()
     this->children[3]->Rotation = Quaternion<>::FromAxisAngle(Vertex::YAxis, ToRadian( 90.f)).ToRotation();    // right
     this->children[4]->Rotation = Quaternion<>::FromAxisAngle(Vertex::XAxis, ToRadian(-90.f)).ToRotation();    // top
     this->children[5]->Rotation = Quaternion<>::FromAxisAngle(Vertex::XAxis, ToRadian( 90.f)).ToRotation();    // bottom
-}
-
-Cube::~Cube()
-{
-    for (auto child : this->children)
-    {
-        delete child;
-    }
-    this->children.clear();
 }

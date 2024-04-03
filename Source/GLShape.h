@@ -4,6 +4,8 @@
 #include "GLScene.h"
 #include "GLTexture.h"
 #include "GLMaterial.h"
+#include <algorithm>
+#include <memory>
 #include <vector>
 
 class GLShape : public GLObject
@@ -117,9 +119,9 @@ public:
     }
     bool HasChild(const GLShape* child) const
     {
-        for (auto c : this->children)
+        for (auto& c : this->children)
         {
-            if (c == child)
+            if (c.get() == child)
             {
                 return true;
             }
@@ -127,7 +129,7 @@ public:
 
         return false;
     }
-    void AddChild(GLShape* child)
+    void AddChild(const std::shared_ptr<GLShape>& child)
     {
         if (child)
         {
@@ -137,11 +139,16 @@ public:
     }
     void RemoveChild(const GLShape* child)
     {
-        this->children.erase(std::find(this->children.begin(), this->children.end(), child));
+        this->children.erase(std::find_if(this->children.begin(), this->children.end(), [child](const std::shared_ptr<GLShape>& p){ return p.get() == child; }));
     }
     void ClearChildren()
     {
         this->children.clear();
+    }
+
+    const std::vector<std::shared_ptr<GLShape>>& Children() const
+    {
+        return this->children;
     }
 
 protected:
@@ -277,5 +284,5 @@ protected:
     GLMaterial material;
 
     GLShape* parent;
-    std::vector<GLShape*> children;
+    std::vector<std::shared_ptr<GLShape>> children;
 };

@@ -6,5 +6,4 @@ class Cube : public GLShape
 {
 public:
     Cube();
-   ~Cube() override;
 };
