@@ -139,6 +139,10 @@ public:
     {
         this->children.erase(std::find(this->children.begin(), this->children.end(), child));
     }
+    void ClearChildren()
+    {
+        this->children.clear();
+    }
 
 protected:
     virtual size_t Apply(const GLScene&)
