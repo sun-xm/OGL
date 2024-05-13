@@ -545,108 +545,70 @@ inline Vector<3, Scalar>& operator^=(Vector<3, Scalar>& v0, const Vector<3, Scal
     return v0;
 }
 
-#define MATRIX_IMP(MRows, MCols, Scalar)\
-    Vector<MCols, Scalar> v[MRows];\
-    Matrix() = default;\
-    explicit Matrix(Scalar v)\
-    {\
-        for (size_t i = 0; i < MRows; i++)\
-        {\
-            this->v[i] = Vector<MCols, Scalar>(v);\
-        }\
-    }\
-    explicit Matrix(const Scalar* v)\
-    {\
-        for (size_t i = 0; i < MRows; i++)\
-        {\
-            this->v[i] = Vector<MCols, Scalar>(v + i * MCols);\
-        }\
-    }\
-    Matrix(const std::initializer_list<Scalar>& list)\
-    {\
-        auto l = list.begin();\
-        for (size_t i = 0; i < MRows; i++)\
-        {\
-            auto& v = this->v[i];\
-            for (size_t j = 0; j < MCols; j++)\
-            {\
-                v[j] = (list.end() == l) ? (Scalar)0 : *l++;\
-            }\
-        }\
-    }\
-    Matrix(const std::initializer_list<const Vector<MCols, Scalar>>& list)\
-    {\
-        static const Vector<MCols, Scalar> Zero = {0};\
-        auto l = list.begin();\
-        for (size_t i = 0; i < MRows; i++)\
-        {\
-            this->v[i] = (list.end() == l) ? Zero : *l++;\
-        }\
-    }\
-    template<typename S>\
-    Matrix(const Matrix<MRows, MCols, S>& other)\
-    {\
-        for (size_t i = 0; i < MRows; i++)\
-        {\
-            this->v[i] = Vector<MCols, Scalar>(other.v[i]);\
-        }\
-    }\
-    bool IsNaN() const\
-    {\
-        for (size_t i = 0; i < MRows; i++)\
-        {\
-            if (this->v[i].IsNaN())\
-            {\
-                return true;\
-            }\
-        }\
-        return false;\
-    }\
-    Matrix<MCols, MRows, Scalar> Transpose() const\
-    {\
-        Matrix<MCols, MRows, Scalar> m;\
-        for (size_t i = 0; i < MRows; i++)\
-        {\
-            for (size_t j = 0; j < MCols; j++)\
-            {\
-                m[j][i] = this->v[i][j];\
-            }\
-        }\
-        return m;\
-    }\
-    Vector<MCols, Scalar>& operator[](size_t index)\
-    {\
-        return this->v[index];\
-    }\
-    const Vector<MCols, Scalar>& operator[](size_t index) const\
-    {\
-        return this->v[index];\
-    }\
-    const Vector<MCols * MRows, Scalar>& ToVector() const\
-    {\
-        return *(Vector<MCols * MRows, Scalar>*)this->v[0].v;\
-    }\
-    operator Scalar*()\
-    {\
-        return (Scalar*)this->v[0];\
-    }\
-    operator const Scalar*() const\
-    {\
-        return (const Scalar*)this->v[0];\
-    }\
-
 template<size_t MRows, size_t MCols = MRows, typename Scalar = float>
 struct Matrix
 {
-    MATRIX_IMP(MRows, MCols, Scalar)
-};
+    Vector<MCols, Scalar> v[MRows];
 
-template<size_t MRows, typename Scalar>
-struct Matrix<MRows, MRows, Scalar>
-{
-    MATRIX_IMP(MRows, MRows, Scalar)
+    Matrix() = default;
+    explicit Matrix(Scalar v)
+    {
+        for (size_t i = 0; i < MRows; i++)
+        {
+            this->v[i] = Vector<MCols, Scalar>(v);
+        }
+    }
+    explicit Matrix(const Scalar* v)
+    {
+        for (size_t i = 0; i < MRows; i++)
+        {
+            this->v[i] = Vector<MCols, Scalar>(v + i * MCols);
+        }
+    }
+    Matrix(const std::initializer_list<Scalar>& list)
+    {
+        auto l = list.begin();
+        for (size_t i = 0; i < MRows; i++)
+        {
+            auto& v = this->v[i];
+            for (size_t j = 0; j < MCols; j++)
+            {
+                v[j] = (list.end() == l) ? (Scalar)0 : *l++;
+            }
+        }
+    }
+    Matrix(const std::initializer_list<const Vector<MCols, Scalar>>& list)
+    {
+        static const Vector<MCols, Scalar> Zero = {0};
+        auto l = list.begin();
+        for (size_t i = 0; i < MRows; i++)
+        {
+            this->v[i] = (list.end() == l) ? Zero : *l++;
+        }
+    }
+    template<typename S>
+    Matrix(const Matrix<MRows, MCols, S>& other)
+    {
+        for (size_t i = 0; i < MRows; i++)
+        {
+            this->v[i] = Vector<MCols, Scalar>(other.v[i]);
+        }
+    }
 
-    Matrix<MRows, MRows, Scalar> Inverse() const
+    bool IsNaN() const
+    {
+        for (size_t i = 0; i < MRows; i++)
+        {
+            if (this->v[i].IsNaN())
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    template<size_t D = MRows, typename std::enable_if<D == MCols, Scalar>::type* = 0>
+    Matrix<D, D, Scalar> Inverse() const
     {
         static const auto id = Matrix<MRows, MRows, Scalar>::Identity();
 
@@ -666,7 +628,44 @@ struct Matrix<MRows, MRows, Scalar>
         return iu * il * p;
     }
 
-    static Matrix<MRows, MRows, Scalar> Identity()
+    Matrix<MCols, MRows, Scalar> Transpose() const
+    {
+        Matrix<MCols, MRows, Scalar> m;
+        for (size_t i = 0; i < MRows; i++)
+        {
+            for (size_t j = 0; j < MCols; j++)
+            {
+                m[j][i] = this->v[i][j];
+            }
+        }
+        return m;
+    }
+
+    const Vector<MCols * MRows, Scalar>& ToVector() const
+    {
+        return *(Vector<MCols * MRows, Scalar>*)this->v[0].v;
+    }
+
+    Vector<MCols, Scalar>& operator[](size_t index)
+    {
+        return this->v[index];
+    }
+    const Vector<MCols, Scalar>& operator[](size_t index) const
+    {
+        return this->v[index];
+    }
+
+    operator Scalar*()
+    {
+        return (Scalar*)this->v[0];
+    }
+    operator const Scalar*() const
+    {
+        return (const Scalar*)this->v[0];
+    }
+
+    template<size_t D = MRows, typename std::enable_if<D == MCols, Scalar>::type* = 0>
+    static Matrix<D, D, Scalar> Identity()
     {
         Matrix<MRows, MRows, Scalar> id((Scalar)0);
 
