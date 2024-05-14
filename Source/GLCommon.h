@@ -824,8 +824,6 @@ struct Matrix
     template<size_t D = MRows, typename std::enable_if<D == MCols, Scalar>::type* = 0>
     Matrix<D, D, Scalar> Inverse() const
     {
-        static const auto id = Matrix<MRows, MRows, Scalar>::Identity();
-
         Matrix<MRows, MRows, Scalar> l, u;
         Vector<MRows, size_t> v;
         DecomposePLU(*this, l, u, v);
@@ -833,7 +831,7 @@ struct Matrix
         Matrix<MRows, MRows, Scalar> p;
         for (size_t i = 0; i < MRows; i++)
         {
-            p[i] = id[v[i]];
+            p[i] = Matrix<MRows, MRows, Scalar>::Identity[v[i]];
         }
 
         auto iu = UpperInverse(u);
@@ -878,19 +876,25 @@ struct Matrix
         return (const Scalar*)this->v[0];
     }
 
-    template<size_t D = MRows, typename std::enable_if<D == MCols, Scalar>::type* = 0>
-    static Matrix<D, D, Scalar> Identity()
-    {
-        Matrix<MRows, MRows, Scalar> id((Scalar)0);
-
-        for (size_t i = 0; i < MRows; i++)
-        {
-            id[i][i] = 1;
-        }
-
-        return id;
-    }
+    static const Matrix<MRows, MRows, Scalar> Identity;
 };
+
+template<size_t MRows, size_t MCols,  typename Scalar>
+const Matrix<MRows, MRows, Scalar> Matrix<MRows, MCols, Scalar>::Identity = MtxIdentity<MRows, Scalar>();
+
+template<size_t Dimensions, typename Scalar>
+inline Matrix<Dimensions, Dimensions, Scalar> MtxIdentity()
+{
+    Matrix<Dimensions, Dimensions, Scalar> id;
+    for (size_t i = 0; i < Dimensions; i++)
+    {
+        for (size_t j = 0; j < Dimensions; j++)
+        {
+            id[i][j] = (Scalar)(i == j ? 1 : 0);
+        }
+    }
+    return id;
+}
 
 template<size_t MRows, size_t MCols, typename Scalar>
 inline size_t Rows(const Matrix<MRows, MCols, Scalar>&)
@@ -1326,11 +1330,9 @@ template<typename Scalar = float>
 class Transform2D
 {
 public:
-    static Matrix<3, 3, Scalar> Identity()
+    static const Matrix<3, 3, Scalar>& Identity()
     {
-        return Matrix<3, 3, Scalar>{{ 1, 0, 0 },
-                                    { 0, 1, 0 },
-                                    { 0, 0, 1 }};
+        return Matrix<3, 3, Scalar>::Identity;
     }
 
     static Matrix<3, 3, Scalar> Shift(Scalar x, Scalar y)
@@ -1362,12 +1364,9 @@ template<typename Scalar = float>
 class Transform3D
 {
 public:
-    static Matrix<4, 4, Scalar> Identity()
+    static const Matrix<4, 4, Scalar>& Identity()
     {
-        return Matrix<4, 4, Scalar>{{ 1, 0, 0, 0 },
-                                    { 0, 1, 0, 0 },
-                                    { 0, 0, 1, 0 },
-                                    { 0, 0, 0, 1 }};
+        return Matrix<4, 4, Scalar>::Identity;
     }
 
     static Matrix<4, 4, Scalar> Shift(Scalar x, Scalar y, Scalar z)
