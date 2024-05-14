@@ -759,27 +759,28 @@ inline Vector<3, Scalar>& operator^=(Vector<3, Scalar>& v0, const Vector<3, Scal
     return v0;
 }
 
-template<size_t MRows, size_t MCols = MRows, typename Scalar = float>
-struct Matrix
+// template<template<size_t R, size_t C, typename S> typename Matrix, size_t MRows, size_t MCols, typename Scalar> not supported by vs2013
+template<typename Matrix, typename MTrans, size_t MRows, size_t MCols, typename Scalar>
+struct MatrixBase
 {
     Vector<MCols, Scalar> v[MRows];
 
-    Matrix() = default;
-    explicit Matrix(Scalar v)
+    MatrixBase() = default;
+    explicit MatrixBase(Scalar v)
     {
         for (size_t i = 0; i < MRows; i++)
         {
             this->v[i] = Vector<MCols, Scalar>(v);
         }
     }
-    explicit Matrix(const Scalar* v)
+    explicit MatrixBase(const Scalar* v)
     {
         for (size_t i = 0; i < MRows; i++)
         {
             this->v[i] = Vector<MCols, Scalar>(v + i * MCols);
         }
     }
-    Matrix(const std::initializer_list<Scalar>& list)
+    MatrixBase(const std::initializer_list<Scalar>& list)
     {
         auto l = list.begin();
         for (size_t i = 0; i < MRows; i++)
@@ -791,7 +792,7 @@ struct Matrix
             }
         }
     }
-    Matrix(const std::initializer_list<const Vector<MCols, Scalar>>& list)
+    MatrixBase(const std::initializer_list<const Vector<MCols, Scalar>>& list)
     {
         static const Vector<MCols, Scalar> Zero = {0};
         auto l = list.begin();
@@ -800,8 +801,8 @@ struct Matrix
             this->v[i] = (list.end() == l) ? Zero : *l++;
         }
     }
-    template<typename S>
-    Matrix(const Matrix<MRows, MCols, S>& other)
+    template<typename M, typename T, typename S>
+    MatrixBase(const MatrixBase<M, T, MRows, MCols, S>& other)
     {
         for (size_t i = 0; i < MRows; i++)
         {
@@ -821,28 +822,9 @@ struct Matrix
         return false;
     }
 
-    template<size_t D = MRows, typename std::enable_if<D == MCols, Scalar>::type* = 0>
-    Matrix<D, D, Scalar> Inverse() const
+    MTrans Transpose() const
     {
-        Matrix<MRows, MRows, Scalar> l, u;
-        Vector<MRows, size_t> v;
-        DecomposePLU(*this, l, u, v);
-
-        Matrix<MRows, MRows, Scalar> p;
-        for (size_t i = 0; i < MRows; i++)
-        {
-            p[i] = Matrix<MRows, MRows, Scalar>::Identity[v[i]];
-        }
-
-        auto iu = UpperInverse(u);
-        auto il = LowerInverse(l);
-
-        return iu * il * p;
-    }
-
-    Matrix<MCols, MRows, Scalar> Transpose() const
-    {
-        Matrix<MCols, MRows, Scalar> m;
+        MatrixBase<MTrans, Matrix, MCols, MRows, Scalar> m;
         for (size_t i = 0; i < MRows; i++)
         {
             for (size_t j = 0; j < MCols; j++)
@@ -850,7 +832,7 @@ struct Matrix
                 m[j][i] = this->v[i][j];
             }
         }
-        return m;
+        return (MTrans&)m;
     }
 
     const Vector<MCols * MRows, Scalar>& ToVector() const
@@ -875,20 +857,72 @@ struct Matrix
     {
         return (const Scalar*)this->v[0];
     }
-
-    static const Matrix<MRows, MRows, Scalar> Identity;
 };
 
-template<size_t MRows, size_t MCols,  typename Scalar>
-const Matrix<MRows, MRows, Scalar> Matrix<MRows, MCols, Scalar>::Identity = MtxIdentity<MRows, Scalar>();
-
-template<size_t Dimensions, typename Scalar>
-inline Matrix<Dimensions, Dimensions, Scalar> MtxIdentity()
+template<size_t MRows, size_t MCols = MRows, typename Scalar = float>
+struct Matrix : MatrixBase<Matrix<MRows, MCols, Scalar>, Matrix<MCols, MRows, Scalar>, MRows, MCols, Scalar>
 {
-    Matrix<Dimensions, Dimensions, Scalar> id;
-    for (size_t i = 0; i < Dimensions; i++)
+    using TransType = Matrix<MCols, MRows, Scalar>;
+    #if (defined(_MSC_VER) && _MSC_VER < 1900)
+    Matrix() : MatrixBase<Matrix, TransType, MRows, MCols, Scalar>() {}
+    explicit Matrix(Scalar v) : MatrixBase<Matrix, TransType, MRows, MCols, Scalar>(v) {}
+    explicit Matrix(const Scalar* v) : MatrixBase<Matrix, TransType, MRows, MCols, Scalar>(v) {}
+    Matrix(const std::initializer_list<Scalar>& list) : MatrixBase<Matrix, TransType, MRows, MCols, Scalar>(list) {}
+    Matrix(const std::initializer_list<const Vector<MCols, Scalar>>& list) : MatrixBase<Matrix, TransType, MRows, MCols, Scalar>(list) {}
+    template<typename S>
+    Matrix(const Matrix<MRows, MCols, S>& other) : MatrixBase<Matrix, TransType, MRows, MCols, Scalar>::MatrixBase((const MatrixBase<Matrix<MRows, MCols, S>, Matrix<MCols, MRows, S>, MRows, MCols, S>&)other) {}
+    #else
+    using MatrixBase<Matrix, TransType, MRows, MCols, Scalar>::MatrixBase;
+    #endif
+};
+
+template<size_t Dims, typename Scalar>
+struct Matrix<Dims, Dims, Scalar> : MatrixBase<Matrix<Dims, Dims, Scalar>, Matrix<Dims, Dims, Scalar>, Dims, Dims, Scalar>
+{
+    using TransType = Matrix<Dims, Dims, Scalar>;
+    #if (defined(_MSC_VER) && _MSC_VER < 1900)
+    Matrix() : MatrixBase<Matrix, TransType, Dims, Dims, Scalar>() {}
+    explicit Matrix(Scalar v) : MatrixBase<Matrix, TransType, Dims, Dims, Scalar>(v) {}
+    explicit Matrix(const Scalar* v) : MatrixBase<Matrix, TransType, Dims, Dims, Scalar>(v) {}
+    Matrix(const std::initializer_list<Scalar>& list) : MatrixBase<Matrix, TransType, Dims, Dims, Scalar>(list) {}
+    Matrix(const std::initializer_list<const Vector<Dims, Scalar>>& list) : MatrixBase<Matrix, TransType, Dims, Dims, Scalar>(list) {}
+    template<typename S>
+    Matrix(const Matrix<Dims, Dims, S>& other) : MatrixBase<Matrix, TransType, Dims, Dims, Scalar>((const MatrixBase<Matrix<Dims, Dims, S>, Matrix<Dims, Dims, S>, Dims, Dims, S>&)other) {}
+    #else
+    using MatrixBase<Matrix, TransType, Dims, Dims, Scalar>::MatrixBase;
+    #endif
+
+    Matrix Inverse() const
     {
-        for (size_t j = 0; j < Dimensions; j++)
+        Matrix l, u;
+        Vector<Dims, size_t> v;
+        DecomposePLU(*this, l, u, v);
+
+        Matrix p;
+        for (size_t i = 0; i < Dims; i++)
+        {
+            p[i] = Matrix::Identity[v[i]];
+        }
+
+        auto iu = UpperInverse(u);
+        auto il = LowerInverse(l);
+
+        return iu * il * p;
+    }
+
+    static const Matrix<Dims, Dims, Scalar> Identity;
+};
+
+template<size_t Dims, typename Scalar>
+const Matrix<Dims, Dims, Scalar> Matrix<Dims, Dims, Scalar>::Identity = MtxIdentity<Dims, Scalar>();
+
+template<size_t Dims, typename Scalar>
+inline Matrix<Dims, Dims, Scalar> MtxIdentity()
+{
+    Matrix<Dims, Dims, Scalar> id;
+    for (size_t i = 0; i < Dims; i++)
+    {
+        for (size_t j = 0; j < Dims; j++)
         {
             id[i][j] = (Scalar)(i == j ? 1 : 0);
         }
