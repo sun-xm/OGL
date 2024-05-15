@@ -759,8 +759,7 @@ inline Vector<3, Scalar>& operator^=(Vector<3, Scalar>& v0, const Vector<3, Scal
     return v0;
 }
 
-// template<template<size_t R, size_t C, typename S> typename Matrix, size_t MRows, size_t MCols, typename Scalar> not supported by vs2013
-template<typename Matrix, typename MTrans, size_t MRows, size_t MCols, typename Scalar>
+template<template<size_t R, size_t C, typename S> class MType, size_t MRows, size_t MCols, typename Scalar>
 struct MatrixBase
 {
     Vector<MCols, Scalar> v[MRows];
@@ -801,8 +800,8 @@ struct MatrixBase
             this->v[i] = (list.end() == l) ? Zero : *l++;
         }
     }
-    template<typename M, typename T, typename S>
-    MatrixBase(const MatrixBase<M, T, MRows, MCols, S>& other)
+    template<typename S>
+    MatrixBase(const MType<MRows, MCols, S>& other)
     {
         for (size_t i = 0; i < MRows; i++)
         {
@@ -822,9 +821,9 @@ struct MatrixBase
         return false;
     }
 
-    MTrans Transpose() const
+    MType<MCols, MRows, Scalar> Transpose() const
     {
-        MatrixBase<MTrans, Matrix, MCols, MRows, Scalar> m;
+        MatrixBase<MType, MCols, MRows, Scalar> m;
         for (size_t i = 0; i < MRows; i++)
         {
             for (size_t j = 0; j < MCols; j++)
@@ -832,12 +831,12 @@ struct MatrixBase
                 m[j][i] = this->v[i][j];
             }
         }
-        return (MTrans&)m;
+        return (MType<MCols, MRows, Scalar>&)m;
     }
 
-    const Vector<MCols * MRows, Scalar>& ToVector() const
+    const Vector<MRows * MCols, Scalar>& ToVector() const
     {
-        return *(Vector<MCols * MRows, Scalar>*)this->v[0].v;
+        return *(Vector<MRows * MCols, Scalar>*)this->v[0].v;
     }
 
     Vector<MCols, Scalar>& operator[](size_t index)
@@ -860,36 +859,34 @@ struct MatrixBase
 };
 
 template<size_t MRows, size_t MCols = MRows, typename Scalar = float>
-struct Matrix : MatrixBase<Matrix<MRows, MCols, Scalar>, Matrix<MCols, MRows, Scalar>, MRows, MCols, Scalar>
+struct Matrix : MatrixBase<Matrix, MRows, MCols, Scalar>
 {
-    using TransType = Matrix<MCols, MRows, Scalar>;
     #if (defined(_MSC_VER) && _MSC_VER < 1900)
-    Matrix() : MatrixBase<Matrix, TransType, MRows, MCols, Scalar>() {}
-    explicit Matrix(Scalar v) : MatrixBase<Matrix, TransType, MRows, MCols, Scalar>(v) {}
-    explicit Matrix(const Scalar* v) : MatrixBase<Matrix, TransType, MRows, MCols, Scalar>(v) {}
-    Matrix(const std::initializer_list<Scalar>& list) : MatrixBase<Matrix, TransType, MRows, MCols, Scalar>(list) {}
-    Matrix(const std::initializer_list<const Vector<MCols, Scalar>>& list) : MatrixBase<Matrix, TransType, MRows, MCols, Scalar>(list) {}
+    Matrix() : MatrixBase() {}
+    explicit Matrix(Scalar v) : MatrixBase(v) {}
+    explicit Matrix(const Scalar* v) : MatrixBase(v) {}
+    Matrix(const std::initializer_list<Scalar>& list) : MatrixBase(list) {}
+    Matrix(const std::initializer_list<const Vector<MCols, Scalar>>& list) : MatrixBase(list) {}
     template<typename S>
-    Matrix(const Matrix<MRows, MCols, S>& other) : MatrixBase<Matrix, TransType, MRows, MCols, Scalar>::MatrixBase((const MatrixBase<Matrix<MRows, MCols, S>, Matrix<MCols, MRows, S>, MRows, MCols, S>&)other) {}
+    Matrix(const Matrix<MRows, MCols, S>& other) : MatrixBase(other) {}
     #else
-    using MatrixBase<Matrix, TransType, MRows, MCols, Scalar>::MatrixBase;
+    using MatrixBase::MatrixBase;
     #endif
 };
 
 template<size_t Dims, typename Scalar>
-struct Matrix<Dims, Dims, Scalar> : MatrixBase<Matrix<Dims, Dims, Scalar>, Matrix<Dims, Dims, Scalar>, Dims, Dims, Scalar>
+struct Matrix<Dims, Dims, Scalar> : MatrixBase<Matrix, Dims, Dims, Scalar>
 {
-    using TransType = Matrix<Dims, Dims, Scalar>;
     #if (defined(_MSC_VER) && _MSC_VER < 1900)
-    Matrix() : MatrixBase<Matrix, TransType, Dims, Dims, Scalar>() {}
-    explicit Matrix(Scalar v) : MatrixBase<Matrix, TransType, Dims, Dims, Scalar>(v) {}
-    explicit Matrix(const Scalar* v) : MatrixBase<Matrix, TransType, Dims, Dims, Scalar>(v) {}
-    Matrix(const std::initializer_list<Scalar>& list) : MatrixBase<Matrix, TransType, Dims, Dims, Scalar>(list) {}
-    Matrix(const std::initializer_list<const Vector<Dims, Scalar>>& list) : MatrixBase<Matrix, TransType, Dims, Dims, Scalar>(list) {}
+    Matrix() : MatrixBase() {}
+    explicit Matrix(Scalar v) : MatrixBase(v) {}
+    explicit Matrix(const Scalar* v) : MatrixBase(v) {}
+    Matrix(const std::initializer_list<Scalar>& list) : MatrixBase(list) {}
+    Matrix(const std::initializer_list<const Vector<Dims, Scalar>>& list) : MatrixBase(list) {}
     template<typename S>
-    Matrix(const Matrix<Dims, Dims, S>& other) : MatrixBase<Matrix, TransType, Dims, Dims, Scalar>((const MatrixBase<Matrix<Dims, Dims, S>, Matrix<Dims, Dims, S>, Dims, Dims, S>&)other) {}
+    Matrix(const Matrix<Dims, Dims, S>& other) : MatrixBase(other) {}
     #else
-    using MatrixBase<Matrix, TransType, Dims, Dims, Scalar>::MatrixBase;
+    using MatrixBase::MatrixBase;
     #endif
 
     Matrix Inverse() const
