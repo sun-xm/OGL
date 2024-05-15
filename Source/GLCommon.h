@@ -149,7 +149,7 @@ struct Vector<2, Scalar> : VectorBase<Vector, 2, Scalar>
     {
         return ::Dot(*this, *this);
     }
-    Scalar Dot(const Vector<3, Scalar>& other) const
+    Scalar Dot(const Vector& other) const
     {
         return ::Dot(*this, other);
     }
@@ -157,7 +157,7 @@ struct Vector<2, Scalar> : VectorBase<Vector, 2, Scalar>
     {
         return ::Length(*this);
     }
-    Vector<2, Scalar> Normalize() const
+    Vector Normalize() const
     {
         return ::Normalize(*this);
     }
