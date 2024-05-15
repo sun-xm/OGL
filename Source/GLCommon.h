@@ -38,73 +38,91 @@ inline Scalar ToDegree(Scalar radian)
     return radian / (Scalar)3.14159265358979323846264338327950288419716939937510l * (Scalar)180.0;
 }
 
-#define VECTOR_IMP(Dimensions, Scalar)\
-    Vector() = default;\
-    explicit Vector(Scalar v)\
-    {\
-        for (size_t i = 0; i < Dimensions; i++)\
-        {\
-            this->v[i] = v;\
-        }\
-    }\
-    explicit Vector(const Scalar* v)\
-    {\
-        for (size_t i = 0; i < Dimensions; i++)\
-        {\
-            this->v[i] = v[i];\
-        }\
-    }\
-    Vector(const std::initializer_list<Scalar>& list)\
-    {\
-        auto l = list.begin();\
-        for (size_t i = 0; i < Dimensions; i++)\
-        {\
-            this->v[i] = (list.end() == l) ? 0 : *l++;\
-        }\
-    }\
-    template<size_t D, typename S>\
-    explicit Vector(const Vector<D, S>& other, const std::initializer_list<Scalar>& list = {})\
-    {\
-        for (size_t i = 0; i < (D < Dimensions ? D : Dimensions); i++)\
-        {\
-            this->v[i] = (Scalar)other.v[i];\
-        }\
-        auto l = list.begin();\
-        for (size_t i = D; i < Dimensions; i++)\
-        {\
-            this->v[i] = (list.end() == l) ? 0 : *l++;\
-        }\
-    }\
-    bool IsNaN() const\
-    {\
-        return Any(*this, [](Scalar s){ return isnan(s); });\
-    }\
-    Scalar& operator[](size_t index)\
-    {\
-        return this->v[index];\
-    }\
-    const Scalar& operator[](size_t index) const\
-    {\
-        return this->v[index];\
-    }\
-    operator Scalar*()\
-    {\
-        return this->v;\
-    }\
-    operator const Scalar*() const\
-    {\
-        return this->v;\
-    }\
+template<template<size_t D, typename S> class VType, size_t Dimensions, typename Scalar>
+struct VectorBase
+{
+    using Vector = VType<Dimensions, Scalar>;
+
+    VectorBase() = default;
+    explicit VectorBase(Scalar v)
+    {
+        for (size_t i = 0; i < Dimensions; i++)
+        {
+            ((Vector*)this)->v[i] = v;
+        }
+    }
+    explicit VectorBase(const Scalar* v)
+    {
+        for (size_t i = 0; i < Dimensions; i++)
+        {
+            ((Vector*)this)->v[i] = v[i];
+        }
+    }
+    VectorBase(const std::initializer_list<Scalar>& list)
+    {
+        auto l = list.begin();
+        for (size_t i = 0; i < Dimensions; i++)
+        {
+            ((Vector*)this)->v[i] = (list.end() == l) ? 0 : *l++;
+        }
+    }
+    template<size_t D, typename S>
+    explicit VectorBase(const VType<D, S>& other, const std::initializer_list<Scalar>& list = {})
+    {
+        for (size_t i = 0; i < (D < Dimensions ? D : Dimensions); i++)
+        {
+            ((Vector*)this)->v[i] = (Scalar)other.v[i];
+        }
+        auto l = list.begin();
+        for (size_t i = D; i < Dimensions; i++)
+        {
+            ((Vector*)this)->v[i] = (list.end() == l) ? 0 : *l++;
+        }
+    }
+
+    bool IsNaN() const
+    {
+        return Any(*(Vector*)this, [](Scalar s){ return isnan(s); });
+    }
+
+    Scalar& operator[](size_t index)
+    {
+        return ((Vector*)this)->v[index];
+    }
+    const Scalar& operator[](size_t index) const
+    {
+        return ((Vector*)this)->v[index];
+    }
+
+    operator Scalar*()
+    {
+        return ((Vector*)this)->v;
+    }
+    operator const Scalar*() const
+    {
+        return ((Vector*)this)->v;
+    }
+};
 
 template<size_t Dimensions, typename Scalar = float>
-struct Vector
+struct Vector : VectorBase<Vector, Dimensions, Scalar>
 {
     Scalar v[Dimensions];
-    VECTOR_IMP(Dimensions, Scalar)
+
+    #if (defined(_MSC_VER) && _MSC_VER < 1900)
+    Vector() : VectorBase() {}
+    explicit Vector(Scalar v) : VectorBase(v) {}
+    explicit Vector(const Scalar* v) : VectorBase(v) {}
+    Vector(const std::initializer_list<Scalar>& list) : VectorBase(list) {}
+    template<size_t D, typename S>
+    explicit Vector(const Vector<D, S>& other, const std::initializer_list<Scalar>& list = {}) : VectorBase(other, list) {}
+    #else
+    using VectorBase::VectorBase;
+    #endif
 };
 
 template<typename Scalar>
-struct Vector<2, Scalar>
+struct Vector<2, Scalar> : VectorBase<Vector, 2, Scalar>
 {
     union
     {
@@ -116,7 +134,16 @@ struct Vector<2, Scalar>
         };
     };
 
-    VECTOR_IMP(2, Scalar)
+    #if (defined(_MSC_VER) && _MSC_VER < 1900)
+    Vector() : VectorBase() {}
+    explicit Vector(Scalar v) : VectorBase(v) {}
+    explicit Vector(const Scalar* v) : VectorBase(v) {}
+    Vector(const std::initializer_list<Scalar>& list) : VectorBase(list) {}
+    template<size_t D, typename S>
+    explicit Vector(const Vector<D, S>& other, const std::initializer_list<Scalar>& list = {}) : VectorBase(other, list) {}
+    #else
+    using VectorBase::VectorBase;
+    #endif
 
     Scalar Dot() const
     {
@@ -135,7 +162,7 @@ struct Vector<2, Scalar>
         return ::Normalize(*this);
     }
 
-    static const Vector<2, Scalar> NaN, Zero, XAxis, YAxis;
+    static const Vector NaN, Zero, XAxis, YAxis;
 };
 template<typename Scalar>
 const Vector<2, Scalar> Vector<2, Scalar>::NaN   = { std::numeric_limits<Scalar>::quiet_NaN(), std::numeric_limits<Scalar>::quiet_NaN() };
@@ -147,7 +174,7 @@ template<typename Scalar>
 const Vector<2, Scalar> Vector<2, Scalar>::YAxis = { 0, 1 };
 
 template<typename Scalar>
-struct Vector<3, Scalar>
+struct Vector<3, Scalar> : VectorBase<Vector, 3, Scalar>
 {
     union
     {
@@ -160,13 +187,22 @@ struct Vector<3, Scalar>
         };
     };
 
-    VECTOR_IMP(3, Scalar)
+    #if (defined(_MSC_VER) && _MSC_VER < 1900)
+    Vector() : VectorBase() {}
+    explicit Vector(Scalar v) : VectorBase(v) {}
+    explicit Vector(const Scalar* v) : VectorBase(v) {}
+    Vector(const std::initializer_list<Scalar>& list) : VectorBase(list) {}
+    template<size_t D, typename S>
+    explicit Vector(const Vector<D, S>& other, const std::initializer_list<Scalar>& list = {}) : VectorBase(other, list) {}
+    #else
+    using VectorBase::VectorBase;
+    #endif
 
     Scalar Dot() const
     {
         return ::Dot(*this, *this);
     }
-    Scalar Dot(const Vector<3, Scalar>& other) const
+    Scalar Dot(const Vector& other) const
     {
         return ::Dot(*this, other);
     }
@@ -174,11 +210,11 @@ struct Vector<3, Scalar>
     {
         return ::Length(*this);
     }
-    Vector<3, Scalar> Cross(const Vector<3, Scalar>& other) const
+    Vector Cross(const Vector& other) const
     {
         return ::Cross(*this, other);
     }
-    Vector<3, Scalar> Normalize() const
+    Vector Normalize() const
     {
         return ::Normalize(*this);
     }
@@ -197,7 +233,7 @@ template<typename Scalar>
 const Vector<3, Scalar> Vector<3, Scalar>::ZAxis = { 0, 0, 1 };
 
 template<typename Scalar>
-struct Vector<4, Scalar>
+struct Vector<4, Scalar> : VectorBase<Vector, 4, Scalar>
 {
     union
     {
@@ -211,9 +247,18 @@ struct Vector<4, Scalar>
         };
     };
 
-    VECTOR_IMP(4, Scalar)
+    #if (defined(_MSC_VER) && _MSC_VER < 1900)
+    Vector() : VectorBase() {}
+    explicit Vector(Scalar v) : VectorBase(v) {}
+    explicit Vector(const Scalar* v) : VectorBase(v) {}
+    Vector(const std::initializer_list<Scalar>& list) : VectorBase(list) {}
+    template<size_t D, typename S>
+    explicit Vector(const Vector<D, S>& other, const std::initializer_list<Scalar>& list = {}) : VectorBase(other, list) {}
+    #else
+    using VectorBase::VectorBase;
+    #endif
 
-    static const Vector<4, Scalar> NaN, Zero, XYPlane, YZPlane, ZXPlane;
+    static const Vector NaN, Zero, XYPlane, YZPlane, ZXPlane;
 };
 template<typename Scalar>
 const Vector<4, Scalar> Vector<4, Scalar>::NaN   = { std::numeric_limits<Scalar>::quiet_NaN(), std::numeric_limits<Scalar>::quiet_NaN(), std::numeric_limits<Scalar>::quiet_NaN(), std::numeric_limits<Scalar>::quiet_NaN() };
