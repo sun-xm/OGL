@@ -232,58 +232,6 @@ typedef Vector<3> Normal;
 typedef Vector<4> Color;
 typedef Vector<2> Coordinate;
 
-template<size_t Dimensions>
-inline bool Any(const Vector<Dimensions, bool>& booleans)
-{
-    for (size_t i = 0; i < Dimensions; i++)
-    {
-        if (booleans[i])
-        {
-            return true;
-        }
-    }
-    return false;
-}
-
-template<size_t Dimensions, typename Scalar, typename Pred>
-inline bool Any(const Vector<Dimensions, Scalar>& v, const Pred& p)
-{
-    for (size_t i = 0; i < Dimensions; i++)
-    {
-        if (p(v[i]))
-        {
-            return true;
-        }
-    }
-    return false;
-}
-
-template<size_t Dimensions>
-inline bool All(const Vector<Dimensions, bool>& booleans)
-{
-    for (size_t i = 0; i < Dimensions; i++)
-    {
-        if (!booleans[i])
-        {
-            return false;
-        }
-    }
-    return true;
-}
-
-template<size_t Dimensions, typename Scalar, typename Pred>
-inline bool All(const Vector<Dimensions, Scalar>& v, const Pred& p)
-{
-    for (size_t i = 0; i < Dimensions; i++)
-    {
-        if (!p(v[i]))
-        {
-            return false;
-        }
-    }
-    return true;
-}
-
 template<size_t Dimensions, typename Scalar>
 inline size_t Dims(const Vector<Dimensions, Scalar>&)
 {
@@ -484,7 +432,7 @@ inline Vector<Dimensions, bool> operator==(const Vector<Dimensions, Scalar>& v0,
     Vector<Dimensions, bool> result;
     for (size_t i = 0; i < Dimensions; i++)
     {
-        result[i] = (v0.v[i] == v1.v[i]);
+        result.v[i] = (v0.v[i] == v1.v[i]);
     }
     return result;
 }
@@ -495,7 +443,7 @@ inline Vector<Dimensions, bool> operator==(const Vector<Dimensions, Scalar>& v, 
     Vector<Dimensions, bool> result;
     for (size_t i = 0; i < Dimensions; i++)
     {
-        result[i] = (v.v[i] == s);
+        result.v[i] = (v.v[i] == s);
     }
     return result;
 }
@@ -512,7 +460,7 @@ inline Vector<Dimensions, bool> operator!=(const Vector<Dimensions, Scalar>& v0,
     Vector<Dimensions, bool> result;
     for (size_t i = 0; i < Dimensions; i++)
     {
-        result[i] = (v0.v[i] != v1.v[i]);
+        result.v[i] = (v0.v[i] != v1.v[i]);
     }
     return result;
 }
@@ -523,7 +471,7 @@ inline Vector<Dimensions, bool> operator!=(const Vector<Dimensions, Scalar>& v, 
     Vector<Dimensions, bool> result;
     for (size_t i = 0; i < Dimensions; i++)
     {
-        result[i] = (v.v[i] != s);
+        result.v[i] = (v.v[i] != s);
     }
     return result;
 }
@@ -540,7 +488,7 @@ inline Vector<Dimensions, bool> operator>(const Vector<Dimensions, Scalar>& v0, 
     Vector<Dimensions, bool> result;
     for (size_t i = 0; i < Dimensions; i++)
     {
-        result[i] = (v0.v[i] > v1.v[i]);
+        result.v[i] = (v0.v[i] > v1.v[i]);
     }
     return result;
 }
@@ -551,7 +499,7 @@ inline Vector<Dimensions, bool> operator>(const Vector<Dimensions, Scalar>& v, S
     Vector<Dimensions, bool> result;
     for (size_t i = 0; i < Dimensions; i++)
     {
-        result[i] = (v.v[i] > s);
+        result.v[i] = (v.v[i] > s);
     }
     return result;
 }
@@ -562,7 +510,7 @@ inline Vector<Dimensions, bool> operator>(Scalar s, const Vector<Dimensions, Sca
     Vector<Dimensions, bool> result;
     for (size_t i = 0; i < Dimensions; i++)
     {
-        result[i] = (s > v.v[i]);
+        result.v[i] = (s > v.v[i]);
     }
     return result;
 }
@@ -573,7 +521,7 @@ inline Vector<Dimensions, bool> operator<(const Vector<Dimensions, Scalar>& v0, 
     Vector<Dimensions, bool> result;
     for (size_t i = 0; i < Dimensions; i++)
     {
-        result[i] = (v0.v[i] < v1.v[i]);
+        result.v[i] = (v0.v[i] < v1.v[i]);
     }
     return result;
 }
@@ -584,7 +532,7 @@ inline Vector<Dimensions, bool> operator<(const Vector<Dimensions, Scalar>& v, S
     Vector<Dimensions, bool> result;
     for (size_t i = 0; i < Dimensions; i++)
     {
-        result[i] = (v.v[i] < s);
+        result.v[i] = (v.v[i] < s);
     }
     return result;
 }
@@ -595,7 +543,7 @@ inline Vector<Dimensions, bool> operator<(Scalar s, const Vector<Dimensions, Sca
     Vector<Dimensions, bool> result;
     for (size_t i = 0; i < Dimensions; i++)
     {
-        result[i] = (s < v.v[i]);
+        result.v[i] = (s < v.v[i]);
     }
     return result;
 }
@@ -606,7 +554,7 @@ inline Vector<Dimensions, bool> operator>=(const Vector<Dimensions, Scalar>& v0,
     Vector<Dimensions, bool> result;
     for (size_t i = 0; i < Dimensions; i++)
     {
-        result[i] = (v0.v[i] >= v1.v[i]);
+        result.v[i] = (v0.v[i] >= v1.v[i]);
     }
     return result;
 }
@@ -617,7 +565,7 @@ inline Vector<Dimensions, bool> operator>=(const Vector<Dimensions, Scalar>& v, 
     Vector<Dimensions, bool> result;
     for (size_t i = 0; i < Dimensions; i++)
     {
-        result[i] = (v.v[i] >= s);
+        result.v[i] = (v.v[i] >= s);
     }
     return result;
 }
@@ -628,7 +576,7 @@ inline Vector<Dimensions, bool> operator>=(Scalar s, const Vector<Dimensions, Sc
     Vector<Dimensions, bool> result;
     for (size_t i = 0; i < Dimensions; i++)
     {
-        result[i] = (s >= v.v[i]);
+        result.v[i] = (s >= v.v[i]);
     }
     return result;
 }
@@ -639,7 +587,7 @@ inline Vector<Dimensions, bool> operator<=(const Vector<Dimensions, Scalar>& v0,
     Vector<Dimensions, bool> result;
     for (size_t i = 0; i < Dimensions; i++)
     {
-        result[i] = (v0.v[i] <= v1.v[i]);
+        result.v[i] = (v0.v[i] <= v1.v[i]);
     }
     return result;
 }
@@ -650,7 +598,7 @@ inline Vector<Dimensions, bool> operator<=(const Vector<Dimensions, Scalar>& v, 
     Vector<Dimensions, bool> result;
     for (size_t i = 0; i < Dimensions; i++)
     {
-        result[i] = (v.v[i] <= s);
+        result.v[i] = (v.v[i] <= s);
     }
     return result;
 }
@@ -661,7 +609,114 @@ inline Vector<Dimensions, bool> operator<=(Scalar s, const Vector<Dimensions, Sc
     Vector<Dimensions, bool> result;
     for (size_t i = 0; i < Dimensions; i++)
     {
-        result[i] = (s <= v.v[i]);
+        result.v[i] = (s <= v.v[i]);
+    }
+    return result;
+}
+
+template<size_t Dimensions>
+inline Vector<Dimensions, bool> operator&&(const Vector<Dimensions, bool>& v0, const Vector<Dimensions, bool>& v1)
+{
+    Vector<Dimensions, bool> result;
+    for (size_t i = 0; i < Dimensions; i++)
+    {
+        result.v[i] = (v0.v[i] && v1.v[i]);
+    }
+    return result;
+}
+
+template<size_t Dimensions>
+inline Vector<Dimensions, bool> operator||(const Vector<Dimensions, bool>& v0, const Vector<Dimensions, bool>& v1)
+{
+    Vector<Dimensions, bool> result;
+    for (size_t i = 0; i < Dimensions; i++)
+    {
+        result.v[i] = (v0.v[i] || v1.v[i]);
+    }
+    return result;
+}
+
+template<size_t Dimensions>
+inline bool Any(const Vector<Dimensions, bool>& booleans)
+{
+    for (size_t i = 0; i < Dimensions; i++)
+    {
+        if (booleans[i])
+        {
+            return true;
+        }
+    }
+    return false;
+}
+
+template<size_t Dimensions, typename Scalar, typename Pred>
+inline bool Any(const Vector<Dimensions, Scalar>& v, const Pred& p)
+{
+    for (size_t i = 0; i < Dimensions; i++)
+    {
+        if (p(v[i]))
+        {
+            return true;
+        }
+    }
+    return false;
+}
+
+template<size_t Dimensions>
+inline bool All(const Vector<Dimensions, bool>& booleans)
+{
+    for (size_t i = 0; i < Dimensions; i++)
+    {
+        if (!booleans[i])
+        {
+            return false;
+        }
+    }
+    return true;
+}
+
+template<size_t Dimensions, typename Scalar, typename Pred>
+inline bool All(const Vector<Dimensions, Scalar>& v, const Pred& p)
+{
+    for (size_t i = 0; i < Dimensions; i++)
+    {
+        if (!p(v[i]))
+        {
+            return false;
+        }
+    }
+    return true;
+}
+
+template<size_t Dimensions, typename Scalar>
+inline Vector<Dimensions, Scalar> Abs(const Vector<Dimensions, Scalar>& v)
+{
+    Vector<Dimensions, Scalar> result;
+    for (size_t i = 0; i < Dimensions; i++)
+    {
+        result.v[i] = std::abs(v.v[i]);
+    }
+    return result;
+}
+
+template<size_t Dimensions, typename Scalar>
+inline Vector<Dimensions, Scalar> Min(const Vector<Dimensions, Scalar>& v0, const Vector<Dimensions, Scalar>& v1)
+{
+    Vector<Dimensions, Scalar> result;
+    for (size_t i = 0; i < Dimensions; i++)
+    {
+        result.v[i] = std::min(v0.v[i], v1.v[i]);
+    }
+    return result;
+}
+
+template<size_t Dimensions, typename Scalar>
+inline Vector<Dimensions, Scalar> Max(const Vector<Dimensions, Scalar>& v0, const Vector<Dimensions, Scalar>& v1)
+{
+    Vector<Dimensions, Scalar> result;
+    for (size_t i = 0; i < Dimensions; i++)
+    {
+        result.v[i] = std::max(v0.v[i], v1.v[i]);
     }
     return result;
 }
@@ -687,18 +742,6 @@ template<size_t Dimensions, typename Scalar>
 inline Vector<Dimensions, Scalar> Normalize(const Vector<Dimensions, Scalar>& v)
 {
     return v / Length(v);
-}
-
-template<typename Scalar>
-inline Scalar Dot(const Vector<2, Scalar>& v0, const Vector<2, Scalar>& v1)
-{
-    return v0.v[0] * v1.v[0] + v0.v[1] * v1.v[1];
-}
-
-template<typename Scalar>
-inline Scalar Dot(const Vector<3, Scalar>& v0, const Vector<3, Scalar>& v1)
-{
-    return v0.v[0] * v1.v[0] + v0.v[1] * v1.v[1] + v0.v[2] * v1.v[2];
 }
 
 template<typename Scalar>
