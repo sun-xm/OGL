@@ -1564,12 +1564,18 @@ public:
 
     static Matrix<4, 4, Scalar> Perspective(Scalar vfov /*in radian*/, Scalar aspect, Scalar _near, Scalar _far)
     {
-        auto f = 1 / tan(vfov / 2);
+        auto fy = 1 / tan(vfov / 2);
+        auto fx = fy / aspect;
+        return PerspectiveF(fx, fy, _near, _far);
+    }
+
+    static Matrix<4, 4, Scalar> PerspectiveF(Scalar fx, Scalar fy, Scalar _near, Scalar _far)
+    {
         auto i = 1 / (_near - _far);
-        return Matrix<4, 4, Scalar>{{ f / aspect,  0,                  0,                    0 },
-                                    {          0,  f,                  0,                    0 },
-                                    {          0,  0, (_near + _far) * i, _near * _far * i * 2 },
-                                    {          0,  0,                 -1,                    0 }};
+        return Matrix<4, 4, Scalar>{{ fx,  0,                  0,                    0 },
+                                    {  0, fy,                  0,                    0 },
+                                    {  0,  0, (_near + _far) * i, _near * _far * i * 2 },
+                                    {  0,  0,                 -1,                    0 }};
     }
 
     static Matrix<4, 4, Scalar> LookAt(const Vector<3, Scalar>& eye, const Vector<3, Scalar>& center, Scalar rotation /*in radian*/)
