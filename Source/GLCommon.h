@@ -38,24 +38,22 @@ inline Scalar ToDegree(Scalar radian)
     return radian / (Scalar)3.14159265358979323846264338327950288419716939937510l * (Scalar)180.0;
 }
 
-template<template<size_t D, typename S> class VType, size_t Dimensions, typename Scalar>
+template<typename Vector, size_t Dimensions, typename Scalar>
 struct VectorBase
 {
-    using Vector = VType<Dimensions, Scalar>;
-
     VectorBase() = default;
-    explicit VectorBase(Scalar v)
+    explicit VectorBase(Scalar s)
     {
         for (size_t i = 0; i < Dimensions; i++)
         {
-            ((Vector*)this)->v[i] = v;
+            ((Vector*)this)->s[i] = s;
         }
     }
-    explicit VectorBase(const Scalar* v)
+    explicit VectorBase(const Scalar* s)
     {
         for (size_t i = 0; i < Dimensions; i++)
         {
-            ((Vector*)this)->v[i] = v[i];
+            ((Vector*)this)->s[i] = s[i];
         }
     }
     VectorBase(const std::initializer_list<Scalar>& list)
@@ -63,20 +61,20 @@ struct VectorBase
         auto l = list.begin();
         for (size_t i = 0; i < Dimensions; i++)
         {
-            ((Vector*)this)->v[i] = (list.end() == l) ? 0 : *l++;
+            ((Vector*)this)->s[i] = (list.end() == l) ? 0 : *l++;
         }
     }
-    template<size_t D, typename S>
-    explicit VectorBase(const VType<D, S>& other, const std::initializer_list<Scalar>& list = {})
+    template<template<size_t D, typename S> class VType, size_t Dims, typename SType>
+    explicit VectorBase(const VType<Dims, SType>& other, const std::initializer_list<Scalar>& list = {})
     {
-        for (size_t i = 0; i < (D < Dimensions ? D : Dimensions); i++)
+        for (size_t i = 0; i < (Dims < Dimensions ? Dims : Dimensions); i++)
         {
-            ((Vector*)this)->v[i] = (Scalar)other.v[i];
+            ((Vector*)this)->s[i] = (Scalar)other.s[i];
         }
         auto l = list.begin();
-        for (size_t i = D; i < Dimensions; i++)
+        for (size_t i = Dims; i < Dimensions; i++)
         {
-            ((Vector*)this)->v[i] = (list.end() == l) ? 0 : *l++;
+            ((Vector*)this)->s[i] = (list.end() == l) ? 0 : *l++;
         }
     }
 
@@ -87,46 +85,44 @@ struct VectorBase
 
     Scalar& operator[](size_t index)
     {
-        return ((Vector*)this)->v[index];
+        return ((Vector*)this)->s[index];
     }
     const Scalar& operator[](size_t index) const
     {
-        return ((Vector*)this)->v[index];
+        return ((Vector*)this)->s[index];
     }
 
     operator Scalar*()
     {
-        return ((Vector*)this)->v;
+        return ((Vector*)this)->s;
     }
     operator const Scalar*() const
     {
-        return ((Vector*)this)->v;
+        return ((Vector*)this)->s;
     }
 };
 
 template<size_t Dimensions, typename Scalar = float>
-struct Vector : VectorBase<Vector, Dimensions, Scalar>
+struct Vector : VectorBase<Vector<Dimensions, Scalar>, Dimensions, Scalar>
 {
-    Scalar v[Dimensions];
+    Scalar s[Dimensions];
 
-    #if (defined(_MSC_VER) && _MSC_VER < 1900)
-    Vector() : VectorBase() {}
-    explicit Vector(Scalar v) : VectorBase(v) {}
-    explicit Vector(const Scalar* v) : VectorBase(v) {}
-    Vector(const std::initializer_list<Scalar>& list) : VectorBase(list) {}
-    template<size_t D, typename S>
-    explicit Vector(const Vector<D, S>& other, const std::initializer_list<Scalar>& list = {}) : VectorBase(other, list) {}
-    #else
-    using VectorBase::VectorBase;
-    #endif
+    using Base = VectorBase<Vector<Dimensions, Scalar>, Dimensions, Scalar>;
+
+    Vector() = default;
+    explicit Vector(Scalar s) : Base(s) {}
+    explicit Vector(const Scalar* s) : Base(s) {}
+    Vector(const std::initializer_list<Scalar>& list) : Base(list) {}
+    template<template<size_t D, typename S> class VType, size_t Dims, typename SType>
+    explicit Vector(const VType<Dims, SType>& other, const std::initializer_list<Scalar>& list) : Base(other, list) {}
 };
 
 template<typename Scalar>
-struct Vector<2, Scalar> : VectorBase<Vector, 2, Scalar>
+struct Vector<2, Scalar> : VectorBase<Vector<2, Scalar>, 2, Scalar>
 {
     union
     {
-        Scalar v[2];
+        Scalar s[2];
         struct
         {
             Scalar X;
@@ -134,16 +130,14 @@ struct Vector<2, Scalar> : VectorBase<Vector, 2, Scalar>
         };
     };
 
-    #if (defined(_MSC_VER) && _MSC_VER < 1900)
-    Vector() : VectorBase() {}
-    explicit Vector(Scalar v) : VectorBase(v) {}
-    explicit Vector(const Scalar* v) : VectorBase(v) {}
-    Vector(const std::initializer_list<Scalar>& list) : VectorBase(list) {}
-    template<size_t D, typename S>
-    explicit Vector(const Vector<D, S>& other, const std::initializer_list<Scalar>& list = {}) : VectorBase(other, list) {}
-    #else
-    using VectorBase::VectorBase;
-    #endif
+    using Base = VectorBase<Vector<2, Scalar>, 2, Scalar>;
+
+    Vector() = default;
+    explicit Vector(Scalar v) : Base(v) {}
+    explicit Vector(const Scalar* v) : Base(v) {}
+    Vector(const std::initializer_list<Scalar>& list) : Base(list) {}
+    template<template<size_t D, typename S> class VType, size_t Dims, typename SType>
+    explicit Vector(const VType<Dims, SType>& other, const std::initializer_list<Scalar>& list = {}) : Base(other, list) {}
 
     Scalar Dot() const
     {
@@ -174,11 +168,11 @@ template<typename Scalar>
 const Vector<2, Scalar> Vector<2, Scalar>::YAxis = { 0, 1 };
 
 template<typename Scalar>
-struct Vector<3, Scalar> : VectorBase<Vector, 3, Scalar>
+struct Vector<3, Scalar> : VectorBase<Vector<3, Scalar>, 3, Scalar>
 {
     union
     {
-        Scalar v[3];
+        Scalar s[3];
         struct
         {
             Scalar X;
@@ -187,16 +181,14 @@ struct Vector<3, Scalar> : VectorBase<Vector, 3, Scalar>
         };
     };
 
-    #if (defined(_MSC_VER) && _MSC_VER < 1900)
-    Vector() : VectorBase() {}
-    explicit Vector(Scalar v) : VectorBase(v) {}
-    explicit Vector(const Scalar* v) : VectorBase(v) {}
-    Vector(const std::initializer_list<Scalar>& list) : VectorBase(list) {}
-    template<size_t D, typename S>
-    explicit Vector(const Vector<D, S>& other, const std::initializer_list<Scalar>& list = {}) : VectorBase(other, list) {}
-    #else
-    using VectorBase::VectorBase;
-    #endif
+    using Base = VectorBase<Vector<3, Scalar>, 3, Scalar>;
+
+    Vector() = default;
+    explicit Vector(Scalar v) : Base(v) {}
+    explicit Vector(const Scalar* v) : Base(v) {}
+    Vector(const std::initializer_list<Scalar>& list) : Base(list) {}
+    template<template<size_t D, typename S> class VType, size_t Dims, typename SType>
+    explicit Vector(const VType<Dims, SType>& other, const std::initializer_list<Scalar>& list = {}) : Base(other, list) {}
 
     Scalar Dot() const
     {
@@ -233,11 +225,11 @@ template<typename Scalar>
 const Vector<3, Scalar> Vector<3, Scalar>::ZAxis = { 0, 0, 1 };
 
 template<typename Scalar>
-struct Vector<4, Scalar> : VectorBase<Vector, 4, Scalar>
+struct Vector<4, Scalar> : VectorBase<Vector<4, Scalar>, 4, Scalar>
 {
     union
     {
-        Scalar v[4];
+        Scalar s[4];
         struct
         {
             Scalar X;
@@ -247,16 +239,14 @@ struct Vector<4, Scalar> : VectorBase<Vector, 4, Scalar>
         };
     };
 
-    #if (defined(_MSC_VER) && _MSC_VER < 1900)
-    Vector() : VectorBase() {}
-    explicit Vector(Scalar v) : VectorBase(v) {}
-    explicit Vector(const Scalar* v) : VectorBase(v) {}
-    Vector(const std::initializer_list<Scalar>& list) : VectorBase(list) {}
-    template<size_t D, typename S>
-    explicit Vector(const Vector<D, S>& other, const std::initializer_list<Scalar>& list = {}) : VectorBase(other, list) {}
-    #else
-    using VectorBase::VectorBase;
-    #endif
+    using Base = VectorBase<Vector<4, Scalar>, 4, Scalar>;
+
+    Vector() = default;
+    explicit Vector(Scalar v) : Base(v) {}
+    explicit Vector(const Scalar* v) : Base(v) {}
+    Vector(const std::initializer_list<Scalar>& list) : Base(list) {}
+    template<template<size_t D, typename S> class VType, size_t Dims, typename SType>
+    explicit Vector(const VType<Dims, SType>& other, const std::initializer_list<Scalar>& list = {}) : Base(other, list) {}
 
     static const Vector NaN, Zero, XYPlane, YZPlane, ZXPlane;
 };
@@ -296,7 +286,7 @@ inline Vector<Dimensions, Scalar> operator+(const Vector<Dimensions, Scalar>& fi
 
     for (size_t i = 0; i < Dimensions; i++)
     {
-        result.v[i] = first.v[i] + second.v[i];
+        result.s[i] = first.s[i] + second.s[i];
     }
 
     return result;
@@ -309,7 +299,7 @@ inline Vector<Dimensions, Scalar> operator+(const Vector<Dimensions, Scalar>& v,
 
     for (size_t i = 0; i < Dimensions; i++)
     {
-        result.v[i] = v.v[i] + s;
+        result.s[i] = v.s[i] + s;
     }
 
     return result;
@@ -328,7 +318,7 @@ inline Vector<Dimensions, Scalar> operator-(const Vector<Dimensions, Scalar>& fi
 
     for (size_t i = 0; i < Dimensions; i++)
     {
-        result.v[i] = first.v[i] - second.v[i];
+        result.s[i] = first.s[i] - second.s[i];
     }
 
     return result;
@@ -341,7 +331,7 @@ inline Vector<Dimensions, Scalar> operator-(const Vector<Dimensions, Scalar>& v,
 
     for (size_t i = 0; i < Dimensions; i++)
     {
-        result.v[i] = v.v[i] - s;
+        result.s[i] = v.s[i] - s;
     }
 
     return result;
@@ -354,7 +344,7 @@ inline Vector<Dimensions, Scalar> operator-(Scalar s, const Vector<Dimensions, S
 
     for (size_t i = 0; i < Dimensions; i++)
     {
-        result.v[i] = s - v.v[i];
+        result.s[i] = s - v.s[i];
     }
 
     return result;
@@ -367,7 +357,7 @@ inline Vector<Dimensions, Scalar> operator*(const Vector<Dimensions, Scalar>& ve
 
     for (size_t i = 0; i < Dimensions; i++)
     {
-        result.v[i] = vector.v[i] * scale;
+        result.s[i] = vector.s[i] * scale;
     }
 
     return result;
@@ -386,7 +376,7 @@ inline Vector<Dimensions, Scalar> operator/(const Vector<Dimensions, Scalar>& ve
 
     for (size_t i = 0; i < Dimensions; i++)
     {
-        result.v[i] = vector.v[i] / scale;
+        result.s[i] = vector.s[i] / scale;
     }
 
     return result;
@@ -399,7 +389,7 @@ inline Vector<Dimensions, Scalar> operator-(const Vector<Dimensions, Scalar>& ve
 
     for (size_t i = 0; i < Dimensions; i++)
     {
-        result.v[i] = -vector.v[i];
+        result.s[i] = -vector.s[i];
     }
 
     return result;
@@ -410,7 +400,7 @@ inline Vector<Dimensions, Scalar>& operator+=(Vector<Dimensions, Scalar>& first,
 {
     for (size_t i = 0; i < Dimensions; i++)
     {
-        first.v[i] += second.v[i];
+        first.s[i] += second.s[i];
     }
 
     return first;
@@ -421,7 +411,7 @@ inline Vector<Dimensions, Scalar>& operator-=(Vector<Dimensions, Scalar>& first,
 {
     for (size_t i = 0; i < Dimensions; i++)
     {
-        first.v[i] -= second.v[i];
+        first.s[i] -= second.s[i];
     }
 
     return first;
@@ -432,7 +422,7 @@ inline Vector<Dimensions, Scalar>& operator+=(Vector<Dimensions, Scalar>& first,
 {
     for (size_t i = 0; i < Dimensions; i++)
     {
-        first.v[i] += second;
+        first.s[i] += second;
     }
 
     return first;
@@ -443,7 +433,7 @@ inline Vector<Dimensions, Scalar>& operator-=(Vector<Dimensions, Scalar>& first,
 {
     for (size_t i = 0; i < Dimensions; i++)
     {
-        first.v[i] -= second;
+        first.s[i] -= second;
     }
 
     return first;
@@ -454,7 +444,7 @@ inline Vector<Dimensions, Scalar>& operator*=(Vector<Dimensions, Scalar>& vector
 {
     for (size_t i = 0; i < Dimensions; i++)
     {
-        vector.v[i] *= scale;
+        vector.s[i] *= scale;
     }
 
     return vector;
@@ -465,7 +455,7 @@ inline Vector<Dimensions, Scalar>& operator/=(Vector<Dimensions, Scalar>& vector
 {
     for (size_t i = 0; i < Dimensions; i++)
     {
-        vector.v[i] /= scale;
+        vector.s[i] /= scale;
     }
 
     return vector;
@@ -477,7 +467,7 @@ inline Vector<Dimensions, bool> operator==(const Vector<Dimensions, Scalar>& v0,
     Vector<Dimensions, bool> result;
     for (size_t i = 0; i < Dimensions; i++)
     {
-        result.v[i] = (v0.v[i] == v1.v[i]);
+        result.s[i] = (v0.s[i] == v1.s[i]);
     }
     return result;
 }
@@ -488,7 +478,7 @@ inline Vector<Dimensions, bool> operator==(const Vector<Dimensions, Scalar>& v, 
     Vector<Dimensions, bool> result;
     for (size_t i = 0; i < Dimensions; i++)
     {
-        result.v[i] = (v.v[i] == s);
+        result.s[i] = (v.s[i] == s);
     }
     return result;
 }
@@ -505,7 +495,7 @@ inline Vector<Dimensions, bool> operator!=(const Vector<Dimensions, Scalar>& v0,
     Vector<Dimensions, bool> result;
     for (size_t i = 0; i < Dimensions; i++)
     {
-        result.v[i] = (v0.v[i] != v1.v[i]);
+        result.s[i] = (v0.s[i] != v1.s[i]);
     }
     return result;
 }
@@ -516,7 +506,7 @@ inline Vector<Dimensions, bool> operator!=(const Vector<Dimensions, Scalar>& v, 
     Vector<Dimensions, bool> result;
     for (size_t i = 0; i < Dimensions; i++)
     {
-        result.v[i] = (v.v[i] != s);
+        result.s[i] = (v.s[i] != s);
     }
     return result;
 }
@@ -533,7 +523,7 @@ inline Vector<Dimensions, bool> operator>(const Vector<Dimensions, Scalar>& v0, 
     Vector<Dimensions, bool> result;
     for (size_t i = 0; i < Dimensions; i++)
     {
-        result.v[i] = (v0.v[i] > v1.v[i]);
+        result.s[i] = (v0.s[i] > v1.s[i]);
     }
     return result;
 }
@@ -544,7 +534,7 @@ inline Vector<Dimensions, bool> operator>(const Vector<Dimensions, Scalar>& v, S
     Vector<Dimensions, bool> result;
     for (size_t i = 0; i < Dimensions; i++)
     {
-        result.v[i] = (v.v[i] > s);
+        result.s[i] = (v.s[i] > s);
     }
     return result;
 }
@@ -555,7 +545,7 @@ inline Vector<Dimensions, bool> operator>(Scalar s, const Vector<Dimensions, Sca
     Vector<Dimensions, bool> result;
     for (size_t i = 0; i < Dimensions; i++)
     {
-        result.v[i] = (s > v.v[i]);
+        result.s[i] = (s > v.s[i]);
     }
     return result;
 }
@@ -566,7 +556,7 @@ inline Vector<Dimensions, bool> operator<(const Vector<Dimensions, Scalar>& v0, 
     Vector<Dimensions, bool> result;
     for (size_t i = 0; i < Dimensions; i++)
     {
-        result.v[i] = (v0.v[i] < v1.v[i]);
+        result.s[i] = (v0.s[i] < v1.s[i]);
     }
     return result;
 }
@@ -577,7 +567,7 @@ inline Vector<Dimensions, bool> operator<(const Vector<Dimensions, Scalar>& v, S
     Vector<Dimensions, bool> result;
     for (size_t i = 0; i < Dimensions; i++)
     {
-        result.v[i] = (v.v[i] < s);
+        result.s[i] = (v.s[i] < s);
     }
     return result;
 }
@@ -588,7 +578,7 @@ inline Vector<Dimensions, bool> operator<(Scalar s, const Vector<Dimensions, Sca
     Vector<Dimensions, bool> result;
     for (size_t i = 0; i < Dimensions; i++)
     {
-        result.v[i] = (s < v.v[i]);
+        result.s[i] = (s < v.s[i]);
     }
     return result;
 }
@@ -599,7 +589,7 @@ inline Vector<Dimensions, bool> operator>=(const Vector<Dimensions, Scalar>& v0,
     Vector<Dimensions, bool> result;
     for (size_t i = 0; i < Dimensions; i++)
     {
-        result.v[i] = (v0.v[i] >= v1.v[i]);
+        result.s[i] = (v0.s[i] >= v1.s[i]);
     }
     return result;
 }
@@ -610,7 +600,7 @@ inline Vector<Dimensions, bool> operator>=(const Vector<Dimensions, Scalar>& v, 
     Vector<Dimensions, bool> result;
     for (size_t i = 0; i < Dimensions; i++)
     {
-        result.v[i] = (v.v[i] >= s);
+        result.s[i] = (v.s[i] >= s);
     }
     return result;
 }
@@ -621,7 +611,7 @@ inline Vector<Dimensions, bool> operator>=(Scalar s, const Vector<Dimensions, Sc
     Vector<Dimensions, bool> result;
     for (size_t i = 0; i < Dimensions; i++)
     {
-        result.v[i] = (s >= v.v[i]);
+        result.s[i] = (s >= v.s[i]);
     }
     return result;
 }
@@ -632,7 +622,7 @@ inline Vector<Dimensions, bool> operator<=(const Vector<Dimensions, Scalar>& v0,
     Vector<Dimensions, bool> result;
     for (size_t i = 0; i < Dimensions; i++)
     {
-        result.v[i] = (v0.v[i] <= v1.v[i]);
+        result.s[i] = (v0.s[i] <= v1.s[i]);
     }
     return result;
 }
@@ -643,7 +633,7 @@ inline Vector<Dimensions, bool> operator<=(const Vector<Dimensions, Scalar>& v, 
     Vector<Dimensions, bool> result;
     for (size_t i = 0; i < Dimensions; i++)
     {
-        result.v[i] = (v.v[i] <= s);
+        result.s[i] = (v.s[i] <= s);
     }
     return result;
 }
@@ -654,7 +644,7 @@ inline Vector<Dimensions, bool> operator<=(Scalar s, const Vector<Dimensions, Sc
     Vector<Dimensions, bool> result;
     for (size_t i = 0; i < Dimensions; i++)
     {
-        result.v[i] = (s <= v.v[i]);
+        result.s[i] = (s <= v.s[i]);
     }
     return result;
 }
@@ -665,7 +655,7 @@ inline Vector<Dimensions, bool> operator&&(const Vector<Dimensions, bool>& v0, c
     Vector<Dimensions, bool> result;
     for (size_t i = 0; i < Dimensions; i++)
     {
-        result.v[i] = (v0.v[i] && v1.v[i]);
+        result.s[i] = (v0.s[i] && v1.s[i]);
     }
     return result;
 }
@@ -676,7 +666,7 @@ inline Vector<Dimensions, bool> operator||(const Vector<Dimensions, bool>& v0, c
     Vector<Dimensions, bool> result;
     for (size_t i = 0; i < Dimensions; i++)
     {
-        result.v[i] = (v0.v[i] || v1.v[i]);
+        result.s[i] = (v0.s[i] || v1.s[i]);
     }
     return result;
 }
@@ -750,7 +740,7 @@ inline Vector<Dimensions, Scalar> Min(const Vector<Dimensions, Scalar>& v0, cons
     Vector<Dimensions, Scalar> result;
     for (size_t i = 0; i < Dimensions; i++)
     {
-        result.v[i] = std::min(v0.v[i], v1.v[i]);
+        result.v[i] = v0.v[i] < v1.v[i] ? v0.v[i] : v1.v[i];
     }
     return result;
 }
@@ -761,7 +751,7 @@ inline Vector<Dimensions, Scalar> Max(const Vector<Dimensions, Scalar>& v0, cons
     Vector<Dimensions, Scalar> result;
     for (size_t i = 0; i < Dimensions; i++)
     {
-        result.v[i] = std::max(v0.v[i], v1.v[i]);
+        result.v[i] = v0.v[i] > v1.v[i] ? v0.v[i] : v1.v[i];
     }
     return result;
 }
@@ -772,7 +762,7 @@ inline Scalar Dot(const Vector<Dimensions, Scalar>& v0, const Vector<Dimensions,
     Scalar product = 0;
     for (size_t i = 0; i < Dimensions; i++)
     {
-        product += v0.v[i] * v1.v[i];
+        product += v0.s[i] * v1.s[i];
     }
     return product;
 }
@@ -792,9 +782,9 @@ inline Vector<Dimensions, Scalar> Normalize(const Vector<Dimensions, Scalar>& v)
 template<typename Scalar>
 inline Vector<3, Scalar> Cross(const Vector<3, Scalar>& v0, const Vector<3, Scalar>& v1)
 {
-    return Vector<3, Scalar>{ v0.v[1] * v1.v[2] - v0.v[2] * v1.v[1],
-                              v0.v[2] * v1.v[0] - v0.v[0] * v1.v[2],
-                              v0.v[0] * v1.v[1] - v0.v[1] * v1.v[0] };
+    return Vector<3, Scalar>{ v0.s[1] * v1.s[2] - v0.s[2] * v1.s[1],
+                              v0.s[2] * v1.s[0] - v0.s[0] * v1.s[2],
+                              v0.s[0] * v1.s[1] - v0.s[1] * v1.s[0] };
 }
 
 template<typename Scalar>
@@ -847,7 +837,7 @@ inline Vector<3, Scalar>& operator^=(Vector<3, Scalar>& v0, const Vector<3, Scal
     return v0;
 }
 
-template<template<size_t R, size_t C, typename S> class MType, size_t MRows, size_t MCols, typename Scalar>
+template<typename MTrans, size_t MRows, size_t MCols, typename Scalar>
 struct MatrixBase
 {
     Vector<MCols, Scalar> v[MRows];
@@ -888,12 +878,17 @@ struct MatrixBase
             this->v[i] = (list.end() == l) ? Zero : *l++;
         }
     }
-    template<typename S>
-    MatrixBase(const MType<MRows, MCols, S>& other)
+    template<template<size_t R, size_t C, typename S> class MType, typename SType>
+    explicit MatrixBase(const MType<MRows, MCols, SType>& other)
     {
         for (size_t i = 0; i < MRows; i++)
         {
-            this->v[i] = Vector<MCols, Scalar>(other.v[i]);
+            auto& t = this->v[i];
+            auto& o = other.v[i];
+            for (size_t j = 0; j < MCols; j++)
+            {
+                t[j] = (Scalar)o[j];
+            }
         }
     }
 
@@ -909,9 +904,9 @@ struct MatrixBase
         return false;
     }
 
-    MType<MCols, MRows, Scalar> Transpose() const
+    MTrans Transpose() const
     {
-        MatrixBase<MType, MCols, MRows, Scalar> m;
+        MTrans m;
         for (size_t i = 0; i < MRows; i++)
         {
             for (size_t j = 0; j < MCols; j++)
@@ -919,7 +914,7 @@ struct MatrixBase
                 m[j][i] = this->v[i][j];
             }
         }
-        return (MType<MCols, MRows, Scalar>&)m;
+        return m;
     }
 
     const Vector<MRows * MCols, Scalar>& ToVector() const
@@ -947,35 +942,29 @@ struct MatrixBase
 };
 
 template<size_t MRows, size_t MCols = MRows, typename Scalar = float>
-struct Matrix : MatrixBase<Matrix, MRows, MCols, Scalar>
+struct Matrix : MatrixBase<Matrix<MCols, MRows, Scalar>, MRows, MCols, Scalar>
 {
-    #if (defined(_MSC_VER) && _MSC_VER < 1900)
-    Matrix() : MatrixBase() {}
-    explicit Matrix(Scalar v) : MatrixBase(v) {}
-    explicit Matrix(const Scalar* v) : MatrixBase(v) {}
-    Matrix(const std::initializer_list<Scalar>& list) : MatrixBase(list) {}
-    Matrix(const std::initializer_list<const Vector<MCols, Scalar>>& list) : MatrixBase(list) {}
-    template<typename S>
-    Matrix(const Matrix<MRows, MCols, S>& other) : MatrixBase(other) {}
-    #else
-    using MatrixBase::MatrixBase;
-    #endif
+    using Base = MatrixBase<Matrix<MCols, MRows, Scalar>, MRows, MCols, Scalar>;
+    Matrix() = default;
+    explicit Matrix(Scalar s) : Base(s) {}
+    explicit Matrix(const Scalar* s) : Base(s) {}
+    Matrix(const std::initializer_list<Scalar>& list) : Base(list) {}
+    Matrix(const std::initializer_list<const Vector<MCols, Scalar>>& list) : Base(list) {}
+    template<template<size_t R, size_t C, typename S> class MType, typename SType>
+    explicit Matrix(const MType<MRows, MCols, SType>& other) : Base(other) {}
 };
 
 template<size_t Dims, typename Scalar>
-struct Matrix<Dims, Dims, Scalar> : MatrixBase<Matrix, Dims, Dims, Scalar>
+struct Matrix<Dims, Dims, Scalar> : MatrixBase<Matrix<Dims, Dims, Scalar>, Dims, Dims, Scalar>
 {
-    #if (defined(_MSC_VER) && _MSC_VER < 1900)
-    Matrix() : MatrixBase() {}
-    explicit Matrix(Scalar v) : MatrixBase(v) {}
-    explicit Matrix(const Scalar* v) : MatrixBase(v) {}
-    Matrix(const std::initializer_list<Scalar>& list) : MatrixBase(list) {}
-    Matrix(const std::initializer_list<const Vector<Dims, Scalar>>& list) : MatrixBase(list) {}
-    template<typename S>
-    Matrix(const Matrix<Dims, Dims, S>& other) : MatrixBase(other) {}
-    #else
-    using MatrixBase::MatrixBase;
-    #endif
+    using Base = MatrixBase<Matrix<Dims, Dims, Scalar>, Dims, Dims, Scalar>;
+    Matrix() = default;
+    explicit Matrix(Scalar v) : Base(v) {}
+    explicit Matrix(const Scalar* v) : Base(v) {}
+    Matrix(const std::initializer_list<Scalar>& list) : Base(list) {}
+    Matrix(const std::initializer_list<const Vector<Dims, Scalar>>& list) : Base(list) {}
+    template<template<size_t R, size_t C, typename S> class MType, typename SType>
+    Matrix(const Matrix<Dims, Dims, SType>& other) : Base(other) {}
 
     Matrix Inverse() const
     {
@@ -999,9 +988,6 @@ struct Matrix<Dims, Dims, Scalar> : MatrixBase<Matrix, Dims, Dims, Scalar>
 };
 
 template<size_t Dims, typename Scalar>
-const Matrix<Dims, Dims, Scalar> Matrix<Dims, Dims, Scalar>::Identity = MtxIdentity<Dims, Scalar>();
-
-template<size_t Dims, typename Scalar>
 inline Matrix<Dims, Dims, Scalar> MtxIdentity()
 {
     Matrix<Dims, Dims, Scalar> id;
@@ -1014,6 +1000,9 @@ inline Matrix<Dims, Dims, Scalar> MtxIdentity()
     }
     return id;
 }
+
+template<size_t Dims, typename Scalar>
+const Matrix<Dims, Dims, Scalar> Matrix<Dims, Dims, Scalar>::Identity = MtxIdentity<Dims, Scalar>();
 
 template<size_t MRows, size_t MCols, typename Scalar>
 inline size_t Rows(const Matrix<MRows, MCols, Scalar>&)
@@ -1301,7 +1290,7 @@ struct Quaternion : public Vector<4, Scalar>
     {
         auto uv = ((Vector<3, Scalar>*)this)->Cross(v);
         uv += uv;
-        return uv * this->v[3] + ((Vector<3, Scalar>*)this)->Cross(uv) + v;
+        return uv * this->s[3] + ((Vector<3, Scalar>*)this)->Cross(uv) + v;
     }
 
     Quaternion<Scalar> Inverse() const
@@ -1317,7 +1306,7 @@ struct Quaternion : public Vector<4, Scalar>
         auto w = t[3] * o[3] - t.Dot(o);
         auto p = t.Cross(o) + o * t[3] + t * o[3];
 
-        return Quaternion<Scalar>{ p.v[0], p.v[1], p.v[2], w };
+        return Quaternion<Scalar>{ p.s[0], p.s[1], p.s[2], w };
     }
 
     Vector<3, Scalar> ToEuler() const
@@ -1332,7 +1321,7 @@ struct Quaternion : public Vector<4, Scalar>
 
     Vector<4, Scalar> ToRotation() const
     {
-        auto a = std::acos(this->v[3]);
+        auto a = std::acos(this->s[3]);
         auto s = std::sin(a);
 
         if (std::abs(s) < FLT_EPSILON)
@@ -1340,7 +1329,7 @@ struct Quaternion : public Vector<4, Scalar>
             return Vector<4, Scalar>{ 1, 0, 0, 0 };
         }
 
-        return Vector<4, Scalar>{ this->v[0] / s, this->v[1] / s, this->v[2] / s, ToDegree(a * 2) };
+        return Vector<4, Scalar>{ this->s[0] / s, this->s[1] / s, this->s[2] / s, ToDegree(a * 2) };
     }
 
     Matrix<4, 4, Scalar> ToMatrix() const
@@ -1379,7 +1368,7 @@ struct Quaternion : public Vector<4, Scalar>
     static Quaternion<Scalar> FromRotation(const Vector<4, Scalar>& rotation)
     {
         auto& axis = (Vector<3, Scalar>&)rotation;
-        auto angle = rotation.v[3];
+        auto angle = rotation.s[3];
 
         if (axis.Dot() < FLT_EPSILON)
         {
@@ -1436,7 +1425,7 @@ struct Quaternion : public Vector<4, Scalar>
         auto s = std::sin(a);
         auto n = axis.Normalize();
 
-        return Quaternion<Scalar>{ s * n.v[0], s * n.v[1], s * n.v[2], c };
+        return Quaternion<Scalar>{ s * n.s[0], s * n.s[1], s * n.s[2], c };
     }
 
     static const Quaternion<Scalar> Identity;
@@ -1564,18 +1553,12 @@ public:
 
     static Matrix<4, 4, Scalar> Perspective(Scalar vfov /*in radian*/, Scalar aspect, Scalar _near, Scalar _far)
     {
-        auto fy = 1 / tan(vfov / 2);
-        auto fx = fy / aspect;
-        return PerspectiveF(fx, fy, _near, _far);
-    }
-
-    static Matrix<4, 4, Scalar> PerspectiveF(Scalar fx, Scalar fy, Scalar _near, Scalar _far)
-    {
+        auto f = 1 / tan(vfov / 2);
         auto i = 1 / (_near - _far);
-        return Matrix<4, 4, Scalar>{{ fx,  0,                  0,                    0 },
-                                    {  0, fy,                  0,                    0 },
-                                    {  0,  0, (_near + _far) * i, _near * _far * i * 2 },
-                                    {  0,  0,                 -1,                    0 }};
+        return Matrix<4, 4, Scalar>{{ f / aspect,  0,                  0,                    0 },
+                                    {          0,  f,                  0,                    0 },
+                                    {          0,  0, (_near + _far) * i, _near * _far * i * 2 },
+                                    {          0,  0,                 -1,                    0 }};
     }
 
     static Matrix<4, 4, Scalar> LookAt(const Vector<3, Scalar>& eye, const Vector<3, Scalar>& center, Scalar rotation /*in radian*/)
