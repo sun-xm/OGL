@@ -1,6 +1,10 @@
 cmake_minimum_required(VERSION 3.10)
 project(OGL)
 
+if(MSVC AND MSVC_VERSION GREATER_EQUAL 1911)
+    add_compile_options(/permissive-)
+endif()
+
 if(WIN32)
     # Config "cmake.configureSettings": { "GLEW_SHARED": "ON" } in settings.json to enable dynamic link to glew32.dll
     set(GLEW_SHARED OFF CACHE BOOL "Link glew shared library")

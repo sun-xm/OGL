@@ -107,7 +107,7 @@ struct Vector : VectorBase<Vector<Dimensions, Scalar>, Dimensions, Scalar>
 {
     Scalar s[Dimensions];
 
-    using Base = VectorBase<Vector<Dimensions, Scalar>, Dimensions, Scalar>;
+    using Base = VectorBase<Vector, Dimensions, Scalar>;
 
     Vector() = default;
     explicit Vector(Scalar s) : Base(s) {}
@@ -130,7 +130,7 @@ struct Vector<2, Scalar> : VectorBase<Vector<2, Scalar>, 2, Scalar>
         };
     };
 
-    using Base = VectorBase<Vector<2, Scalar>, 2, Scalar>;
+    using Base = VectorBase<Vector, 2, Scalar>;
 
     Vector() = default;
     explicit Vector(Scalar v) : Base(v) {}
@@ -181,7 +181,7 @@ struct Vector<3, Scalar> : VectorBase<Vector<3, Scalar>, 3, Scalar>
         };
     };
 
-    using Base = VectorBase<Vector<3, Scalar>, 3, Scalar>;
+    using Base = VectorBase<Vector, 3, Scalar>;
 
     Vector() = default;
     explicit Vector(Scalar v) : Base(v) {}
@@ -239,7 +239,7 @@ struct Vector<4, Scalar> : VectorBase<Vector<4, Scalar>, 4, Scalar>
         };
     };
 
-    using Base = VectorBase<Vector<4, Scalar>, 4, Scalar>;
+    using Base = VectorBase<Vector, 4, Scalar>;
 
     Vector() = default;
     explicit Vector(Scalar v) : Base(v) {}
@@ -957,7 +957,7 @@ struct Matrix : MatrixBase<Matrix<MCols, MRows, Scalar>, MRows, MCols, Scalar>
 template<size_t Dims, typename Scalar>
 struct Matrix<Dims, Dims, Scalar> : MatrixBase<Matrix<Dims, Dims, Scalar>, Dims, Dims, Scalar>
 {
-    using Base = MatrixBase<Matrix<Dims, Dims, Scalar>, Dims, Dims, Scalar>;
+    using Base = MatrixBase<Matrix, Dims, Dims, Scalar>;
     Matrix() = default;
     explicit Matrix(Scalar v) : Base(v) {}
     explicit Matrix(const Scalar* v) : Base(v) {}

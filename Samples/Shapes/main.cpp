@@ -11,7 +11,7 @@ int APIENTRY wWinMain(HINSTANCE hInstance, HINSTANCE, LPWSTR, int nCmdShow)
     Gdiplus::GdiplusStartupOutput output;
     Gdiplus::GdiplusStartup(&token, &input, &output);
 
-    auto ret = App(hInstance).Run(MainWindow(), nCmdShow);
+    auto ret = App(hInstance).Run((Window&)MainWindow(), nCmdShow);
 
     Gdiplus::GdiplusShutdown(token);
 
