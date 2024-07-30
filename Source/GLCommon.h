@@ -788,6 +788,12 @@ inline Vector<3, Scalar> Cross(const Vector<3, Scalar>& v0, const Vector<3, Scal
 }
 
 template<typename Scalar>
+inline Vector<4, Scalar> Plane(const Vector<3, Scalar>& position, const Vector<3, Scalar>& normal)
+{
+    return { normal.X, normal.Y, normal.Z, -normal.X * position.X - normal.Y * position.Y - normal.Z * position.Z };
+}
+
+template<typename Scalar>
 inline Vector<3, Scalar> Project(const Vector<3, Scalar>& vector, const Vector<4, Scalar>& plane)
 {
     auto a = plane.X;
