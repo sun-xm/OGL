@@ -794,22 +794,22 @@ inline Vector<4, Scalar> Plane(const Vector<3, Scalar>& position, const Vector<3
 }
 
 template<typename Scalar>
-inline Vector<3, Scalar> Project(const Vector<3, Scalar>& vector, const Vector<4, Scalar>& plane)
+inline Vector<3, Scalar> Project(const Vector<3, Scalar>& position, const Vector<4, Scalar>& plane)
 {
-    auto a = plane.X;
-    auto b = plane.Y;
-    auto c = plane.Z;
-    auto d = plane.W;
+    return Intersect(position, (Vector<3, Scalar>&)plane, plane);
+}
 
-    auto a2 = a * a;
-    auto b2 = b * b;
-    auto c2 = c * c;
+template<typename Scalar>
+inline Vector<3, Scalar> Intersect(const Vector<3, Scalar>& position, const Vector<3, Scalar>& vector, const Vector<4, Scalar>& plane)
+{
+    auto t = -Distance(position, plane) / Dot(vector, (Vector<3, Scalar>&)plane);
+    return position + t * vector;
+}
 
-    auto x = ((b2 + c2) * vector.X - a * (b * vector.Y + c * vector.Z + d)) / (a2 + b2 + c2);
-    auto y = ((a2 + c2) * vector.Y - b * (a * vector.X + c * vector.Z + d)) / (a2 + b2 + c2);
-    auto z = ((a2 + b2) * vector.Z - c * (a * vector.X + b * vector.Y + d)) / (a2 + b2 + c2);
-
-    return Vector<3, Scalar>{ x, y, z };
+template<typename Scalar>
+inline Scalar Distance(const Vector<3, Scalar>& position, const Vector<4, Scalar>& plane)
+{
+    return position.X * plane.X + position.Y * plane.Y + position.Z * plane.Z + plane.W;
 }
 
 template<typename Scalar>
