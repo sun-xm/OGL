@@ -230,6 +230,7 @@ protected:
         this->material.Revoke();
         this->RevokeTexture();
         this->RevokeTexCoords();
+        this->RevokeColors();
         this->RevokeNormals();
         this->RevokeVertices();
     }
