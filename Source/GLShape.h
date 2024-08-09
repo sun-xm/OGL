@@ -40,6 +40,27 @@ public:
         return this->tbo.Data(coords, count * sizeof(*coords), GL_STATIC_DRAW);
     }
 
+    const GLElmBuf& Elements() const
+    {
+        return this->ebo;
+    }
+    const GLBuffer& Vertices() const
+    {
+        return this->vbo;
+    }
+    const GLBuffer& Normals() const
+    {
+        return this->nbo;
+    }
+    const GLBuffer& Colors() const
+    {
+        return this->cbo;
+    }
+    const GLBuffer& TexCoords() const
+    {
+        return this->nbo;
+    }
+
     GLenum Mode() const
     {
         return this->mode;
