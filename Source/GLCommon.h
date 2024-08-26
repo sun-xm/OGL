@@ -147,6 +147,10 @@ struct Vector<2, Scalar> : VectorBase<Vector<2, Scalar>, 2, Scalar>
     {
         return ::Dot(*this, other);
     }
+    Scalar Cross(const Vector& other) const
+    {
+        return ::Cross(*this, other);
+    }
     Scalar Length() const
     {
         return ::Length(*this);
@@ -780,6 +784,12 @@ inline Vector<Dimensions, Scalar> Normalize(const Vector<Dimensions, Scalar>& v)
 }
 
 template<typename Scalar>
+inline Scalar Cross(const Vector<2, Scalar>& v0, const Vector<2, Scalar>& v1)
+{
+    return v0.s[0] * v1.s[1] - v0.s[1] * v1.s[0];
+}
+
+template<typename Scalar>
 inline Vector<3, Scalar> Cross(const Vector<3, Scalar>& v0, const Vector<3, Scalar>& v1)
 {
     return Vector<3, Scalar>{ v0.s[1] * v1.s[2] - v0.s[2] * v1.s[1],
@@ -828,6 +838,12 @@ template<typename Scalar>
 inline Scalar operator*(const Vector<3, Scalar>& v0, const Vector<3, Scalar>& v1)
 {
     return Dot(v0, v1);
+}
+
+template<typename Scalar>
+inline Scalar operator^(const Vector<2, Scalar>& v0, const Vector<2, Scalar>& v1)
+{
+    return Cross(v0, v1);
 }
 
 template<typename Scalar>
