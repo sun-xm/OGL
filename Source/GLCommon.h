@@ -38,87 +38,14 @@ inline Scalar ToDegree(Scalar radian)
     return radian / (Scalar)3.14159265358979323846264338327950288419716939937510l * (Scalar)180.0;
 }
 
-template<typename Vector, size_t Dimensions, typename Scalar>
-struct VectorBase
-{
-    VectorBase() = default;
-    explicit VectorBase(Scalar s)
-    {
-        for (size_t i = 0; i < Dimensions; i++)
-        {
-            ((Vector*)this)->s[i] = s;
-        }
-    }
-    explicit VectorBase(const Scalar* s)
-    {
-        for (size_t i = 0; i < Dimensions; i++)
-        {
-            ((Vector*)this)->s[i] = s[i];
-        }
-    }
-    VectorBase(const std::initializer_list<Scalar>& list)
-    {
-        auto l = list.begin();
-        for (size_t i = 0; i < Dimensions; i++)
-        {
-            ((Vector*)this)->s[i] = (list.end() == l) ? 0 : *l++;
-        }
-    }
-    template<template<size_t D, typename S> class VType, size_t Dims, typename SType>
-    explicit VectorBase(const VType<Dims, SType>& other, const std::initializer_list<Scalar>& list = {})
-    {
-        for (size_t i = 0; i < (Dims < Dimensions ? Dims : Dimensions); i++)
-        {
-            ((Vector*)this)->s[i] = (Scalar)other.s[i];
-        }
-        auto l = list.begin();
-        for (size_t i = Dims; i < Dimensions; i++)
-        {
-            ((Vector*)this)->s[i] = (list.end() == l) ? 0 : *l++;
-        }
-    }
-
-    bool IsNaN() const
-    {
-        return Any(*(Vector*)this, [](Scalar s){ return isnan(s); });
-    }
-
-    Scalar& operator[](size_t index)
-    {
-        return ((Vector*)this)->s[index];
-    }
-    const Scalar& operator[](size_t index) const
-    {
-        return ((Vector*)this)->s[index];
-    }
-
-    operator Scalar*()
-    {
-        return ((Vector*)this)->s;
-    }
-    operator const Scalar*() const
-    {
-        return ((Vector*)this)->s;
-    }
-};
-
-template<size_t Dimensions, typename Scalar = float>
-struct Vector : VectorBase<Vector<Dimensions, Scalar>, Dimensions, Scalar>
+template<size_t Dimensions, typename Scalar>
+struct VectorData
 {
     Scalar s[Dimensions];
-
-    using Base = VectorBase<Vector, Dimensions, Scalar>;
-
-    Vector() = default;
-    explicit Vector(Scalar s) : Base(s) {}
-    explicit Vector(const Scalar* s) : Base(s) {}
-    Vector(const std::initializer_list<Scalar>& list) : Base(list) {}
-    template<template<size_t D, typename S> class VType, size_t Dims, typename SType>
-    explicit Vector(const VType<Dims, SType>& other, const std::initializer_list<Scalar>& list) : Base(other, list) {}
 };
 
 template<typename Scalar>
-struct Vector<2, Scalar> : VectorBase<Vector<2, Scalar>, 2, Scalar>
+struct VectorData<2, Scalar>
 {
     union
     {
@@ -129,15 +56,120 @@ struct Vector<2, Scalar> : VectorBase<Vector<2, Scalar>, 2, Scalar>
             Scalar Y;
         };
     };
+};
 
-    using Base = VectorBase<Vector, 2, Scalar>;
+template<typename Scalar>
+struct VectorData<3, Scalar>
+{
+    union
+    {
+        Scalar s[3];
+        struct
+        {
+            Scalar X;
+            Scalar Y;
+            Scalar Z;
+        };
+    };
+};
 
+template<typename Scalar>
+struct VectorData<4, Scalar>
+{
+    union
+    {
+        Scalar s[4];
+        struct
+        {
+            Scalar X;
+            Scalar Y;
+            Scalar Z;
+            Scalar W;
+        };
+    };
+};
+
+template<size_t Dimensions, typename Scalar>
+struct VectorBase : VectorData<Dimensions, Scalar>
+{
+    VectorBase() = default;
+    VectorBase(const std::initializer_list<Scalar>& list)
+    {
+        auto beg = list.begin();
+        for (size_t i = 0; i < Dimensions; i++)
+        {
+            this->s[i] = (list.end() == beg ? 0 : *beg++);
+        }
+    }
+    explicit VectorBase(Scalar s)
+    {
+        for (size_t i = 0; i < Dimensions; i++) { this->s[i] = s; }
+    }
+    explicit VectorBase(const Scalar* s)
+    {
+        for (size_t i = 0; i < Dimensions; i++) { this->s[i] = s[i]; }
+    }
+    template<size_t Dims>
+    explicit VectorBase(const VectorBase<Dims, Scalar>& other, const std::initializer_list<Scalar>& list = {})
+    {
+        size_t cnt = Dims < Dimensions ? Dims : Dimensions;
+        for (size_t i = 0; i < cnt; i++)
+        {
+            this->s[i] = other.s[i];
+        }
+
+        auto beg = list.begin();
+        for (size_t i = Dims; i < Dimensions; i++)
+        {
+            this->s[i] = (list.end() == beg ? 0 : *beg++);
+        }
+    }
+
+    bool IsNaN() const
+    {
+        for (auto& e : this->s) { if (isnan(e)) return true; }
+        return false;
+    }
+
+    Scalar& operator[](size_t index)
+    {
+        return this->s[index];
+    }
+    const Scalar& operator[](size_t index) const
+    {
+        return this->s[index];
+    }
+
+    operator Scalar*()
+    {
+        return this->s;
+    }
+    operator const Scalar*() const
+    {
+        return this->s;
+    }
+};
+
+template<size_t Dimensions, typename Scalar = float>
+struct Vector : VectorBase<Dimensions, Scalar>
+{
     Vector() = default;
-    explicit Vector(Scalar v) : Base(v) {}
-    explicit Vector(const Scalar* v) : Base(v) {}
-    Vector(const std::initializer_list<Scalar>& list) : Base(list) {}
-    template<template<size_t D, typename S> class VType, size_t Dims, typename SType>
-    explicit Vector(const VType<Dims, SType>& other, const std::initializer_list<Scalar>& list = {}) : Base(other, list) {}
+    Vector(const std::initializer_list<Scalar>& list) : VectorBase(list) {}
+    explicit Vector(Scalar s) : VectorBase(s) {}
+    explicit Vector(const Scalar* s) : VectorBase(s) {}
+    template<size_t Dims>
+    explicit Vector(const Vector<Dims, Scalar>& other, const std::initializer_list<Scalar>& list) : VectorBase(other, list) {}
+};
+
+template<typename Scalar>
+struct Vector<2, Scalar> : VectorBase<2, Scalar>
+{
+    Vector() = default;
+    Vector(const std::initializer_list<Scalar>& list) : VectorBase(list) {}
+    explicit Vector(Scalar s) : VectorBase(s) {}
+    explicit Vector(const Scalar* s) : VectorBase(s) {}
+    template<size_t Dims>
+    explicit Vector(const Vector<Dims, Scalar>& other, const std::initializer_list<Scalar>& list) : VectorBase(other, list) {}
 
     Scalar Dot() const
     {
@@ -172,27 +204,14 @@ template<typename Scalar>
 const Vector<2, Scalar> Vector<2, Scalar>::YAxis = { 0, 1 };
 
 template<typename Scalar>
-struct Vector<3, Scalar> : VectorBase<Vector<3, Scalar>, 3, Scalar>
+struct Vector<3, Scalar> : VectorBase<3, Scalar>
 {
-    union
-    {
-        Scalar s[3];
-        struct
-        {
-            Scalar X;
-            Scalar Y;
-            Scalar Z;
-        };
-    };
-
-    using Base = VectorBase<Vector, 3, Scalar>;
-
     Vector() = default;
-    explicit Vector(Scalar v) : Base(v) {}
-    explicit Vector(const Scalar* v) : Base(v) {}
-    Vector(const std::initializer_list<Scalar>& list) : Base(list) {}
-    template<template<size_t D, typename S> class VType, size_t Dims, typename SType>
-    explicit Vector(const VType<Dims, SType>& other, const std::initializer_list<Scalar>& list = {}) : Base(other, list) {}
+    Vector(const std::initializer_list<Scalar>& list) : VectorBase(list) {}
+    explicit Vector(Scalar s) : VectorBase(s) {}
+    explicit Vector(const Scalar* s) : VectorBase(s) {}
+    template<size_t Dims>
+    explicit Vector(const Vector<Dims, Scalar>& other, const std::initializer_list<Scalar>& list) : VectorBase(other, list) {}
 
     Scalar Dot() const
     {
@@ -229,28 +248,14 @@ template<typename Scalar>
 const Vector<3, Scalar> Vector<3, Scalar>::ZAxis = { 0, 0, 1 };
 
 template<typename Scalar>
-struct Vector<4, Scalar> : VectorBase<Vector<4, Scalar>, 4, Scalar>
+struct Vector<4, Scalar> : VectorBase<4, Scalar>
 {
-    union
-    {
-        Scalar s[4];
-        struct
-        {
-            Scalar X;
-            Scalar Y;
-            Scalar Z;
-            Scalar W;
-        };
-    };
-
-    using Base = VectorBase<Vector, 4, Scalar>;
-
     Vector() = default;
-    explicit Vector(Scalar v) : Base(v) {}
-    explicit Vector(const Scalar* v) : Base(v) {}
-    Vector(const std::initializer_list<Scalar>& list) : Base(list) {}
-    template<template<size_t D, typename S> class VType, size_t Dims, typename SType>
-    explicit Vector(const VType<Dims, SType>& other, const std::initializer_list<Scalar>& list = {}) : Base(other, list) {}
+    Vector(const std::initializer_list<Scalar>& list) : VectorBase(list) {}
+    explicit Vector(Scalar s) : VectorBase(s) {}
+    explicit Vector(const Scalar* s) : VectorBase(s) {}
+    template<size_t Dims>
+    explicit Vector(const Vector<Dims, Scalar>& other, const std::initializer_list<Scalar>& list) : VectorBase(other, list) {}
 
     static const Vector NaN, Zero, XYPlane, YZPlane, ZXPlane;
 };
