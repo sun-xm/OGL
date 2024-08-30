@@ -122,7 +122,7 @@ public:
         }
         else
         {
-            auto l = Length(this->position - this->lookAt);
+            auto l = (this->position - this->lookAt).Length();
             auto orthWidth = width * orthHeight / height;
             glOrtho(-.5f * orthHeight, .5f * orthHeight, -.5f * orthHeight, .5f * orthHeight, this->clip[0] - l, this->clip[1] - l);
         }

@@ -38,14 +38,32 @@ inline Scalar ToDegree(Scalar radian)
     return radian / (Scalar)3.14159265358979323846264338327950288419716939937510l * (Scalar)180.0;
 }
 
-template<size_t Dimensions, typename Scalar>
+template<typename Scalar, typename = void>
+struct NaNHelper
+{
+    static bool IsNaN(Scalar s)
+    {
+        return false;
+    }
+};
+
+template<typename Scalar>
+struct NaNHelper<Scalar, typename std::enable_if<std::is_floating_point<Scalar>::value>::type>
+{
+    static bool IsNaN(Scalar s)
+    {
+        return std::isnan(s);
+    }
+};
+
+template<template<size_t, typename> class Vector, size_t Dimensions, typename Scalar>
 struct VectorData
 {
     Scalar s[Dimensions];
 };
 
-template<typename Scalar>
-struct VectorData<2, Scalar>
+template<template<size_t, typename> class Vector, typename Scalar>
+struct VectorData<Vector, 2, Scalar>
 {
     union
     {
@@ -56,10 +74,17 @@ struct VectorData<2, Scalar>
             Scalar Y;
         };
     };
-};
 
-template<typename Scalar>
-struct VectorData<3, Scalar>
+    static const Vector<2, Scalar> XAxis;
+    static const Vector<2, Scalar> YAxis;
+};
+template<template<size_t, typename> class Vector, typename Scalar>
+const Vector<2, Scalar> VectorData<Vector, 2, Scalar>::XAxis = { 1, 0 };
+template<template<size_t, typename> class Vector, typename Scalar>
+const Vector<2, Scalar> VectorData<Vector, 2, Scalar>::YAxis = { 0, 1 };
+
+template<template<size_t, typename> class Vector, typename Scalar>
+struct VectorData<Vector, 3, Scalar>
 {
     union
     {
@@ -71,10 +96,20 @@ struct VectorData<3, Scalar>
             Scalar Z;
         };
     };
-};
 
-template<typename Scalar>
-struct VectorData<4, Scalar>
+    static const Vector<3, Scalar> XAxis;
+    static const Vector<3, Scalar> YAxis;
+    static const Vector<3, Scalar> ZAxis;
+};
+template<template<size_t, typename> class Vector, typename Scalar>
+const Vector<3, Scalar> VectorData<Vector, 3, Scalar>::XAxis = { 1, 0, 0 };
+template<template<size_t, typename> class Vector, typename Scalar>
+const Vector<3, Scalar> VectorData<Vector, 3, Scalar>::YAxis = { 0, 1, 0 };
+template<template<size_t, typename> class Vector, typename Scalar>
+const Vector<3, Scalar> VectorData<Vector, 3, Scalar>::ZAxis = { 0, 0, 1 };
+
+template<template<size_t, typename> class Vector, typename Scalar>
+struct VectorData<Vector, 4, Scalar>
 {
     union
     {
@@ -87,10 +122,20 @@ struct VectorData<4, Scalar>
             Scalar W;
         };
     };
-};
 
-template<size_t Dimensions, typename Scalar>
-struct VectorBase : VectorData<Dimensions, Scalar>
+    static const Vector<4, Scalar> XYPlane;
+    static const Vector<4, Scalar> YZPlane;
+    static const Vector<4, Scalar> ZXPlane;
+};
+template<template<size_t, typename> class Vector, typename Scalar>
+const Vector<4, Scalar> VectorData<Vector, 4, Scalar>::XYPlane = { 0, 0, 1, 0 };
+template<template<size_t, typename> class Vector, typename Scalar>
+const Vector<4, Scalar> VectorData<Vector, 4, Scalar>::YZPlane = { 1, 0, 0, 0 };
+template<template<size_t, typename> class Vector, typename Scalar>
+const Vector<4, Scalar> VectorData<Vector, 4, Scalar>::ZXPlane = { 0, 1, 0, 0 };
+
+template<template<size_t, typename> class Vector, size_t Dimensions, typename Scalar>
+struct VectorBase : VectorData<Vector, Dimensions, Scalar>
 {
     VectorBase() = default;
     VectorBase(const std::initializer_list<Scalar>& list)
@@ -109,8 +154,8 @@ struct VectorBase : VectorData<Dimensions, Scalar>
     {
         for (size_t i = 0; i < Dimensions; i++) { this->s[i] = s[i]; }
     }
-    template<size_t D, typename S>
-    explicit VectorBase(const VectorBase<D, S>& other, const std::initializer_list<Scalar>& list)
+    template<template<size_t, typename> class V, size_t D, typename S>
+    explicit VectorBase(const VectorBase<V, D, S>& other, const std::initializer_list<Scalar>& list)
     {
         size_t cnt = D < Dimensions ? D : Dimensions;
         for (size_t i = 0; i < cnt; i++)
@@ -127,8 +172,28 @@ struct VectorBase : VectorData<Dimensions, Scalar>
 
     bool IsNaN() const
     {
-        for (auto& e : this->s) { if (isnan(e)) return true; }
+        if (std::is_floating_point<Scalar>::value)
+        {
+            for (auto& e : this->s)
+            {
+                if (NaNHelper<Scalar>::IsNaN(e)) return true;
+            }
+        }
         return false;
+    }
+
+    Scalar Dot() const
+    {
+        return ::Dot(*(Vector<Dimensions, Scalar>*)this, *(Vector<Dimensions, Scalar>*)this);
+    }
+    Scalar Length() const
+    {
+        return sqrtx(this->Dot());
+    }
+
+    Vector<Dimensions, Scalar> Normalize() const
+    {
+        return *(Vector<Dimensions, Scalar>*)this / this->Length();
     }
 
     Scalar& operator[](size_t index)
@@ -148,10 +213,17 @@ struct VectorBase : VectorData<Dimensions, Scalar>
     {
         return this->s;
     }
+
+    static const Vector<Dimensions, Scalar> NaN;
+    static const Vector<Dimensions, Scalar> Zero;
 };
+template<template<size_t, typename> class Vector, size_t Dimensions, typename Scalar>
+const Vector<Dimensions, Scalar> VectorBase<Vector, Dimensions, Scalar>::NaN  = Vector<Dimensions, Scalar>(std::numeric_limits<Scalar>::quiet_NaN());
+template<template<size_t, typename> class Vector, size_t Dimensions, typename Scalar>
+const Vector<Dimensions, Scalar> VectorBase<Vector, Dimensions, Scalar>::Zero = Vector<Dimensions, Scalar>((Scalar)0);
 
 template<size_t Dimensions, typename Scalar = float>
-struct Vector : VectorBase<Dimensions, Scalar>
+struct Vector : VectorBase<Vector, Dimensions, Scalar>
 {
     Vector() = default;
     Vector(const std::initializer_list<Scalar>& list) : VectorBase(list) {}
@@ -160,115 +232,6 @@ struct Vector : VectorBase<Dimensions, Scalar>
     template<size_t D, typename S>
     explicit Vector(const Vector<D, S>& other, const std::initializer_list<Scalar>& list = {}) : VectorBase(other, list) {}
 };
-
-template<typename Scalar>
-struct Vector<2, Scalar> : VectorBase<2, Scalar>
-{
-    Vector() = default;
-    Vector(const std::initializer_list<Scalar>& list) : VectorBase(list) {}
-    explicit Vector(Scalar s) : VectorBase(s) {}
-    explicit Vector(const Scalar* s) : VectorBase(s) {}
-    template<size_t D, typename S>
-    explicit Vector(const Vector<D, S>& other, const std::initializer_list<Scalar>& list = {}) : VectorBase(other, list) {}
-
-    Scalar Dot() const
-    {
-        return ::Dot(*this, *this);
-    }
-    Scalar Dot(const Vector& other) const
-    {
-        return ::Dot(*this, other);
-    }
-    Scalar Cross(const Vector& other) const
-    {
-        return ::Cross(*this, other);
-    }
-    Scalar Length() const
-    {
-        return ::Length(*this);
-    }
-    Vector Normalize() const
-    {
-        return ::Normalize(*this);
-    }
-
-    static const Vector NaN, Zero, XAxis, YAxis;
-};
-template<typename Scalar>
-const Vector<2, Scalar> Vector<2, Scalar>::NaN   = { std::numeric_limits<Scalar>::quiet_NaN(), std::numeric_limits<Scalar>::quiet_NaN() };
-template<typename Scalar>
-const Vector<2, Scalar> Vector<2, Scalar>::Zero  = { 0, 0 };
-template<typename Scalar>
-const Vector<2, Scalar> Vector<2, Scalar>::XAxis = { 1, 0 };
-template<typename Scalar>
-const Vector<2, Scalar> Vector<2, Scalar>::YAxis = { 0, 1 };
-
-template<typename Scalar>
-struct Vector<3, Scalar> : VectorBase<3, Scalar>
-{
-    Vector() = default;
-    Vector(const std::initializer_list<Scalar>& list) : VectorBase(list) {}
-    explicit Vector(Scalar s) : VectorBase(s) {}
-    explicit Vector(const Scalar* s) : VectorBase(s) {}
-    template<size_t D, typename S>
-    explicit Vector(const Vector<D, S>& other, const std::initializer_list<Scalar>& list = {}) : VectorBase(other, list) {}
-
-    Scalar Dot() const
-    {
-        return ::Dot(*this, *this);
-    }
-    Scalar Dot(const Vector& other) const
-    {
-        return ::Dot(*this, other);
-    }
-    Scalar Length() const
-    {
-        return ::Length(*this);
-    }
-    Vector Cross(const Vector& other) const
-    {
-        return ::Cross(*this, other);
-    }
-    Vector Normalize() const
-    {
-        return ::Normalize(*this);
-    }
-
-    static const Vector<3, Scalar> NaN, Zero, XAxis, YAxis, ZAxis;
-};
-template<typename Scalar>
-const Vector<3, Scalar> Vector<3, Scalar>::NaN   = { std::numeric_limits<Scalar>::quiet_NaN(), std::numeric_limits<Scalar>::quiet_NaN(), std::numeric_limits<Scalar>::quiet_NaN() };
-template<typename Scalar>
-const Vector<3, Scalar> Vector<3, Scalar>::Zero  = { 0, 0, 0 };
-template<typename Scalar>
-const Vector<3, Scalar> Vector<3, Scalar>::XAxis = { 1, 0, 0 };
-template<typename Scalar>
-const Vector<3, Scalar> Vector<3, Scalar>::YAxis = { 0, 1, 0 };
-template<typename Scalar>
-const Vector<3, Scalar> Vector<3, Scalar>::ZAxis = { 0, 0, 1 };
-
-template<typename Scalar>
-struct Vector<4, Scalar> : VectorBase<4, Scalar>
-{
-    Vector() = default;
-    Vector(const std::initializer_list<Scalar>& list) : VectorBase(list) {}
-    explicit Vector(Scalar s) : VectorBase(s) {}
-    explicit Vector(const Scalar* s) : VectorBase(s) {}
-    template<size_t D, typename S>
-    explicit Vector(const Vector<D, S>& other, const std::initializer_list<Scalar>& list = {}) : VectorBase(other, list) {}
-
-    static const Vector NaN, Zero, XYPlane, YZPlane, ZXPlane;
-};
-template<typename Scalar>
-const Vector<4, Scalar> Vector<4, Scalar>::NaN   = { std::numeric_limits<Scalar>::quiet_NaN(), std::numeric_limits<Scalar>::quiet_NaN(), std::numeric_limits<Scalar>::quiet_NaN(), std::numeric_limits<Scalar>::quiet_NaN() };
-template<typename Scalar>
-const Vector<4, Scalar> Vector<4, Scalar>::Zero  = { 0, 0, 0, 0 };
-template<typename Scalar>
-const Vector<4, Scalar> Vector<4, Scalar>::XYPlane = { 0, 0, 1, 0 };
-template<typename Scalar>
-const Vector<4, Scalar> Vector<4, Scalar>::YZPlane = { 1, 0, 0, 0 };
-template<typename Scalar>
-const Vector<4, Scalar> Vector<4, Scalar>::ZXPlane = { 0, 1, 0, 0 };
 
 typedef Vector<3, uint32_t> Element;
 typedef Vector<3> Vertex;
@@ -776,18 +739,6 @@ inline Scalar Dot(const Vector<Dimensions, Scalar>& v0, const Vector<Dimensions,
     return product;
 }
 
-template<size_t Dimensions, typename Scalar>
-inline Scalar Length(const Vector<Dimensions, Scalar>& v)
-{
-    return sqrtx(Dot(v, v));
-}
-
-template<size_t Dimensions, typename Scalar>
-inline Vector<Dimensions, Scalar> Normalize(const Vector<Dimensions, Scalar>& v)
-{
-    return v / Length(v);
-}
-
 template<typename Scalar>
 inline Scalar Cross(const Vector<2, Scalar>& v0, const Vector<2, Scalar>& v1)
 {
@@ -830,17 +781,11 @@ inline Scalar Distance(const Vector<3, Scalar>& position, const Vector<4, Scalar
 template<typename Scalar>
 inline Scalar CosOfVectors(const Vector<3, Scalar>& v0, const Vector<3, Scalar>& v1)
 {
-    return Dot(Normalize(v0), Normalize(v1));
+    return Dot(v0.Normalize(), v1.Normalize());
 }
 
-template<typename Scalar>
-inline Scalar operator*(const Vector<2, Scalar>& v0, const Vector<2, Scalar>& v1)
-{
-    return Dot(v0, v1);
-}
-
-template<typename Scalar>
-inline Scalar operator*(const Vector<3, Scalar>& v0, const Vector<3, Scalar>& v1)
+template<size_t Dimensions, typename Scalar>
+inline Scalar operator*(const Vector<Dimensions, Scalar>& v0, const Vector<Dimensions, Scalar>& v1)
 {
     return Dot(v0, v1);
 }
@@ -855,13 +800,6 @@ template<typename Scalar>
 inline Vector<3, Scalar> operator^(const Vector<3, Scalar>& v0, const Vector<3, Scalar>& v1)
 {
     return Cross(v0, v1);
-}
-
-template<typename Scalar>
-inline Vector<3, Scalar>& operator^=(Vector<3, Scalar>& v0, const Vector<3, Scalar>& v1)
-{
-    v0 = Cross(v0, v1);
-    return v0;
 }
 
 template<typename MTrans, size_t MRows, size_t MCols, typename Scalar>
@@ -1315,9 +1253,9 @@ struct Quaternion : public Vector<4, Scalar>
 
     Vector<3, Scalar> Rotate(const Vector<3, Scalar>& v) const
     {
-        auto uv = ((Vector<3, Scalar>*)this)->Cross(v);
+        auto uv = Cross((*(Vector<3, Scalar>*)this), v);
         uv += uv;
-        return uv * this->s[3] + ((Vector<3, Scalar>*)this)->Cross(uv) + v;
+        return uv * this->s[3] + Cross((*(Vector<3, Scalar>*)this), uv) + v;
     }
 
     Quaternion<Scalar> Inverse() const
@@ -1330,8 +1268,8 @@ struct Quaternion : public Vector<4, Scalar>
         auto& t = (Vector<3, Scalar>&)*this;
         auto& o = (Vector<3, Scalar>&)other;
 
-        auto w = t[3] * o[3] - t.Dot(o);
-        auto p = t.Cross(o) + o * t[3] + t * o[3];
+        auto w = t[3] * o[3] - ::Dot(t, o);
+        auto p = Cross(t, o) + o * t[3] + t * o[3];
 
         return Quaternion<Scalar>{ p.s[0], p.s[1], p.s[2], w };
     }
@@ -1409,8 +1347,8 @@ struct Quaternion : public Vector<4, Scalar>
     {
         const auto e = std::numeric_limits<Scalar>::epsilon();
 
-        auto n0 = v0.Normalize();
-        auto n1 = v1.Normalize();
+        auto n0 = (Vector<3, Scalar>&)v0.Normalize();
+        auto n1 = (Vector<3, Scalar>&)v1.Normalize();
 
         if ((n0 - n1).Length() < e)
         {
@@ -1418,9 +1356,9 @@ struct Quaternion : public Vector<4, Scalar>
         }
         else if ((n0 + n1).Length() < e)
         {
-            auto cx = std::abs(Dot(n0, Vector<3, Scalar>::XAxis));
-            auto cy = std::abs(Dot(n0, Vector<3, Scalar>::YAxis));
-            auto cz = std::abs(Dot(n0, Vector<3, Scalar>::ZAxis));
+            auto cx = std::abs(::Dot(n0, Vector<3, Scalar>::XAxis));
+            auto cy = std::abs(::Dot(n0, Vector<3, Scalar>::YAxis));
+            auto cz = std::abs(::Dot(n0, Vector<3, Scalar>::ZAxis));
 
             auto axis = Vector<3, Scalar>::XAxis;
             auto minc = cx;
@@ -1435,14 +1373,14 @@ struct Quaternion : public Vector<4, Scalar>
                 axis = Vector<3, Scalar>::ZAxis;
             }
 
-            auto v = n0.Cross(axis);
+            auto v = Cross(n0, axis);
             return Quaternion<Scalar>{ v[0], v[1], v[2], 0 };
         }
 
         auto h = (n0 + n1).Normalize();
-        auto q = n0.Cross(h);
+        auto q = Cross(n0, h);
 
-        return Quaternion<Scalar>{ q[0], q[1], q[2], n0.Dot(h) };
+        return Quaternion<Scalar>{ q[0], q[1], q[2], ::Dot(n0, h) };
     }
 
     static Quaternion<Scalar> FromAxisAngle(const Vector<3, Scalar>& axis, float radian)
