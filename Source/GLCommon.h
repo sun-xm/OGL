@@ -10,5 +10,5 @@ typedef Vector<4> Color;
 typedef Vector<2> Coordinate;
 
 template<typename T, size_t N>
-char(&_ArraySizeHelper(T(&array)[N]))[N];
-#define COUNTOF(array)(sizeof( _ArraySizeHelper(array)))
+char(&_ArraySizeHelper(T(&)[N]))[N];
+#define COUNTOF(arr)(sizeof( _ArraySizeHelper(arr)))

@@ -213,15 +213,22 @@ struct VectorBase : VectorData<Vector, Dimensions, Scalar>
 template<template<size_t, typename> class Vector, size_t Dimensions, typename Scalar>
 const Vector<Dimensions, Scalar> VectorBase<Vector, Dimensions, Scalar>::Zero = Vector<Dimensions, Scalar>((Scalar)0);
 
+template<size_t Dimensions, typename Scalar>
+struct Vector;
+template<size_t Dimensions, typename Scalar>
+using VectorBaseT = VectorBase<Vector, Dimensions, Scalar>;
+
 template<size_t Dimensions, typename Scalar = float>
-struct Vector : VectorBase<Vector, Dimensions, Scalar>
+struct Vector : VectorBaseT<Dimensions, Scalar>
 {
+    using Base = VectorBaseT<Dimensions, Scalar>;
+
     Vector() = default;
-    Vector(const std::initializer_list<Scalar>& list) : VectorBase(list) {}
-    explicit Vector(Scalar s) : VectorBase(s) {}
-    explicit Vector(const Scalar* s) : VectorBase(s) {}
+    Vector(const std::initializer_list<Scalar>& list) : Base(list) {}
+    explicit Vector(Scalar s) : Base(s) {}
+    explicit Vector(const Scalar* s) : Base(s) {}
     template<size_t D, typename S>
-    explicit Vector(const Vector<D, S>& other, const std::initializer_list<Scalar>& list = {}) : VectorBase(other, list) {}
+    explicit Vector(const Vector<D, S>& other, const std::initializer_list<Scalar>& list = {}) : Base(other, list) {}
 };
 
 template<size_t Dimensions, typename Scalar>
