@@ -1343,10 +1343,10 @@ struct Quaternion : public Vector<4, Scalar>
 
     static Quaternion<Scalar> From2Vectors(const Vector<3, Scalar>& v0, const Vector<3, Scalar>& v1)
     {
-        const auto e = std::numeric_limits<Scalar>::epsilon();
+        static const auto e = std::numeric_limits<Scalar>::epsilon();
 
-        auto n0 = (Vector<3, Scalar>&)v0.Normalize();
-        auto n1 = (Vector<3, Scalar>&)v1.Normalize();
+        auto n0 = v0.Normalize();
+        auto n1 = v1.Normalize();
 
         if ((n0 - n1).Length() < e)
         {
