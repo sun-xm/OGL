@@ -1266,7 +1266,7 @@ struct Quaternion : public Vector<4, Scalar>
         auto& t = (Vector<3, Scalar>&)*this;
         auto& o = (Vector<3, Scalar>&)other;
 
-        auto w = t[3] * o[3] - Dot(t, o);
+        auto w = t[3] * o[3] - ::Dot(t, o);
         auto p = Cross(t, o) + o * t[3] + t * o[3];
 
         return Quaternion<Scalar>{ p.s[0], p.s[1], p.s[2], w };
