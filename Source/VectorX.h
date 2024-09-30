@@ -128,6 +128,12 @@ const Vector<4, Scalar> VectorData<Vector, 4, Scalar>::YZPlane = { 1, 0, 0, 0 };
 template<template<size_t, typename> class Vector, typename Scalar>
 const Vector<4, Scalar> VectorData<Vector, 4, Scalar>::ZXPlane = { 0, 1, 0, 0 };
 
+template<size_t Dimensions, typename Scalar>
+struct Vector;
+
+template<size_t Dimensions, typename Scalar>
+inline Scalar Dot(const Vector<Dimensions, Scalar>&, const Vector<Dimensions, Scalar>&);
+
 template<template<size_t, typename> class Vector, size_t Dimensions, typename Scalar>
 struct VectorBase : VectorData<Vector, Dimensions, Scalar>
 {
@@ -178,7 +184,7 @@ struct VectorBase : VectorData<Vector, Dimensions, Scalar>
 
     Scalar Dot() const
     {
-        return Dot(*(Vector<Dimensions, Scalar>*)this, *(Vector<Dimensions, Scalar>*)this);
+        return ::Dot(*(Vector<Dimensions, Scalar>*)this, *(Vector<Dimensions, Scalar>*)this);
     }
     Scalar Length() const
     {
@@ -1348,9 +1354,9 @@ struct Quaternion : public Vector<4, Scalar>
         }
         else if ((n0 + n1).Length() < e)
         {
-            auto cx = std::abs(Dot(n0, Vector<3, Scalar>::XAxis));
-            auto cy = std::abs(Dot(n0, Vector<3, Scalar>::YAxis));
-            auto cz = std::abs(Dot(n0, Vector<3, Scalar>::ZAxis));
+            auto cx = std::abs(::Dot(n0, Vector<3, Scalar>::XAxis));
+            auto cy = std::abs(::Dot(n0, Vector<3, Scalar>::YAxis));
+            auto cz = std::abs(::Dot(n0, Vector<3, Scalar>::ZAxis));
 
             auto axis = Vector<3, Scalar>::XAxis;
             auto minc = cx;
@@ -1372,7 +1378,7 @@ struct Quaternion : public Vector<4, Scalar>
         auto h = (n0 + n1).Normalize();
         auto q = Cross(n0, h);
 
-        return Quaternion<Scalar>{ q[0], q[1], q[2], Dot(n0, h) };
+        return Quaternion<Scalar>{ q[0], q[1], q[2], ::Dot(n0, h) };
     }
 
     static Quaternion<Scalar> FromAxisAngle(const Vector<3, Scalar>& axis, float radian)
