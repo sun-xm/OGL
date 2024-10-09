@@ -205,6 +205,16 @@ struct VectorBase : VectorData<Vector, Dimensions, Scalar>
         return this->s[index];
     }
 
+    // Cater for stupid clang
+    Scalar& operator[](int index)
+    {
+        return this->s[index];
+    }
+    const Scalar& operator[](int index) const
+    {
+        return this->s[index];
+    }
+
     operator Scalar*()
     {
         return this->s;
@@ -890,6 +900,16 @@ struct MatrixBase
         return this->v[index];
     }
     const Vector<MCols, Scalar>& operator[](size_t index) const
+    {
+        return this->v[index];
+    }
+
+    // Cater for stupid clang
+    Vector<MCols, Scalar>& operator[](int index)
+    {
+        return this->v[index];
+    }
+    const Vector<MCols, Scalar>& operator[](int index) const
     {
         return this->v[index];
     }
