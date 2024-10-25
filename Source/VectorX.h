@@ -205,7 +205,7 @@ struct VectorBase : VectorData<Vector, Dimensions, Scalar>
         return this->s[index];
     }
 
-    // Cater for stupid clang
+#if defined(__clang__) && defined(__ARM_ARCH_7A__)
     Scalar& operator[](int index)
     {
         return this->s[index];
@@ -214,6 +214,7 @@ struct VectorBase : VectorData<Vector, Dimensions, Scalar>
     {
         return this->s[index];
     }
+#endif
 
     operator Scalar*()
     {
@@ -904,7 +905,7 @@ struct MatrixBase
         return this->v[index];
     }
 
-    // Cater for stupid clang
+#if defined(__clang__) && defined(__ARM_ARCH_7A__)
     Vector<MCols, Scalar>& operator[](int index)
     {
         return this->v[index];
@@ -913,6 +914,7 @@ struct MatrixBase
     {
         return this->v[index];
     }
+#endif
 
     operator Scalar*()
     {
