@@ -811,8 +811,37 @@ inline Vector<3, Scalar> operator^(const Vector<3, Scalar>& v0, const Vector<3, 
     return Cross(v0, v1);
 }
 
+template<size_t MRows, size_t MCols, typename Scalar>
+struct Matrix;
+
+template<size_t MRows, size_t MCols, typename Scalar>
+inline Matrix<MRows, MCols, Scalar> MtxNaN()
+{
+    Matrix<MRows, MCols, Scalar> nan;
+
+    for (size_t i = 0; i < MRows; i++)
+    {
+        nan.v[i] = Vector<MCols, Scalar>::NaN;
+    }
+
+    return nan;
+}
+
+template<template<size_t, size_t, typename> class Matrix, size_t MRows, size_t MCols, typename Scalar, typename = void>
+struct MatrixNaN
+{
+};
+
+template<template<size_t, size_t, typename> class Matrix, size_t MRows, size_t MCols, typename Scalar>
+struct MatrixNaN<Matrix, MRows, MCols, Scalar, typename std::enable_if<std::is_floating_point<Scalar>::value>::type>
+{
+    static const Matrix<MRows, MCols, Scalar> NaN;
+};
+template<template<size_t, size_t, typename> class Matrix, size_t MRows, size_t MCols, typename Scalar>
+const Matrix<MRows, MCols, Scalar> MatrixNaN<Matrix, MRows, MCols, Scalar, typename std::enable_if<std::is_floating_point<Scalar>::value>::type>::NaN = MtxNaN<MRows, MCols, Scalar>();
+
 template<typename MTrans, size_t MRows, size_t MCols, typename Scalar>
-struct MatrixBase
+struct MatrixBase : MatrixNaN<Matrix, MRows, MCols, Scalar>
 {
     Vector<MCols, Scalar> v[MRows];
 
