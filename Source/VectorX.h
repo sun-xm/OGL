@@ -1423,13 +1423,13 @@ struct Quaternion : public Vector<4, Scalar>
             }
 
             auto v = Cross(n0, axis);
-            return Quaternion<Scalar>{ v[0], v[1], v[2], 0 };
+            return Quaternion<Scalar>{ v[0u], v[1u], v[2u], 0 };
         }
 
         auto h = (n0 + n1).Normalize();
         auto q = Cross(n0, h);
 
-        return Quaternion<Scalar>{ q[0], q[1], q[2], ::Dot(n0, h) };
+        return Quaternion<Scalar>{ q[0u], q[1u], q[2u], ::Dot(n0, h) };
     }
 
     static Quaternion<Scalar> FromAxisAngle(const Vector<3, Scalar>& axis, float radian)
@@ -1501,7 +1501,7 @@ public:
 
     static Matrix<4, 4, Scalar> Shift(const Vector<3, Scalar>& v)
     {
-        return Shift(v[0], v[1], v[2]);
+        return Shift(v[0u], v[1u], v[2u]);
     }
 
     static Matrix<4, 4, Scalar> Scale(Scalar x, Scalar y, Scalar z)
@@ -1585,18 +1585,18 @@ public:
 
     static void GetTranslation(const Matrix<4, 4, Scalar>& matrix, Vector<3, Scalar>& translation)
     {
-        translation = { matrix[0][3], matrix[1][3], matrix[2][3] };
+        translation = { matrix[0u][3u], matrix[1u][3u], matrix[2u][3u] };
     }
 
     static void GetRotation(const Matrix<4, 4, Scalar>& matrix, Vector<3, Scalar>& axis, Scalar& radian)
     {
-        auto trace = matrix[0][0] + matrix[1][1] + matrix[2][2];
+        auto trace = matrix[0u][0u] + matrix[1u][1u] + matrix[2u][2u];
         radian = std::acos((trace - 1) / 2);
 
         auto factor = 1 / (2 * (Scalar)std::sqrt(1 + trace));
-        axis = { factor * (matrix[2][1] - matrix[1][2]),
-                 factor * (matrix[0][2] - matrix[2][0]),
-                 factor * (matrix[1][0] - matrix[0][1]) };
+        axis = { factor * (matrix[2u][1u] - matrix[1u][2u]),
+                 factor * (matrix[0u][2u] - matrix[2u][0u]),
+                 factor * (matrix[1u][0u] - matrix[0u][1u]) };
     }
 };
 
