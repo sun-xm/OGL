@@ -1,9 +1,11 @@
 #ifndef _VECTOR_X_H_
 #define _VECTOR_X_H_
 
+#include <cfloat>
 #include <cmath>
 #include <initializer_list>
 #include <limits>
+#include <type_traits>
 
 #define SCALAR_TYPE(v) decltype(ScalarHelper(v))
 
