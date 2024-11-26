@@ -1569,8 +1569,8 @@ public:
 
     static Matrix<4, 4, Scalar> Perspective(Scalar vfov /*in radian*/, Scalar aspect, Scalar _near, Scalar _far)
     {
-        auto f = 1 / tan(vfov / 2);
-        auto i = 1 / (_near - _far);
+        Scalar f = 1 / tan(vfov / 2);
+        Scalar i = 1 / (_near - _far);
         return Matrix<4, 4, Scalar>{{ f / aspect,  0,                  0,                    0 },
                                     {          0,  f,                  0,                    0 },
                                     {          0,  0, (_near + _far) * i, _near * _far * i * 2 },
