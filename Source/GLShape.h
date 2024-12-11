@@ -69,6 +69,9 @@ public:
     {
         switch (mode)
         {
+            case GL_LINES:
+            case GL_LINE_STRIP:
+            case GL_POINTS:
             case GL_TRIANGLES:
             case GL_TRIANGLE_STRIP:
             case GL_TRIANGLE_FAN:
