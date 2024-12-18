@@ -7,7 +7,7 @@ class GLBuffer
 public:
     GLBuffer(GLenum target = GL_ARRAY_BUFFER) : buffer(0), target(target) {}
     GLBuffer(const GLBuffer& other) = delete;
-    virtual ~GLBuffer() {}
+    virtual ~GLBuffer() { this->Release(); }
 
     bool Create()
     {
