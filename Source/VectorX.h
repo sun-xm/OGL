@@ -777,10 +777,64 @@ inline Vector<3, Scalar> Project(const Vector<3, Scalar>& position, const Vector
 }
 
 template<typename Scalar>
-inline Vector<3, Scalar> Intersect(const Vector<3, Scalar>& position, const Vector<3, Scalar>& vector, const Vector<4, Scalar>& plane)
+inline Vector<3, Scalar> Intersect(const Vector<3, Scalar>& position, const Vector<3, Scalar>& direction, const Vector<4, Scalar>& plane)
 {
-    auto t = -Distance(position, plane) / Dot(vector, (Vector<3, Scalar>&)plane);
-    return position + t * vector;
+    auto t = -Distance(position, plane) / Dot(direction, (Vector<3, Scalar>&)plane);
+    return position + t * direction;
+}
+
+template<typename Scalar>
+inline bool Intersect(const Vector<3, Scalar>& position, const Vector<3, Scalar>& direction, const Vector<4, Scalar&>& plane, Vector<3>& point)
+{
+    // It's better to normalize <direction> to avoid precision lost
+    auto d = Dot(direction, (Vector<3, Scalar>&)plane);
+    if (std::abs(d) < std::numeric_limits<Scalar>::epsilon())
+    {
+        return false;
+    }
+
+    auto t = -Distance(position, plane) / d;
+    point = position + t * direction;
+
+    return true;
+}
+
+template<typename Scalar>
+inline bool Intersect(const Vector<3, Scalar>& position, const Vector<3, Scalar>& direction, const Vector<3, Scalar>& vertex0, const Vector<3, Scalar>& vertex1, const Vector<3, Scalar>& vertex2, Vector<3, Scalar>& point)
+{
+    // It's better to normalize <direction> to avoid precision lost
+    auto  e1 = vertex1 - vertex0;
+    auto  e2 = vertex2 - vertex0;
+    auto   P = Cross(direction, e2);
+    auto   d = Dot(e1, P);
+
+    auto epsilon = std::numeric_limits<Scalar>::epsilon();
+    epsilon = std::max(epsilon, epsilon * std::max(e1.Length(), e2.Length()));
+    if (std::abs(d) < epsilon)
+    {
+        return false;
+    }
+
+    auto invd = (Scalar)1 / d;
+    auto T = position - vertex0;
+    auto u = Dot(T, P) * invd;
+
+    if (u < 0 || u > (Scalar)1)
+    {
+        return false;
+    }
+
+    auto Q = Cross(T, e1);
+    auto v = Dot(direction, Q) * invd;
+
+    if (v < 0 || u + v > (Scalar)1)
+    {
+        return false;
+    }
+
+    point = position + direction * Dot(e2, Q) * invd;;
+
+    return true;
 }
 
 template<typename Scalar>

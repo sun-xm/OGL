@@ -86,7 +86,7 @@ public:
             case GL_RGBA:
             case GL_BGRA:
             {
-                internalFormat = GL_RGBA;
+                internalFormat = GL_RGBA8;
                 break;
             }
 
