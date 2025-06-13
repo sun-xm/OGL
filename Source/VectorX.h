@@ -1,6 +1,7 @@
 #ifndef _VECTOR_X_H_
 #define _VECTOR_X_H_
 
+#include <algorithm>
 #include <cfloat>
 #include <cmath>
 #include <initializer_list>
@@ -809,7 +810,7 @@ inline bool Intersect(const Vector<3, Scalar>& position, const Vector<3, Scalar>
     auto   d = Dot(e1, P);
 
     auto epsilon = std::numeric_limits<Scalar>::epsilon();
-    epsilon = std::max(epsilon, epsilon * std::max(e1.Length(), e2.Length()));
+    epsilon = (std::max)(epsilon, epsilon * (std::max)(e1.Length(), e2.Length()));
     if (std::abs(d) < epsilon)
     {
         return false;
