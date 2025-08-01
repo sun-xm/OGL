@@ -713,7 +713,7 @@ inline Vector<Dimensions, Scalar> Abs(const Vector<Dimensions, Scalar>& v)
     Vector<Dimensions, Scalar> result;
     for (size_t i = 0; i < Dimensions; i++)
     {
-        result.v[i] = std::abs(v.v[i]);
+        result.s[i] = std::abs(v.s[i]);
     }
     return result;
 }
@@ -724,7 +724,7 @@ inline Vector<Dimensions, Scalar> Min(const Vector<Dimensions, Scalar>& v0, cons
     Vector<Dimensions, Scalar> result;
     for (size_t i = 0; i < Dimensions; i++)
     {
-        result.v[i] = v0.v[i] < v1.v[i] ? v0.v[i] : v1.v[i];
+        result.s[i] = v0.s[i] < v1.s[i] ? v0.s[i] : v1.s[i];
     }
     return result;
 }
@@ -735,7 +735,7 @@ inline Vector<Dimensions, Scalar> Max(const Vector<Dimensions, Scalar>& v0, cons
     Vector<Dimensions, Scalar> result;
     for (size_t i = 0; i < Dimensions; i++)
     {
-        result.v[i] = v0.v[i] > v1.v[i] ? v0.v[i] : v1.v[i];
+        result.s[i] = v0.s[i] > v1.s[i] ? v0.s[i] : v1.s[i];
     }
     return result;
 }
