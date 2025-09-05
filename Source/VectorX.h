@@ -222,11 +222,11 @@ struct VectorBase : VectorData<Vector, Dimensions, Scalar>
     using ArrRef = Scalar(&)[Dimensions];
     operator ArrRef()
     {
-        return this->s;
+        return (ArrRef)this->s;
     }
     operator const ArrRef() const
     {
-        return this->s;
+        return (const ArrRef)this->s;
     }
 
     static const Vector<Dimensions, Scalar> Zero;
