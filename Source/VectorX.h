@@ -219,11 +219,12 @@ struct VectorBase : VectorData<Vector, Dimensions, Scalar>
     }
 #endif
 
-    operator Scalar*()
+    using ArrRef = Scalar(&)[Dimensions];
+    operator ArrRef()
     {
         return this->s;
     }
-    operator const Scalar*() const
+    operator const ArrRef() const
     {
         return this->s;
     }
@@ -1002,13 +1003,14 @@ struct MatrixBase : MatrixNaN<Matrix, MRows, MCols, Scalar>
     }
 #endif
 
-    operator Scalar*()
+    using ArrRef = Scalar(&)[MRows * MCols];
+    operator ArrRef()
     {
-        return (Scalar*)this->v[0];
+        return (ArrRef)this->v;
     }
-    operator const Scalar*() const
+    operator const ArrRef() const
     {
-        return (const Scalar*)this->v[0];
+        return (const ArrRef)this->v;
     }
 };
 
