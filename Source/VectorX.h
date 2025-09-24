@@ -8,7 +8,14 @@
 #include <limits>
 #include <type_traits>
 
-#define SCALAR_TYPE(v) decltype(ScalarHelper(v))
+#define VX_SCALAR_TYPE(v) decltype(ScalarHelper(v))
+
+#ifdef VECTOR_X_NS
+#define VXNS VECTOR_X_NS
+namespace VECTOR_X_NS {
+#else
+#define VXNS
+#endif
 
 template<typename Scalar>
 inline Scalar ToRadian(Scalar degree)
@@ -187,7 +194,7 @@ struct VectorBase : VectorData<Vector, Dimensions, Scalar>
 
     Scalar Dot() const
     {
-        return ::Dot(*(Vector<Dimensions, Scalar>*)this, *(Vector<Dimensions, Scalar>*)this);
+        return VXNS::Dot(*(Vector<Dimensions, Scalar>*)this, *(Vector<Dimensions, Scalar>*)this);
     }
     Scalar Length() const
     {
@@ -1376,7 +1383,7 @@ struct Quaternion : public Vector<4, Scalar>
         auto& t = (Vector<3, Scalar>&)*this;
         auto& o = (Vector<3, Scalar>&)other;
 
-        auto w = t[3] * o[3] - ::Dot(t, o);
+        auto w = t[3] * o[3] - VXNS::Dot(t, o);
         auto p = Cross(t, o) + o * t[3] + t * o[3];
 
         return Quaternion<Scalar>{ p.s[0], p.s[1], p.s[2], w };
@@ -1464,9 +1471,9 @@ struct Quaternion : public Vector<4, Scalar>
         }
         else if ((n0 + n1).Length() < e)
         {
-            auto cx = std::abs(::Dot(n0, Vector<3, Scalar>::XAxis));
-            auto cy = std::abs(::Dot(n0, Vector<3, Scalar>::YAxis));
-            auto cz = std::abs(::Dot(n0, Vector<3, Scalar>::ZAxis));
+            auto cx = std::abs(VXNS::Dot(n0, Vector<3, Scalar>::XAxis));
+            auto cy = std::abs(VXNS::Dot(n0, Vector<3, Scalar>::YAxis));
+            auto cz = std::abs(VXNS::Dot(n0, Vector<3, Scalar>::ZAxis));
 
             auto axis = Vector<3, Scalar>::XAxis;
             auto minc = cx;
@@ -1488,7 +1495,7 @@ struct Quaternion : public Vector<4, Scalar>
         auto h = (n0 + n1).Normalize();
         auto q = Cross(n0, h);
 
-        return Quaternion<Scalar>{ q[0u], q[1u], q[2u], ::Dot(n0, h) };
+        return Quaternion<Scalar>{ q[0u], q[1u], q[2u], VXNS::Dot(n0, h) };
     }
 
     static Quaternion<Scalar> FromAxisAngle(const Vector<3, Scalar>& axis, float radian)
@@ -1659,4 +1666,8 @@ public:
     }
 };
 
+#ifdef VECTOR_X_NS
+}
+#endif
+#undef VXNS
 #endif // _VECTOR_X_H_
