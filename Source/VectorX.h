@@ -10,9 +10,9 @@
 
 #define VX_SCALAR_TYPE(v) decltype(ScalarHelper(v))
 
-#ifdef VECTOR_X_NS
-#define VXNS VECTOR_X_NS
-namespace VECTOR_X_NS {
+#ifdef VECTORX_NS
+#define VXNS VECTORX_NS
+namespace VECTORX_NS {
 #else
 #define VXNS
 #endif
@@ -1666,7 +1666,7 @@ public:
     }
 };
 
-#ifdef VECTOR_X_NS
+#ifdef VECTORX_NS
 }
 #endif
 #undef VXNS
