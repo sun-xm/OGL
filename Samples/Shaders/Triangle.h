@@ -12,7 +12,7 @@ public:
     void Create();
     void Release();
 
-    bool Colors(const Vector<3>* colors, int count);
+    bool Colors(const vx::Vector<3>* colors, int count);
     void Render(GLProgram& program, const Vertex& lightPos);
 
 protected:

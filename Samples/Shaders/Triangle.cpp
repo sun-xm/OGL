@@ -1,6 +1,7 @@
 #include "Triangle.h"
 
 using namespace std;
+using namespace vx;
 
 Triangle::Triangle()
 {

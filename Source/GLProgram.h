@@ -184,7 +184,7 @@ public:
         auto err = glGetError();
         return GL_NO_ERROR == err;
     }
-    bool UniformV2f(const std::string& name, const Vector<2>& value)
+    bool UniformV2f(const std::string& name, const vx::Vector<2>& value)
     {
         auto loc = this->UniformLocation(name);
         if (loc < 0)
@@ -197,7 +197,7 @@ public:
         auto err = glGetError();
         return GL_NO_ERROR == err;
     }
-    bool UniformV3f(const std::string& name, const Vector<3>& value)
+    bool UniformV3f(const std::string& name, const vx::Vector<3>& value)
     {
         auto loc = this->UniformLocation(name);
         if (loc < 0)
@@ -210,7 +210,7 @@ public:
         auto err = glGetError();
         return GL_NO_ERROR == err;
     }
-    bool UniformM3f(const std::string& name, const Matrix<3>& value, bool transpose = true)
+    bool UniformM3f(const std::string& name, const vx::Matrix<3>& value, bool transpose = true)
     {
         auto loc = this->UniformLocation(name);
         if (loc < 0)
@@ -223,7 +223,7 @@ public:
         auto err = glGetError();
         return GL_NO_ERROR == err;
     }
-    bool UniformV4f(const std::string& name, const Vector<4>& value)
+    bool UniformV4f(const std::string& name, const vx::Vector<4>& value)
     {
         auto loc = this->UniformLocation(name);
         if (loc < 0)
@@ -236,7 +236,7 @@ public:
         auto err = glGetError();
         return GL_NO_ERROR == err;
     }
-    bool UniformM4f(const std::string& name, const Matrix<4>& value, bool transpose = true)
+    bool UniformM4f(const std::string& name, const vx::Matrix<4>& value, bool transpose = true)
     {
         auto loc = this->UniformLocation(name);
         if (loc < 0)

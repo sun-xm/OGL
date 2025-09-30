@@ -3,11 +3,17 @@
 #include "VectorX.h"
 #include <cstdint>
 
-typedef Vector<3, uint32_t> Element;
-typedef Vector<3> Vertex;
-typedef Vector<3> Normal;
-typedef Vector<4> Color;
-typedef Vector<2> Coordinate;
+#ifdef VECTORX_NS
+    #define vx VECTORX_NS
+#else
+    #define vx
+#endif
+
+typedef vx::Vector<3, uint32_t> Element;
+typedef vx::Vector<3, float>    Vertex;
+typedef vx::Vector<3, float>    Normal;
+typedef vx::Vector<4, float>    Color;
+typedef vx::Vector<2, float>    Coordinate;
 
 template<typename T, size_t N>
 char(&_ArraySizeHelper(T(&)[N]))[N];

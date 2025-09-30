@@ -4,6 +4,7 @@
 #include <string>
 
 using namespace std;
+using namespace vx;
 
 Viewport::Viewport()
 {

@@ -2,9 +2,15 @@
 
 #include "GLCommon.h"
 
+#ifdef VECTORX_NS
+    #define vx VECTORX_NS
+#else
+    #define vx
+#endif
+
 struct GLObject
 {
-    Vector<3> Position;
-    Vector<4> Rotation;
-    Vector<3> Scaling;
+    vx::Vector<3> Position;
+    vx::Vector<4> Rotation;
+    vx::Vector<3> Scaling;
 };

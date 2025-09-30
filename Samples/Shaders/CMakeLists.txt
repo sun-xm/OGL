@@ -6,6 +6,12 @@ file(GLOB APP_CPP ${CMAKE_CURRENT_LIST_DIR}/*.cpp)
 add_executable(${PROJECT_NAME} WIN32
                ${SRC_CPP}
                ${APP_CPP})
+
+target_compile_definitions(
+    ${PROJECT_NAME}
+    PRIVATE
+        VECTORX_NS=vx
+)
 target_link_libraries(${PROJECT_NAME} W32LIB opengl32 glu32 ${GLEW_LIB})
 
 add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD

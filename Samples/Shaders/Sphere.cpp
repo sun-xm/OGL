@@ -2,6 +2,7 @@
 #include <cmath>
 
 using namespace std;
+using namespace vx;
 
 #define RATIO  (4.f / sqrtf(6.f))
 #define LEVELS (4)
