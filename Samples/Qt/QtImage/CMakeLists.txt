@@ -18,9 +18,15 @@ file(GLOB APP_SRC "${CMAKE_CURRENT_LIST_DIR}/*.cpp" "${CMAKE_CURRENT_LIST_DIR}/*
 
 if(WIN32)
     set(Qt5_DIR "$ENV{Qt5_DIR}/lib/cmake/Qt5") # Example C:\Qt\Qt5.9.9\5.9.9\msvc2013_64\lib\cmake\Qt5
-    add_executable(${PROJECT_NAME} WIN32
-                   ${APP_SRC})
-    target_link_libraries(${PROJECT_NAME} ${GLEW_LIB} opengl32 glu32)
+    add_executable(${PROJECT_NAME} WIN32 ${APP_SRC})
+
+    target_link_libraries(
+        ${PROJECT_NAME}
+        PRIVATE
+            ${GLEW_LIB}
+            opengl32
+            glu32
+    )
 
     set(SUFFIX "$<IF:$<CONFIG:Debug>,d,>")
     add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
@@ -37,5 +43,8 @@ else()
 endif()
 
 find_package(Qt5 COMPONENTS Widgets REQUIRED)
-target_link_libraries(${PROJECT_NAME}
-                    Qt5::Widgets)
+target_link_libraries(
+    ${PROJECT_NAME}
+    PRIVATE
+        Qt5::Widgets
+)

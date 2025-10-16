@@ -1,4 +1,4 @@
-#include <App.h>
+#include <Application.h>
 #include <gdiplus.h>
 #include "MainWindow.h"
 
@@ -11,7 +11,7 @@ int APIENTRY wWinMain(HINSTANCE hInstance, HINSTANCE, LPWSTR, int nCmdShow)
     GdiplusStartupOutput output;
     GdiplusStartup(&token, &input, &output);
 
-    auto ret = App(hInstance).Run((Window&)MainWindow(), nCmdShow);
+    auto ret = Application(hInstance).Run(MainWindow(), nCmdShow);
 
     GdiplusShutdown(token);
 

@@ -1,12 +1,16 @@
-cmake_minimum_required(VERSION 3.10)
 project(Clouds)
 
-file(GLOB APP_CPP ${CMAKE_CURRENT_LIST_DIR}/*.cpp)
+file(GLOB APP_SRC ${CMAKE_CURRENT_LIST_DIR}/*.cpp)
 
-add_executable(${PROJECT_NAME} WIN32
-               ${SRC_CPP}
-               ${APP_CPP})
-target_link_libraries(${PROJECT_NAME} W32LIB opengl32 glu32 ${GLEW_LIB})
+add_executable(${PROJECT_NAME} WIN32 ${APP_SRC})
+
+target_link_libraries(
+    ${PROJECT_NAME}
+    PRIVATE
+        opengl32
+        glu32
+        ${GLEW_LIB}
+)
 
 add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
                    COMMAND ${CMAKE_COMMAND} -E copy_if_different

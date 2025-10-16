@@ -18,19 +18,14 @@ if(WIN32)
     endif()
 
     set(CMAKE_CXX_STANDARD 11)
-    set(SRC_DIR ${CMAKE_CURRENT_LIST_DIR}/Source)
-    set(W32_DIR ${CMAKE_CURRENT_LIST_DIR}/W32/Source)
+    set(OGL_INC ${CMAKE_CURRENT_LIST_DIR}/Source)
+    set(W32_INC ${CMAKE_CURRENT_LIST_DIR}/W32/Source)
     set(GLEW_DIR ${CMAKE_CURRENT_LIST_DIR}/3rdParty/glew-2.1.0)
 
-    file(GLOB SRC_CPP ${SRC_DIR}/*.cpp)
-    file(GLOB W32_CPP ${W32_DIR}/*.cpp)
-
-    include_directories(${SRC_DIR} ${W32_DIR} ${GLEW_DIR}/include)
+    include_directories(${OGL_INC} ${W32_INC} ${GLEW_DIR}/include)
     link_directories(${GLEW_DIR}/lib/${CMAKE_VS_PLATFORM_NAME})
 
     add_compile_definitions(WIN32 _WINDOWS _UNICODE UNICODE)
-
-    add_library(W32LIB STATIC ${W32_CPP})
 
     add_subdirectory(Samples/Clouds  Clouds)
     add_subdirectory(Samples/Shapes  Shapes)
