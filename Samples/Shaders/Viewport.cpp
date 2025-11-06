@@ -74,8 +74,8 @@ void Viewport::OnPaint()
         this->program.Use();
         this->program.UniformFlt("Ambient", 0.2f);
         this->program.UniformV3f("LightPos", this->lightPos);
-        this->program.UniformM4f("WorldView", Transform3D<>::LookAt({ 0, 0, 4 }, { 0, 0, 0 }, 0.f));
-        this->program.UniformM4f("Projection", Transform3D<>::Perspective(ToRadian(45.f), (float)this->ClientW() / this->ClientH(), 0.01f, 100.f));
+        this->program.UniformM4f("WorldView", Transform3D<>::GLLookAt({ 0, 0, 4 }, { 0, 0, 0 }, 0.f));
+        this->program.UniformM4f("Projection", Transform3D<>::GLPerspect(ToRadian(45.f), (float)this->ClientW() / this->ClientH(), 0.01f, 100.f));
 
         this->sphere.Render(this->program, this->lightPos);
         this->triangle.Render(this->program, this->lightPos);

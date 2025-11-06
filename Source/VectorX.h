@@ -1631,9 +1631,9 @@ public:
         };
     }
 
-    static Matrix<4, 4, Scalar> Perspective(Scalar vfov /*in radian*/, Scalar aspect, Scalar _near, Scalar _far)
+    static Matrix<4, 4, Scalar> GLPerspect(Scalar vfovInRad, Scalar aspect, Scalar _near, Scalar _far)
     {
-        Scalar f = 1 / tan(vfov / 2);
+        Scalar f = 1 / tan(vfovInRad / 2);
         Scalar i = 1 / (_near - _far);
         return Matrix<4, 4, Scalar>{{ f / aspect,  0,                  0,                    0 },
                                     {          0,  f,                  0,                    0 },
@@ -1641,12 +1641,32 @@ public:
                                     {          0,  0,                 -1,                    0 }};
     }
 
-    static Matrix<4, 4, Scalar> LookAt(const Vector<3, Scalar>& eye, const Vector<3, Scalar>& center, Scalar rotation /*in radian*/)
+    static Matrix<4, 4, Scalar> VKPerspect(Scalar vfovInRad, Scalar aspect, Scalar _near, Scalar _far)
+    {
+        Scalar f = 1 / tan(vfovInRad / 2);
+        Scalar i = 1 / (_near - _far);
+        return Matrix<4, 4, Scalar>{{ f / aspect,  0,         0,                0 },
+                                    {          0,  f,         0,                0 },
+                                    {          0,  0, -_far * i, _near * _far * i },
+                                    {          0,  0,         1,                0 }};
+    }
+
+    static Matrix<4, 4, Scalar> LookAt(const Vector<3, Scalar>& eye, const Vector<3, Scalar>& focus, Scalar rotation /*in radian*/, const Vector<3, Scalar>& direction)
     {
         auto s = Shift(Vector<3, Scalar>::Zero - eye);
-        auto q = Quaternion<Scalar>::From2Vectors(center - eye, -Vector<3, Scalar>::ZAxis);
+        auto q = Quaternion<Scalar>::From2Vectors(focus - eye, direction);
         auto r = Quaternion<Scalar>::FromAxisAngle(q.Rotate(Vector<3, Scalar>::ZAxis), rotation);
         return r.ToMatrix() * q.ToMatrix() * s;
+    }
+
+    static Matrix<4, 4, Scalar> GLLookAt(const Vector<3, Scalar>& eye, const Vector<3, Scalar>& focus, Scalar rotInRad = (Scalar)0)
+    {
+        return LookAt(eye, focus, rotInRad, -Vector<3, Scalar>::ZAxis);
+    }
+
+    static Matrix<4, 4, Scalar> VKLookAt(const Vector<3, Scalar>& eye, const Vector<3, Scalar>& focus, Scalar rotInRad = (Scalar)0)
+    {
+        return LookAt(eye, focus, rotInRad, Vector<3, Scalar>::ZAxis);
     }
 
     static void GetTranslation(const Matrix<4, 4, Scalar>& matrix, Vector<3, Scalar>& translation)
