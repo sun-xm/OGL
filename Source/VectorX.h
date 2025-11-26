@@ -1365,6 +1365,10 @@ struct Quaternion : public Vector<4, Scalar>
     Quaternion(const std::initializer_list<Scalar>& v) : Vector<4, Scalar>(v)
     {
     }
+    template<typename S>
+    explicit Quaternion(const Quaternion<S>& other, const std::initializer_list<Scalar>& list = {}) : Vector<4, Scalar>(other, list)
+    {
+    }
 
     Vector<3, Scalar> Rotate(const Vector<3, Scalar>& v) const
     {
