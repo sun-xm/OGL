@@ -1030,8 +1030,8 @@ struct Matrix : MatrixBase<Matrix<MCols, MRows, Scalar>, MRows, MCols, Scalar>
     explicit Matrix(const Scalar* s) : Base(s) {}
     Matrix(const std::initializer_list<Scalar>& list) : Base(list) {}
     Matrix(const std::initializer_list<const Vector<MCols, Scalar>>& list) : Base(list) {}
-    template<template<size_t R, size_t C, typename S> class MType, typename SType>
-    explicit Matrix(const MType<MRows, MCols, SType>& other) : Base(other) {}
+    template<typename SType>
+    explicit Matrix(const Matrix<MRows, MCols, SType>& other) : Base(other) {}
 };
 
 template<size_t Dims, typename Scalar>
@@ -1043,7 +1043,7 @@ struct Matrix<Dims, Dims, Scalar> : MatrixBase<Matrix<Dims, Dims, Scalar>, Dims,
     explicit Matrix(const Scalar* v) : Base(v) {}
     Matrix(const std::initializer_list<Scalar>& list) : Base(list) {}
     Matrix(const std::initializer_list<const Vector<Dims, Scalar>>& list) : Base(list) {}
-    template<template<size_t R, size_t C, typename S> class MType, typename SType>
+    template<typename SType>
     Matrix(const Matrix<Dims, Dims, SType>& other) : Base(other) {}
 
     Matrix Inverse() const
