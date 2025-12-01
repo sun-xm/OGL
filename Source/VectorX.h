@@ -6,6 +6,7 @@
 #include <cmath>
 #include <initializer_list>
 #include <limits>
+#include <stdexcept>
 #include <type_traits>
 
 #define VX_SCALAR_TYPE(v) decltype(ScalarHelper(v))
@@ -664,32 +665,6 @@ inline Vector<Dimensions, bool> operator||(const Vector<Dimensions, bool>& v0, c
 }
 
 template<size_t Dimensions>
-inline bool Any(const Vector<Dimensions, bool>& booleans)
-{
-    for (size_t i = 0; i < Dimensions; i++)
-    {
-        if (booleans[i])
-        {
-            return true;
-        }
-    }
-    return false;
-}
-
-template<size_t Dimensions, typename Scalar, typename Pred>
-inline bool Any(const Vector<Dimensions, Scalar>& v, const Pred& p)
-{
-    for (size_t i = 0; i < Dimensions; i++)
-    {
-        if (p(v[i]))
-        {
-            return true;
-        }
-    }
-    return false;
-}
-
-template<size_t Dimensions>
 inline bool All(const Vector<Dimensions, bool>& booleans)
 {
     for (size_t i = 0; i < Dimensions; i++)
@@ -713,6 +688,32 @@ inline bool All(const Vector<Dimensions, Scalar>& v, const Pred& p)
         }
     }
     return true;
+}
+
+template<size_t Dimensions>
+inline bool Any(const Vector<Dimensions, bool>& booleans)
+{
+    for (size_t i = 0; i < Dimensions; i++)
+    {
+        if (booleans[i])
+        {
+            return true;
+        }
+    }
+    return false;
+}
+
+template<size_t Dimensions, typename Scalar, typename Pred>
+inline bool Any(const Vector<Dimensions, Scalar>& v, const Pred& p)
+{
+    for (size_t i = 0; i < Dimensions; i++)
+    {
+        if (p(v[i]))
+        {
+            return true;
+        }
+    }
+    return false;
 }
 
 template<size_t Dimensions, typename Scalar>
@@ -985,9 +986,52 @@ struct MatrixBase : MatrixNaN<Matrix, MRows, MCols, Scalar>
         return m;
     }
 
+    template<size_t MR, size_t MC = MR>
+    Matrix<MR, MC, Scalar> Range(size_t row = 0, size_t col = 0) const
+    {
+        if (MR + row > MRows || MC + col > MCols)
+        {
+            throw std::runtime_error("Invalid range parameters");
+        }
+
+        Matrix<MR, MC, Scalar> m;
+        for (size_t i = 0; i < MR; i++)
+        {
+            auto& v0 = this->v[i + row];
+            auto& vm = m.v[i];
+
+            for (size_t j = 0; j < MC; j++)
+            {
+                vm[j] = v0[j + col];
+            }
+        }
+
+        return m;
+    }
+
+    template<size_t MR, size_t MC = MR>
+    void Range(const Matrix<MR, MC, Scalar>& m, size_t row = 0, size_t col = 0)
+    {
+        if (MR + row > MRows || MC + col > MCols)
+        {
+            throw std::runtime_error("Invalid range parameters");
+        }
+
+        for (size_t i = 0; i < MR; i++)
+        {
+            auto& v0 = this->v[i + row];
+            auto& vm = m.v[i];
+
+            for (size_t j = 0; j < MC; j++)
+            {
+                v0[j + col] = vm[j];
+            }
+        }
+    }
+
     const Vector<MRows * MCols, Scalar>& ToVector() const
     {
-        return *(Vector<MRows * MCols, Scalar>*)this->v[0].v;
+        return *(Vector<MRows * MCols, Scalar>*)this->v[0].s;
     }
 
     Vector<MCols, Scalar>& operator[](size_t index)
@@ -1032,6 +1076,8 @@ struct Matrix : MatrixBase<Matrix<MCols, MRows, Scalar>, MRows, MCols, Scalar>
     Matrix(const std::initializer_list<const Vector<MCols, Scalar>>& list) : Base(list) {}
     template<typename SType>
     explicit Matrix(const Matrix<MRows, MCols, SType>& other) : Base(other) {}
+    template<size_t MR, size_t MC, typename ST, typename std::enable_if<MRows != MR || MCols != MC, int>::type = 0>
+    Matrix(const Matrix<MR, MC, ST>&){ static_assert(MRows == MR && MCols == MC, "Operation is not allowd"); }
 };
 
 template<size_t Dims, typename Scalar>
@@ -1045,6 +1091,8 @@ struct Matrix<Dims, Dims, Scalar> : MatrixBase<Matrix<Dims, Dims, Scalar>, Dims,
     Matrix(const std::initializer_list<const Vector<Dims, Scalar>>& list) : Base(list) {}
     template<typename SType>
     Matrix(const Matrix<Dims, Dims, SType>& other) : Base(other) {}
+    template<size_t MR, size_t MC, typename ST, typename std::enable_if<Dims != MR || Dims != MC, int>::type = 0>
+    Matrix(const Matrix<MR, MC, ST>&){ static_assert(Dims == MR && Dims == MC, "Operation is not allowed"); }
 
     Matrix Inverse() const
     {
@@ -1353,6 +1401,70 @@ template<size_t MRows, size_t MCols, typename Scalar>
 inline bool operator!=(const Matrix<MRows, MCols, Scalar>& m0, const Matrix<MRows, MCols, Scalar>& m1)
 {
     return !(m0 == m1);
+}
+
+template<size_t MRows, size_t MCols>
+inline bool All(const Matrix<MRows, MCols, bool>& m)
+{
+    for (size_t i = 0; i < MRows; i++)
+    {
+        if (!All(m[i]))
+        {
+            return false;
+        }
+    }
+    return true;
+}
+
+template<size_t MRows, size_t MCols, typename Scalar, typename Pred>
+inline bool All(const Matrix<MRows, MCols, Scalar>& m, const Pred& p)
+{
+    for (size_t i = 0; i < MRows; i++)
+    {
+        if (!All(m[i], p))
+        {
+            return false;
+        }
+    }
+    return true;
+}
+
+template<size_t MRows, size_t MCols>
+inline bool Any(const Matrix<MRows, MCols, bool>& m)
+{
+    for (size_t i = 0; i < MRows; i++)
+    {
+        if (Any(m[i]))
+        {
+            return true;
+        }
+    }
+    return false;
+}
+
+template<size_t MRows, size_t MCols, typename Scalar, typename Pred>
+inline bool Any(const Matrix<MRows, MCols, Scalar>& m, const Pred& p)
+{
+    for (size_t i = 0; i < MRows; i++)
+    {
+        if (Any(m[i], p))
+        {
+            return true;
+        }
+    }
+    return false;
+}
+
+
+template<size_t MRows, size_t MCols, typename Scalar>
+inline Matrix<MRows, MCols, Scalar> Abs(const Matrix<MRows, MCols, Scalar>& m)
+{
+    Matrix<MRows, MCols, Scalar> r;
+    for (size_t i = 0; i < MRows; i++)
+    {
+        r[i] = Abs(m[i]);
+    }
+    return r;
 }
 
 template<typename Scalar = float>
