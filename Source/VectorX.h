@@ -232,9 +232,10 @@ struct VectorBase : VectorData<Vector, Dimensions, Scalar>
     {
         return (ArrRef)this->s;
     }
-    operator const ArrRef() const
+    using ConstAR = const Scalar(&)[Dimensions];
+    operator ConstAR() const
     {
-        return (const ArrRef)this->s;
+        return (ConstAR)this->s;
     }
 
     static const Vector<Dimensions, Scalar> Zero;
@@ -1059,9 +1060,10 @@ struct MatrixBase : MatrixNaN<Matrix, MRows, MCols, Scalar>
     {
         return (ArrRef)this->v;
     }
-    operator const ArrRef() const
+    using ConstAR = const Scalar(&)[MRows * MCols];
+    operator ConstAR() const
     {
-        return (const ArrRef)this->v;
+        return (ConstAR)this->v;
     }
 };
 
