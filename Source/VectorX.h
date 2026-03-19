@@ -665,6 +665,52 @@ inline Vector<Dimensions, bool> operator||(const Vector<Dimensions, bool>& v0, c
     return result;
 }
 
+template<size_t Dimensions, typename Scalar>
+inline Vector<Dimensions + 1, Scalar> operator|(const Vector<Dimensions, Scalar>& v, Scalar s)
+{
+    Vector<Dimensions + 1, Scalar> result;
+
+    for (size_t i = 0; i < Dimensions; i++)
+    {
+        result[i] = v[i];
+    }
+
+    result[Dimensions] = s;
+    return result;
+}
+
+template<size_t Dimensions, typename Scalar>
+inline Vector<Dimensions + 1, Scalar> operator|(Scalar s, const Vector<Dimensions, Scalar>& v)
+{
+    Vector<Dimensions + 1, Scalar> result;
+    result[0] = s;
+
+    for (size_t i = 0; i < Dimensions; i++)
+    {
+        result[i + 1] = v[i];
+    }
+
+    return result;
+}
+
+template<size_t D0, size_t D1, typename Scalar>
+inline Vector<D0 + D1, Scalar> operator|(const Vector<D0, Scalar>& v0, const Vector<D1, Scalar>& v1)
+{
+    Vector<D0 + D1, Scalar> result;
+
+    for (size_t i = 0; i < D0; i++)
+    {
+        result[i] = v0[i];
+    }
+
+    for (size_t i = 0; i < D1; i++)
+    {
+        result[i + D1] = v1[i];
+    }
+
+    return result;
+}
+
 template<size_t Dimensions>
 inline bool All(const Vector<Dimensions, bool>& booleans)
 {
@@ -990,9 +1036,13 @@ struct MatrixBase : MatrixNaN<Matrix, MRows, MCols, Scalar>
     template<size_t MR, size_t MC = MR>
     Matrix<MR, MC, Scalar> Range(size_t row = 0, size_t col = 0) const
     {
-        if (MR + row > MRows || MC + col > MCols)
+        if (MR + row > MRows)
         {
-            throw std::runtime_error("Invalid range parameters");
+            throw std::out_of_range("Row index")
+        }
+        if (MC + col > MCols)
+        {
+            throw std::out_of_range("Column index");
         }
 
         Matrix<MR, MC, Scalar> m;
@@ -1013,9 +1063,13 @@ struct MatrixBase : MatrixNaN<Matrix, MRows, MCols, Scalar>
     template<size_t MR, size_t MC = MR>
     void Range(const Matrix<MR, MC, Scalar>& m, size_t row = 0, size_t col = 0)
     {
-        if (MR + row > MRows || MC + col > MCols)
+        if (MR + row > MRows)
         {
-            throw std::runtime_error("Invalid range parameters");
+            throw std::out_of_range("Row index");
+        }
+        if (MC + col > MCols)
+        {
+            throw std::out_of_range("Column index");
         }
 
         for (size_t i = 0; i < MR; i++)
@@ -1027,6 +1081,29 @@ struct MatrixBase : MatrixNaN<Matrix, MRows, MCols, Scalar>
             {
                 v0[j + col] = vm[j];
             }
+        }
+    }
+
+    void SetRow(const Vector<MCols, Scalar>& v, size_t row)
+    {
+        if (row >= MRows)
+        {
+            throw std::out_of_range("Row index");
+        }
+
+        this->v[row] = v;
+    }
+
+    void SetCol(const Vector<MRows, Scalar>& v, size_t col)
+    {
+        if (col >= MCols)
+        {
+            throw std::out_of_range("Column index");
+        }
+
+        for (size_t i = 0; i < MRows; i++)
+        {
+            this->v[i][col] = v[i];
         }
     }
 
@@ -1065,7 +1142,26 @@ struct MatrixBase : MatrixNaN<Matrix, MRows, MCols, Scalar>
     {
         return (ConstAR)this->v;
     }
+
+    static const Matrix<MRows, MCols, Scalar> Zero;
 };
+
+template<size_t MRows, size_t MCols, typename Scalar>
+inline Matrix<MRows, MCols, Scalar> MtxZero()
+{
+    Matrix<MRows, MCols, Scalar> zero;
+    for (size_t i = 0; i < MRows; i++)
+    {
+        for (size_t j = 0; j < MCols; j++)
+        {
+            zero[i][j] = (Scalar)0;
+        }
+    }
+    return zero;
+}
+
+template<typename MTrans, size_t MRows, size_t MCols, typename Scalar>
+const Matrix<MRows, MCols, Scalar> MatrixBase<MTrans, MRows, MCols, Scalar>::Zero = MtxZero<MRows, MCols, Scalar>();
 
 template<size_t MRows, size_t MCols = MRows, typename Scalar = float>
 struct Matrix : MatrixBase<Matrix<MCols, MRows, Scalar>, MRows, MCols, Scalar>
