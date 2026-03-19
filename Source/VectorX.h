@@ -1038,7 +1038,7 @@ struct MatrixBase : MatrixNaN<Matrix, MRows, MCols, Scalar>
     {
         if (MR + row > MRows)
         {
-            throw std::out_of_range("Row index")
+            throw std::out_of_range("Row index");
         }
         if (MC + col > MCols)
         {
