@@ -1482,6 +1482,58 @@ inline Matrix<MRows, MCols, Scalar>& operator/=(Matrix<MRows, MCols, Scalar>& m,
     return operator*=(m, r);
 }
 
+template<size_t MRows, size_t MC0, size_t MC1, typename Scalar>
+inline Matrix<MRows, MC0 + MC1, Scalar> operator|(const Matrix<MRows, MC0, Scalar>& m0, const Matrix<MRows, MC1, Scalar>& m1)
+{
+    Matrix<MRows, MC0 + MC1, Scalar> m;
+    for (size_t i = 0; i < MRows; i++)
+    {
+        auto& v  = m[i];
+        auto& v0 = m0[i];
+        auto& v1 = m1[i];
+
+        for (size_t j = 0; j < MC0; j++)
+        {
+            v[j] = v0[j];
+        }
+
+        for (size_t j = MC0, j1 = 0; j1 < MC1; j++, j1++)
+        {
+            v[j] = v1[j1];
+        }
+    }
+
+    return m;
+}
+
+template<size_t MR0, size_t MR1, size_t MCols, typename Scalar>
+inline Matrix<MR0 + MR1, MCols, Scalar> operator&(const Matrix<MR0, MCols, Scalar>& m0, const Matrix<MR1, MCols, Scalar>& m1)
+{
+    Matrix<MR0 + MR1, MCols, Scalar> m;
+    for (size_t i = 0; i < MR0; i++)
+    {
+        auto& v  = m[i];
+        auto& v0 = m0[i];
+
+        for (size_t j = 0; j < MCols; j++)
+        {
+            v[j] = v0[j];
+        }
+    }
+
+    for (size_t i = MR0, i1 = 0; i1 < MR1; i++, i1++)
+    {
+        auto& v  = m[i];
+        auto& v1 = m1[i1];
+
+        for (size_t j = 0; j < MCols; j++)
+        {
+            v[j] = v1[j];
+        }
+    }
+    return m;
+}
+
 template<size_t MRows, size_t MCols, typename Scalar>
 inline bool operator==(const Matrix<MRows, MCols, Scalar>& m0, const Matrix<MRows, MCols, Scalar>& m1)
 {
