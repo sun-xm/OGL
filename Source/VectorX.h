@@ -693,24 +693,6 @@ inline Vector<Dimensions + 1, Scalar> operator|(Scalar s, const Vector<Dimension
     return result;
 }
 
-template<size_t D0, size_t D1, typename Scalar>
-inline Vector<D0 + D1, Scalar> operator|(const Vector<D0, Scalar>& v0, const Vector<D1, Scalar>& v1)
-{
-    Vector<D0 + D1, Scalar> result;
-
-    for (size_t i = 0; i < D0; i++)
-    {
-        result[i] = v0[i];
-    }
-
-    for (size_t i = 0; i < D1; i++)
-    {
-        result[i + D1] = v1[i];
-    }
-
-    return result;
-}
-
 template<size_t Dimensions>
 inline bool All(const Vector<Dimensions, bool>& booleans)
 {
@@ -1482,6 +1464,47 @@ inline Matrix<MRows, MCols, Scalar>& operator/=(Matrix<MRows, MCols, Scalar>& m,
     return operator*=(m, r);
 }
 
+template<size_t Dimensions, typename Scalar>
+inline Matrix<Dimensions, 2, Scalar> operator|(const Vector<Dimensions, Scalar>& v0, const Vector<Dimensions, Scalar>& v1)
+{
+    Matrix<Dimensions, 2, Scalar> m;
+    for (size_t i = 0; i < Dimensions; i++)
+    {
+        auto& v = m[i];
+        v[0] = v0[i];
+        v[1] = v1[i];
+    }
+    return m;
+}
+
+template<size_t MRows, size_t MCols, typename Scalar>
+inline Matrix<MRows, MCols + 1, Scalar> operator|(const Matrix<MRows, MCols, Scalar>& m, const Vector<MRows, Scalar>& v)
+{
+    Matrix<MRows, MCols + 1, Scalar> result;
+    result.Range(m);
+
+    for (size_t i = 0; i < MRows; i++)
+    {
+        result[i][MCols] = v[i];
+    }
+
+    return result;
+}
+
+template<size_t MRows, size_t MCols, typename Scalar>
+inline Matrix<MRows, MCols + 1, Scalar> operator|(const Vector<MRows, Scalar>& v, const Matrix<MRows, MCols, Scalar>& m)
+{
+    Matrix<MRows, MCols + 1, Scalar> result;
+    result.Range(m, 0, 1);
+
+    for (size_t i = 0; i < MRows; i++)
+    {
+        result[i][0] = v[i];
+    }
+
+    return result;
+}
+
 template<size_t MRows, size_t MC0, size_t MC1, typename Scalar>
 inline Matrix<MRows, MC0 + MC1, Scalar> operator|(const Matrix<MRows, MC0, Scalar>& m0, const Matrix<MRows, MC1, Scalar>& m1)
 {
@@ -1504,6 +1527,45 @@ inline Matrix<MRows, MC0 + MC1, Scalar> operator|(const Matrix<MRows, MC0, Scala
     }
 
     return m;
+}
+
+template<size_t Dimensions, typename Scalar>
+inline Matrix<2, Dimensions, Scalar> operator&(const Vector<Dimensions, Scalar>& v0, const Vector<Dimensions, Scalar>& v1)
+{
+    Matrix<2, Dimensions, Scalar> m;
+    m.SetRow(v0, 0);
+    m.SetRow(v1, 1);
+    return m;
+}
+
+template<size_t MRows, size_t MCols, typename Scalar>
+inline Matrix<MRows + 1, MCols, Scalar> operator&(const Matrix<MRows, MCols, Scalar>& m, const Vector<MCols, Scalar>& v)
+{
+    Matrix<MRows + 1, MCols, Scalar> result;
+    result.Range(m);
+
+    auto& row = result[MRows];
+    for (size_t i = 0; i < MCols; i++)
+    {
+        row[i] = v[i];
+    }
+
+    return result;
+}
+
+template<size_t MRows, size_t MCols, typename Scalar>
+inline Matrix<MRows + 1, MCols, Scalar> operator&(const Vector<MCols, Scalar>& v, const Matrix<MRows, MCols, Scalar>& m)
+{
+    Matrix<MRows + 1, MCols, Scalar> result;
+    result.Range(m, 1, 0);
+
+    auto& row = result[0];
+    for (size_t i = 0; i < MCols; i++)
+    {
+        row[i] = v[i];
+    }
+
+    return result;
 }
 
 template<size_t MR0, size_t MR1, size_t MCols, typename Scalar>
