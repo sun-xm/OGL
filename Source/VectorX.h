@@ -1089,7 +1089,12 @@ struct MatrixBase : MatrixNaN<Matrix, MRows, MCols, Scalar>
         }
     }
 
-    const Vector<MRows * MCols, Scalar>& ToVector() const
+    Vector<MRows * MCols, Scalar>& AsVector()
+    {
+        return *(Vector<MRows * MCols, Scalar>*)this->v[0].s;
+    }
+
+    const Vector<MRows * MCols, Scalar>& AsVector() const
     {
         return *(Vector<MRows * MCols, Scalar>*)this->v[0].s;
     }
