@@ -16,19 +16,19 @@ int main()
 
     auto m3i = Matrix<3, 3, int>::Zero;
     m3i.Range(Matrix<2, 2, int>::Identity, 1, 1);
-    if (Any(m3i.ToVector() != Vector<9, int>{ 0, 0, 0, 0, 1, 0, 0, 0, 1 }))
+    if (Any(m3i.AsVector() != Vector<9, int>{ 0, 0, 0, 0, 1, 0, 0, 0, 1 }))
     {
         return -1;
     }
 
     m3i.SetCol(Vector<3, int>{ 1, 1, 1 }, 1);
-    if (Any(m3i.ToVector() != Vector<9, int>{ 0, 1, 0, 0, 1, 0, 0, 1, 1 }))
+    if (Any(m3i.AsVector() != Vector<9, int>{ 0, 1, 0, 0, 1, 0, 0, 1, 1 }))
     {
         return -1;
     }
 
     m3i.SetRow(Vector<3, int>{ 1, 1, 1 }, 1);
-    if (Any(m3i.ToVector() != Vector<9, int>{ 0, 1, 0, 1, 1, 1, 0, 1, 1 }))
+    if (Any(m3i.AsVector() != Vector<9, int>{ 0, 1, 0, 1, 1, 1, 0, 1, 1 }))
     {
         return -1;
     }

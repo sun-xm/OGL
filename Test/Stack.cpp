@@ -11,7 +11,7 @@ int main(int argc, char* argv[])
         return -1;
     }
 
-    if (Any(m0.ToVector() != Vector<4, int>{ v0[0], v0[1], v1[0], v1[1] }))
+    if (Any(m0.AsVector() != Vector<4, int>{ v0[0], v0[1], v1[0], v1[1] }))
     {
         return -1;
     }
@@ -25,7 +25,7 @@ int main(int argc, char* argv[])
         return -1;
     }
 
-    if (Any(m1.ToVector() != Vector<4, int>{ v0[0], v1[0], v0[1], v1[1] }))
+    if (Any(m1.AsVector() != Vector<4, int>{ v0[0], v1[0], v0[1], v1[1] }))
     {
         return false;
     }
@@ -36,7 +36,7 @@ int main(int argc, char* argv[])
         return -1;
     }
 
-    if (Any(m24.ToVector() != Vector<8, int>{ m0[0][0], m0[0][1], m1[0][0], m1[0][1], m0[1][0], m0[1][1], m1[1][0], m1[1][1] }))
+    if (Any(m24.AsVector() != Vector<8, int>{ m0[0][0], m0[0][1], m1[0][0], m1[0][1], m0[1][0], m0[1][1], m1[1][0], m1[1][1] }))
     {
         return -1;
     }
@@ -47,7 +47,7 @@ int main(int argc, char* argv[])
         return -1;
     }
 
-    if (Any(m42.ToVector() != Vector<8, int>{ m0[0][0], m0[0][1], m0[1][0], m0[1][1], m1[0][0], m1[0][1], m1[1][0], m1[1][1] }))
+    if (Any(m42.AsVector() != Vector<8, int>{ m0[0][0], m0[0][1], m0[1][0], m0[1][1], m1[0][0], m1[0][1], m1[1][0], m1[1][1] }))
     {
         return -1;
     }
@@ -60,13 +60,13 @@ int main(int argc, char* argv[])
         return -1;
     }
 
-    if (Any(m23.ToVector() != Vector<6, int>{ m0[0][0], m0[0][1], v[0], m0[1][0], m0[1][1], v[1] }))
+    if (Any(m23.AsVector() != Vector<6, int>{ m0[0][0], m0[0][1], v[0], m0[1][0], m0[1][1], v[1] }))
     {
         return -1;
     }
 
     m23 = v | m0;
-    if (Any(m23.ToVector() != Vector<6, int>{ v[0], m0[0][0], m0[0][1], v[1], m0[1][0], m0[1][1] }))
+    if (Any(m23.AsVector() != Vector<6, int>{ v[0], m0[0][0], m0[0][1], v[1], m0[1][0], m0[1][1] }))
     {
         return -1;
     }
@@ -77,13 +77,13 @@ int main(int argc, char* argv[])
         return -1;
     }
 
-    if (Any(m32.ToVector() != Vector<6, int>{ m0[0][0], m0[0][1], m0[1][0], m0[1][1], v[0], v[1] }))
+    if (Any(m32.AsVector() != Vector<6, int>{ m0[0][0], m0[0][1], m0[1][0], m0[1][1], v[0], v[1] }))
     {
         return -1;
     }
 
     m32 = v & m0;
-    if (Any(m32.ToVector() != Vector<6, int>{ v[0], v[1], m0[0][0], m0[0][1], m0[1][0], m0[1][1] }))
+    if (Any(m32.AsVector() != Vector<6, int>{ v[0], v[1], m0[0][0], m0[0][1], m0[1][0], m0[1][1] }))
     {
         return -1;
     }
