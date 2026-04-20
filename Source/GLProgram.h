@@ -59,26 +59,6 @@ public:
         }
     }
 
-    bool Link(const GLVShader& vshader, const GLFShader& fshader)
-    {
-        if (!this->Attach(vshader))
-        {
-            return false;
-        }
-
-        if (!this->Attach(fshader))
-        {
-            this->Detach(fshader);
-            return false;
-        }
-
-        auto res = this->Link();
-
-        this->Detach(vshader);
-        this->Detach(fshader);
-
-        return res;
-    }
     bool Link()
     {
         if (!this->program)
@@ -102,6 +82,21 @@ public:
 
         this->log.clear();
         return true;
+    }
+
+    template<typename... Shaders>
+    bool Link(const GLShader& shader, const Shaders&... shaders)
+    {
+        if (!this->Attach(shader))
+        {
+            return false;
+        }
+
+        bool success = sizeof...(shaders) ? this->Link(shaders...) :
+                                            this->Link();
+
+        this->Detach(shader);
+        return success;
     }
 
     bool BindAttrib(const std::string& name, const GLBuffer& buffer, GLint size, GLenum type, GLboolean normalized = GL_FALSE, GLsizei stride = 0, const void* pointer = 0)
