@@ -4,6 +4,7 @@
 #include "GLBuffer.h"
 #include "GLShader.h"
 #include "GLTexture.h"
+#include "GLVertexArray.h"
 
 class GLProgram
 {
@@ -99,7 +100,7 @@ public:
         return success;
     }
 
-    bool BindAttrib(const std::string& name, const GLBuffer& buffer, GLint size, GLenum type, GLboolean normalized = GL_FALSE, GLsizei stride = 0, const void* pointer = 0)
+    bool BindAttrib(const std::string& name, const GLBuffer& buffer, size_t count, GLenum type, GLboolean normalized = GL_FALSE)
     {
         auto loc = this->GetAttribLocation(name);
         if (loc < 0)
@@ -113,7 +114,33 @@ public:
         }
         buffer.Bind();
 
-        glVertexAttribPointer(loc, size, type, normalized, stride, pointer);
+        glVertexAttribPointer(loc, (GLint)count, type, normalized, 0, 0);
+        glEnableVertexAttribArray(loc);
+
+        auto err = glGetError();
+        return GL_NO_ERROR == err;
+    }
+    bool BindAttrib(const std::string& name, const GLVertexArray& array, const GLBuffer& buffer, size_t count, GLenum type, size_t stride, size_t offset, GLboolean normalized = GL_FALSE)
+    {
+        auto loc = this->GetAttribLocation(name);
+        if (loc < 0)
+        {
+            return false;
+        }
+
+        if (!array)
+        {
+            return false;
+        }
+        array.Bind();
+
+        if (!buffer)
+        {
+            return false;
+        }
+        buffer.Bind();
+
+        glVertexAttribPointer(loc, (GLint)count, type, normalized, (GLsizei)stride, (const void*)offset);
         glEnableVertexAttribArray(loc);
 
         auto err = glGetError();
