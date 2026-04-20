@@ -16,5 +16,6 @@ public:
     void Render(GLProgram& program, const Vertex& lightPos);
 
 protected:
-    GLBuffer  vbo, nbo, cbo;
+    GLBuffer vbo, nbo, cbo;
+    GLVertexArray vao;
 };

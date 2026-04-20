@@ -102,16 +102,18 @@ public:
 
     bool BindAttrib(const std::string& name, const GLBuffer& buffer, size_t count, GLenum type, GLboolean normalized = GL_FALSE)
     {
+        if (!buffer)
+        {
+            return false;
+        }
+
         auto loc = this->GetAttribLocation(name);
         if (loc < 0)
         {
             return false;
         }
 
-        if (!buffer)
-        {
-            return false;
-        }
+        glBindVertexArray(0);
         buffer.Bind();
 
         glVertexAttribPointer(loc, (GLint)count, type, normalized, 0, 0);
@@ -120,24 +122,20 @@ public:
         auto err = glGetError();
         return GL_NO_ERROR == err;
     }
-    bool BindAttrib(const std::string& name, const GLVertexArray& array, const GLBuffer& buffer, size_t count, GLenum type, size_t stride, size_t offset, GLboolean normalized = GL_FALSE)
+    bool BindAttrib(const std::string& name, const GLVertexArray& array, const GLBuffer& buffer, size_t count, GLenum type, size_t stride = 0, size_t offset = 0, GLboolean normalized = GL_FALSE)
     {
+        if (!array || !buffer)
+        {
+            return false;
+        }
+
         auto loc = this->GetAttribLocation(name);
         if (loc < 0)
         {
             return false;
         }
 
-        if (!array)
-        {
-            return false;
-        }
         array.Bind();
-
-        if (!buffer)
-        {
-            return false;
-        }
         buffer.Bind();
 
         glVertexAttribPointer(loc, (GLint)count, type, normalized, (GLsizei)stride, (const void*)offset);

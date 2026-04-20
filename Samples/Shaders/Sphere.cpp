@@ -16,6 +16,8 @@ Sphere::Sphere()
 
 void Sphere::Create()
 {
+    this->vao.Create();
+
     vector<Vertex> vertices;
 
     Vertex v0 = { RADIUS, 0, 0 };
@@ -48,6 +50,7 @@ void Sphere::Create()
 
 void Sphere::Release()
 {
+    this->vao.Release();
     this->vbo.Release();
     this->nbo.Release();
     this->cbo.Release();
@@ -70,11 +73,11 @@ bool Sphere::Colors(const Vector<3>* colors, int count)
 
 void Sphere::Render(GLProgram& program, const Vertex& lightPos)
 {
-    program.UniformM4f("ModelView",  Transform3D<>::Shift(this->Position) * Quaternion<>::FromRotation(this->Rotation).ToMatrix());
+    program.BindAttrib("vtx", this->vao, this->vbo, 3, GL_FLOAT);
+    program.BindAttrib("clr", this->vao, this->cbo, 3, GL_FLOAT);
+    program.BindAttrib("nml", this->vao, this->nbo, 3, GL_FLOAT);
 
-    program.BindAttrib("vtx", this->vbo, 3, GL_FLOAT);
-    program.BindAttrib("clr", this->cbo, 3, GL_FLOAT);
-    program.BindAttrib("nml", this->nbo, 3, GL_FLOAT);
+    program.UniformM4f("ModelView",  Transform3D<>::Shift(this->Position) * Quaternion<>::FromRotation(this->Rotation).ToMatrix());
 
     glDrawArrays(GL_TRIANGLES, 0, this->vbo.Size() / sizeof(Vertex));
 }

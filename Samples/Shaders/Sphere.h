@@ -20,5 +20,6 @@ private:
     static void Split(uint32_t level, const Vertex& v0, const Vertex& v1, const Vertex& v2, std::vector<Vertex>& vertices);
 
     GLBuffer vbo, nbo, cbo;
+    GLVertexArray vao;
     vx::Vector<3> lightPos;
 };
