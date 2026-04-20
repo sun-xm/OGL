@@ -140,6 +140,11 @@ void GLRenderer::Triangles(const Coordinate* coordinates, size_t count, const Ve
         vertices[i] = Vertex{ c.X, -c.Y, 1 };
     }
 
+    GLVertexArray vao;
+    vao.Create();
+    vao.Bind();
+    ONCLEANUP(vao, [&]{ vao.Release(); });
+
     GLBuffer vbo;
     ONCLEANUP(vbo, [&]{ vbo.Release(); });
 

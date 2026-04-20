@@ -17,6 +17,7 @@ protected:
     void paintGL() override;
 
 private:
+    GLVertexArray vao;
     GLBuffer vbo, tbo;
     GLTexture tex;
     GLProgram program;

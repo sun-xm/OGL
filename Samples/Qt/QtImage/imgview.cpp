@@ -10,6 +10,7 @@ ImgView::ImgView(QWidget* parent) : QOpenGLWidget(parent)
 ImgView::~ImgView()
 {
     this->makeCurrent();
+    this->vao.Release();
     this->vbo.Release();
     this->tbo.Release();
     this->tex.Release();
@@ -98,6 +99,8 @@ void ImgView::initializeGL()
         return;
     }
 
+    this->vao.Create();
+
     QOpenGLWidget::initializeGL();
 }
 
@@ -122,6 +125,8 @@ void ImgView::paintGL()
     auto x = this->size().width()  - (int)this->tex.Width();
     auto y = this->size().height() - (int)this->tex.Height();
     auto t = Transform2D<>::Shift(x * 0.5f, -y * 0.5f);
+
+    this->vao.Bind();
 
     this->program.Use();
     this->program.BindAttrib("vtx", this->vbo, 3, GL_FLOAT);

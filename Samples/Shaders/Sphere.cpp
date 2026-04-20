@@ -73,9 +73,10 @@ bool Sphere::Colors(const Vector<3>* colors, int count)
 
 void Sphere::Render(GLProgram& program, const Vertex& lightPos)
 {
-    program.BindAttrib("vtx", this->vao, this->vbo, 3, GL_FLOAT);
-    program.BindAttrib("clr", this->vao, this->cbo, 3, GL_FLOAT);
-    program.BindAttrib("nml", this->vao, this->nbo, 3, GL_FLOAT);
+    this->vao.Bind();
+    program.BindAttrib("vtx", this->vbo, 3, GL_FLOAT);
+    program.BindAttrib("clr", this->cbo, 3, GL_FLOAT);
+    program.BindAttrib("nml", this->nbo, 3, GL_FLOAT);
 
     program.UniformM4f("ModelView",  Transform3D<>::Shift(this->Position) * Quaternion<>::FromRotation(this->Rotation).ToMatrix());
 
