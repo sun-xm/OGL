@@ -7,7 +7,7 @@ class GLBuffer
 public:
     GLBuffer(GLenum target = GL_ARRAY_BUFFER) : buffer(0), target(target) {}
     GLBuffer(const GLBuffer& other) = delete;
-    virtual ~GLBuffer() {}
+    virtual ~GLBuffer() { this->Release(); }
 
     bool Create()
     {
@@ -72,11 +72,6 @@ public:
     }
     bool Copy(const GLBuffer& other, GLenum usage = 0)
     {
-        if (this->target != other.target)
-        {
-            return false;
-        }
-
         if (!other)
         {
             return false;
@@ -99,6 +94,19 @@ public:
         glBindBuffer(GL_COPY_READ_BUFFER,  other.buffer);
         glBindBuffer(GL_COPY_WRITE_BUFFER, this->buffer);
         glCopyBufferSubData(GL_COPY_READ_BUFFER, GL_COPY_WRITE_BUFFER, 0, 0, size);
+
+        auto err = glGetError();
+        return GL_NO_ERROR == err;
+    }
+    bool Read(void* data, GLsizeiptr size, GLintptr offset = 0)
+    {
+        if (!this->buffer)
+        {
+            return false;
+        }
+
+        this->Bind();
+        glGetBufferSubData(this->target, offset, size, data);
 
         auto err = glGetError();
         return GL_NO_ERROR == err;

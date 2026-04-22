@@ -1,6 +1,7 @@
 #include "GLWindow.h"
-#include "GLScene.h"
+#include "GLProgram.h"
 #include "GLCloud.h"
+#include "GLScene.h"
 
 class ViewPort : public GLWindow
 {
@@ -14,10 +15,13 @@ protected:
     void OnPaint() override;
 
 private:
-    void LoadCloud();
+    bool LoadCloud();
 
 private:
     POINT   cursor;
     GLScene scene;
     GLCloud cloud;
+
+    GLProgram center;
+    GLProgram shift;
 };

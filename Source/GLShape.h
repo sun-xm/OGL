@@ -44,7 +44,15 @@ public:
     {
         return this->ebo;
     }
+    GLElmBuf& Elements()
+    {
+        return this->ebo;
+    }
     const GLBuffer& Vertices() const
+    {
+        return this->vbo;
+    }
+    GLBuffer& Vertices()
     {
         return this->vbo;
     }
@@ -52,11 +60,23 @@ public:
     {
         return this->nbo;
     }
+    GLBuffer& Normals()
+    {
+        return this->nbo;
+    }
     const GLBuffer& Colors() const
     {
         return this->cbo;
     }
+    GLBuffer& Colors()
+    {
+        return this->cbo;
+    }
     const GLBuffer& TexCoords() const
+    {
+        return this->nbo;
+    }
+    GLBuffer& TexCoords()
     {
         return this->nbo;
     }

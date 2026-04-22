@@ -11,7 +11,7 @@ class GLShader
 public:
     GLShader(GLenum type) : shader(0), type(type) {}
     GLShader(const GLShader&) = delete;
-    virtual ~GLShader() {}
+    virtual ~GLShader() { this->Release(); }
 
     bool Create()
     {
@@ -119,4 +119,10 @@ class GLFShader : public GLShader
 {
 public:
     GLFShader() : GLShader(GL_FRAGMENT_SHADER) {}
+};
+
+class GLCShader : public GLShader
+{
+public:
+    GLCShader() : GLShader(GL_COMPUTE_SHADER) {}
 };

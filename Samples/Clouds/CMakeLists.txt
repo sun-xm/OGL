@@ -17,6 +17,10 @@ add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
                    "${CMAKE_CURRENT_LIST_DIR}/cloud.txt"
                    "${CMAKE_CURRENT_BINARY_DIR}/$<CONFIG>/")
 
+add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+                   COMMAND ${CMAKE_COMMAND} -E copy_if_different "${CMAKE_CURRENT_LIST_DIR}/GLSL/center.glsl" "${CMAKE_CURRENT_BINARY_DIR}/$<CONFIG>/"
+                   COMMAND ${CMAKE_COMMAND} -E copy_if_different "${CMAKE_CURRENT_LIST_DIR}/GLSL/shift.glsl"  "${CMAKE_CURRENT_BINARY_DIR}/$<CONFIG>/")
+
 if(GLEW_SHARED)
     add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
                        COMMAND ${CMAKE_COMMAND} -E copy_if_different

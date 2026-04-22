@@ -52,6 +52,7 @@ public:
         auto err = glGetError();
         return GL_NO_ERROR == err;
     }
+
     void Detach(const GLShader& shader)
     {
         if (this->program)
@@ -121,6 +122,7 @@ public:
         auto err = glGetError();
         return GL_NO_ERROR == err;
     }
+
     void UnbindAttrib(const std::string& name)
     {
         auto loc = this->GetAttribLocation(name);
@@ -132,17 +134,71 @@ public:
         glDisableVertexAttribArray(loc);
     }
 
-    bool  BindAttribLocation(GLuint index, const std::string& name)
+    bool BindAttribLocation(GLuint index, const std::string& name)
     {
         glBindAttribLocation(this->program, index, name.c_str());
 
         auto err = glGetError();
         return GL_NO_ERROR == err;
     }
-    GLint GetAttribLocation(const std::string& name)
+
+    bool BindBuffer(const std::string& name, const GLBuffer& buffer)
     {
-        return glGetAttribLocation(this->program, name.c_str());
+        if (GL_SHADER_STORAGE_BUFFER != buffer.Target())
+        {
+            return false;
+        }
+
+        auto binding = GetBufferBinding(name);
+        if (binding < 0)
+        {
+            return false;
+        }
+
+        glBindBufferBase(buffer.Target(), binding, buffer);
+
+        auto err = glGetError();
+        return GL_NO_ERROR == err;
     }
+
+    bool BindUniformAtomic(const std::string& name, const GLBuffer& buffer)
+    {
+        if (GL_ATOMIC_COUNTER_BUFFER != buffer.Target())
+        {
+            return false;
+        }
+
+        auto binding = GetUniformAtomicBinding(name);
+        if (binding < 0)
+        {
+            return false;
+        }
+
+        glBindBufferBase(GL_ATOMIC_COUNTER_BUFFER, binding, buffer);
+
+        auto err = glGetError();
+        return GL_NO_ERROR == err;
+    }
+
+    bool BindUniformBlock(const std::string& name, const GLBuffer& buffer)
+    {
+        if (GL_UNIFORM_BUFFER != buffer.Target())
+        {
+            return false;
+        }
+
+        auto binding = GetUniformBlockBinding(name);
+        if (binding < 0)
+        {
+            return false;
+        }
+
+        glBindBufferBase(GL_UNIFORM_BUFFER, binding, buffer);
+
+        auto err = glGetError();
+        return GL_NO_ERROR == err;
+    }
+
     bool  BindFragDataLocation(GLuint index, const std::string& name)
     {
         glBindFragDataLocation(this->program, index, name.c_str());
@@ -150,6 +206,7 @@ public:
         auto err = glGetError();
         return GL_NO_ERROR == err;
     }
+
     GLint GetFragDataLocation(const std::string& name)
     {
         return glGetFragDataLocation(this->program, name.c_str());
@@ -157,7 +214,7 @@ public:
 
     bool UniformInt(const std::string& name, int value)
     {
-        auto loc = this->UniformLocation(name);
+        auto loc = this->GetUniformLocation(name);
         if (loc < 0)
         {
             return false;
@@ -168,9 +225,10 @@ public:
         auto err = glGetError();
         return GL_NO_ERROR == err;
     }
+
     bool UniformFlt(const std::string& name, float value)
     {
-        auto loc = this->UniformLocation(name);
+        auto loc = this->GetUniformLocation(name);
         if (loc < 0)
         {
             return false;
@@ -181,9 +239,10 @@ public:
         auto err = glGetError();
         return GL_NO_ERROR == err;
     }
+
     bool UniformV2f(const std::string& name, const vx::Vector<2>& value)
     {
-        auto loc = this->UniformLocation(name);
+        auto loc = this->GetUniformLocation(name);
         if (loc < 0)
         {
             return false;
@@ -194,9 +253,10 @@ public:
         auto err = glGetError();
         return GL_NO_ERROR == err;
     }
+
     bool UniformV3f(const std::string& name, const vx::Vector<3>& value)
     {
-        auto loc = this->UniformLocation(name);
+        auto loc = this->GetUniformLocation(name);
         if (loc < 0)
         {
             return false;
@@ -207,9 +267,10 @@ public:
         auto err = glGetError();
         return GL_NO_ERROR == err;
     }
+
     bool UniformM3f(const std::string& name, const vx::Matrix<3>& value, bool transpose = true)
     {
-        auto loc = this->UniformLocation(name);
+        auto loc = this->GetUniformLocation(name);
         if (loc < 0)
         {
             return false;
@@ -220,9 +281,10 @@ public:
         auto err = glGetError();
         return GL_NO_ERROR == err;
     }
+
     bool UniformV4f(const std::string& name, const vx::Vector<4>& value)
     {
-        auto loc = this->UniformLocation(name);
+        auto loc = this->GetUniformLocation(name);
         if (loc < 0)
         {
             return false;
@@ -233,9 +295,10 @@ public:
         auto err = glGetError();
         return GL_NO_ERROR == err;
     }
+
     bool UniformM4f(const std::string& name, const vx::Matrix<4>& value, bool transpose = true)
     {
-        auto loc = this->UniformLocation(name);
+        auto loc = this->GetUniformLocation(name);
         if (loc < 0)
         {
             return false;
@@ -246,9 +309,10 @@ public:
         auto err = glGetError();
         return GL_NO_ERROR == err;
     }
+
     bool UniformTex(const std::string& name, const GLTexture& texture, uint32_t index)
     {
-        auto loc = this->UniformLocation(name);
+        auto loc = this->GetUniformLocation(name);
         if (loc < 0)
         {
             return false;
@@ -271,6 +335,7 @@ public:
     {
         return !!this->program;
     }
+
     operator GLuint() const
     {
         return this->program;
@@ -279,7 +344,59 @@ public:
     GLProgram& operator=(const GLProgram& other) = delete;
 
 private:
-    GLint UniformLocation(const std::string& name)
+
+    GLint GetAttribLocation(const std::string& name)
+    {
+        return glGetAttribLocation(this->program, name.c_str());
+    }
+
+    GLint GetBufferBinding(const std::string& name)
+    {
+        static const GLenum prop = GL_BUFFER_BINDING;
+
+        auto block = glGetProgramResourceIndex(this->program, GL_SHADER_STORAGE_BLOCK, name.c_str());
+        if (GL_INVALID_INDEX == block)
+        {
+            return -1;
+        }
+
+        GLint binding = -1;
+        glGetProgramResourceiv(this->program, GL_SHADER_STORAGE_BLOCK, block, 1, &prop, 1, nullptr, &binding);
+        return binding;
+    }
+
+    GLint GetUniformAtomicBinding(const std::string& name)
+    {
+        static const GLenum prop = GL_ATOMIC_COUNTER_BUFFER_INDEX;
+
+        auto index = glGetProgramResourceIndex(this->program, GL_UNIFORM, name.c_str());
+        if (GL_INVALID_INDEX == index)
+        {
+            return -1;
+        }
+
+        GLint atomic;
+        glGetProgramResourceiv(this->program, GL_UNIFORM, index, 1, &prop, 1, nullptr, &atomic);
+
+        GLint binding = -1;
+        glGetActiveAtomicCounterBufferiv(this->program, atomic, GL_ATOMIC_COUNTER_BUFFER_BINDING, &binding);
+        return binding;
+    }
+
+    GLint GetUniformBlockBinding(const std::string& name)
+    {
+        auto index = glGetUniformBlockIndex(this->program, name.c_str());
+        if (GL_INVALID_INDEX == index)
+        {
+            return -1;
+        }
+
+        GLint binding = -1;
+        glGetActiveUniformBlockiv(this->program, index, GL_UNIFORM_BLOCK_BINDING, &binding);
+        return binding;
+    }
+
+    GLint GetUniformLocation(const std::string& name)
     {
         if (!this->program)
         {
