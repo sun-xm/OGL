@@ -278,7 +278,7 @@ inline std::istream& operator>>(std::istream& is, Vector<Dimensions, Scalar>& v)
 
         default:
         {
-            is.setstate(ios::failbit);
+            is.setstate(std::ios::failbit);
             return is;
         }
     }
@@ -292,7 +292,7 @@ inline std::istream& operator>>(std::istream& is, Vector<Dimensions, Scalar>& v)
             char c = VXNS::details::read(is);
             if (',' != c)
             {
-                is.setstate(ios::failbit);
+                is.setstate(std::ios::failbit);
                 return is;
             }
             is >> v.s[i];
@@ -301,7 +301,7 @@ inline std::istream& operator>>(std::istream& is, Vector<Dimensions, Scalar>& v)
 
     if (closing != VXNS::details::read(is))
     {
-        is.setstate(ios::failbit);
+        is.setstate(std::ios::failbit);
     }
 
     return is;
@@ -340,7 +340,7 @@ inline std::istream& operator>>(std::istream& is, Matrix<MRows, MCols, Scalar>& 
 
         default:
         {
-            is.setstate(ios::failbit);
+            is.setstate(std::ios::failbit);
             return is;
         }
     }
@@ -354,7 +354,7 @@ inline std::istream& operator>>(std::istream& is, Matrix<MRows, MCols, Scalar>& 
             char c = VXNS::details::read(is);
             if (',' != c)
             {
-                is.setstate(ios::failbit);
+                is.setstate(std::ios::failbit);
                 return is;
             }
             is >> m.v[i];
@@ -363,7 +363,7 @@ inline std::istream& operator>>(std::istream& is, Matrix<MRows, MCols, Scalar>& 
 
     if (closing != VXNS::details::read(is))
     {
-        is.setstate(ios::failbit);
+        is.setstate(std::ios::failbit);
     }
 
     return is;
